@@ -11,9 +11,11 @@ module EffectiveTestBot
     end
 
     initializer "effective_test_bot.after_initialization", :after => :after_initialize do |app|
-      puts "AFTER INITIALISE"
-      Rails.logger.info "AFTER INITAIZELR LOGGER"
-      EffectiveTestBot::Command.new().start
+      Process.detach(
+        fork do
+          EffectiveTestBot::Command.new(@options).start
+        end
+      )
     end
 
   end

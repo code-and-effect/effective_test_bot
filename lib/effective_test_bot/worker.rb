@@ -13,14 +13,13 @@ module EffectiveTestBot
         Thread.new { say 'Exiting...' } and stop
       end
 
-      say 'Starting EffectiveTestBot'
+      say "Starting..."
 
       count = 10
 
       loop do
         # Run each recipe
-        say "This is a command"
-        say User.count
+        say "This is a command: #{User.count}"
         sleep(1)
         break if stop?
 
@@ -28,6 +27,8 @@ module EffectiveTestBot
 
         break if count <= 0
       end
+
+      SiteMailer.test_bot_works().deliver
     end
 
     def stop
@@ -39,8 +40,8 @@ module EffectiveTestBot
     end
 
     def say(content)
-      puts content
-      Rails.logger.info content
+      puts "[EffectiveTestBot #{Process.pid}] #{content}"
+      Rails.logger.info "[EffectiveTestBotLogger #{Process.pid}] #{content}"
     end
 
   end
