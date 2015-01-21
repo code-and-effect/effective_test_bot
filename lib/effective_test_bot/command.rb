@@ -14,7 +14,7 @@ module EffectiveTestBot
       puts "EffectiveTestBot started with parent process #{Process.argv0}"
 
       # Only run the EffectiveTestBot if we are running as a server
-      if ['rails', 'ruby_executable_hooks'].none? { |cmd| Process.argv0.end_with?(cmd) }
+      if ['rails', 'ruby_executable_hooks', 'unicorn'].none? { |cmd| Process.argv0.end_with?(cmd) }
         puts 'EffectiveTestBot skipping run.  Exitting.'
         exit 1
       end
