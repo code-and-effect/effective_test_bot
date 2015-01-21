@@ -15,7 +15,7 @@ module EffectiveTestBot
 
       say "Starting..."
 
-      count = 10
+      count = 1
 
       loop do
         # Run each recipe
@@ -28,7 +28,7 @@ module EffectiveTestBot
         break if count <= 0
       end
 
-      SiteMailer.test_bot_works().deliver
+      #Effective::TestBotMailer.hello_world().deliver
     end
 
     def stop

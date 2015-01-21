@@ -10,12 +10,18 @@ module EffectiveTestBot
     def start
       Dir.mkdir(@options[:pid_dir]) unless File.exists?(@options[:pid_dir])
 
-      # Also check how this process was called.  Don't run on delayed_job kind athing
-      puts "EffectiveTestBot started with parent process #{Process.argv0}"
+      puts "EffectiveTestBot started with #{Process.argv0}"
+
+      puts "DEFINED? #{defined?(Rails::Console)}"
+
+      if defined?(Rails::Console)
+        puts 'EffectiveTestBot skipping run.  Process is not a server.'
+        exit 1
+      end
 
       # Only run the EffectiveTestBot if we are running as a server
       if ['rails', 'ruby_executable_hooks', 'unicorn'].none? { |cmd| Process.argv0.end_with?(cmd) }
-        puts 'EffectiveTestBot skipping run.  Exitting.'
+        puts "EffectiveTestBot skipping run.  Process argv0 not in whitelist.  Started with #{Process.argv0}"
         exit 1
       end
 
@@ -23,7 +29,7 @@ module EffectiveTestBot
       mutex = file.flock(File::LOCK_EX|File::LOCK_NB)
 
       if mutex == false
-        puts "EffectiveTestBot already run.  Exitting."
+        puts "EffectiveTestBot skipping run.  Already run.  Unable to get exclusive lock on #{@options[:pid_file]}"
         exit 1
       end
 
