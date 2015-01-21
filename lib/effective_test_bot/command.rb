@@ -12,15 +12,13 @@ module EffectiveTestBot
 
       puts "EffectiveTestBot started with #{Process.argv0}"
 
-      puts "DEFINED? #{defined?(Rails::Console)}"
-
       if defined?(Rails::Console)
         puts 'EffectiveTestBot skipping run.  Process is not a server.'
         exit 1
       end
 
       # Only run the EffectiveTestBot if we are running as a server
-      if ['rails', 'ruby_executable_hooks', 'unicorn'].none? { |cmd| Process.argv0.end_with?(cmd) }
+      if ['rails', 'ruby_executable_hooks', 'unicorn', 'passenger', 'thin'].none? { |cmd| Process.argv0.end_with?(cmd) }
         puts "EffectiveTestBot skipping run.  Process argv0 not in whitelist.  Started with #{Process.argv0}"
         exit 1
       end

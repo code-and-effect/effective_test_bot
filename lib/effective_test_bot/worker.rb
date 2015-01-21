@@ -41,7 +41,6 @@ module EffectiveTestBot
 
     def say(content)
       puts "[EffectiveTestBot #{Process.pid}] #{content}"
-      Rails.logger.info "[EffectiveTestBotLogger #{Process.pid}] #{content}"
     end
 
   end
