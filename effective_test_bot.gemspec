@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.email       = ["info@codeandeffect.com"]
   s.authors     = ["Code and Effect"]
   s.homepage    = "https://github.com/code-and-effect/effective_test_bot"
-  s.summary     = ""
-  s.description = ""
+  s.summary     = "A shared library of rails model & capybara-based feature tests that should pass in every Rails application."
+  s.description = "A shared library of rails model & capybara-based feature tests that should pass in every Rails application."
   s.licenses    = ['MIT']
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
