@@ -18,7 +18,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 RSpec.configure do |config|
-  config.files_or_directories_to_run = config.instance_variable_get(:@files_or_directories_to_run) + ['../effective_test_bot/spec']
+  config.files_or_directories_to_run = ['spec', '../effective_test_bot/spec']
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
