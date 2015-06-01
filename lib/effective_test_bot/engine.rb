@@ -9,14 +9,5 @@ module EffectiveTestBot
       # Set up our defaults, as per our initializer template
       eval File.read("#{config.root}/lib/generators/templates/effective_test_bot.rb")
     end
-
-    initializer "effective_test_bot.after_initialization", :after => :after_initialize do |app|
-      Process.detach(
-        fork do
-          EffectiveTestBot::Command.new(@options).start
-        end
-      )
-    end
-
   end
 end
