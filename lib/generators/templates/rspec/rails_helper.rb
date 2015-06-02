@@ -4,7 +4,14 @@ require 'spec_helper'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 
+require 'capybara/rspec'
+require 'capybara/webkit'
+require 'capybara-screenshot/rspec'
+
+Capybara.default_driver = :webkit
 Capybara.javascript_driver = :webkit
+Capybara::Screenshot.prune_strategy = :keep_last_run
+Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
