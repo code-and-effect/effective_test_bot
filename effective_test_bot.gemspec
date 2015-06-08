@@ -14,8 +14,7 @@ Gem::Specification.new do |s|
   s.description = "A shared library of rails model & capybara-based feature tests that should pass in every Rails application."
   s.licenses    = ['MIT']
 
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
-  s.test_files = Dir["spec/**/*"]
+  s.files = Dir["{app,config,db,lib,spec,test}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
 
   s.add_dependency 'rails'
   s.add_dependency 'minitest'
