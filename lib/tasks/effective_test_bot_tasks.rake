@@ -27,6 +27,9 @@ namespace :test do
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
     puts "Read effective_test_bot rake task!"
 
+    puts "#{File.dirname(__FILE__)}/../../test/**/*_test.rb"
+    puts FileList["#{File.dirname(__FILE__)}/../../test/**/*_test.rb"]
+
     t.libs << 'test'
     t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/**/*_test.rb"]
   end
