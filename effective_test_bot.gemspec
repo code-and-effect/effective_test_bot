@@ -18,12 +18,19 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency 'rails'
-  s.add_dependency 'rspec-rails'
+  s.add_dependency 'minitest'
+  s.add_dependency 'minitest-rails'
+  s.add_dependency 'minitest-capybara'
+  s.add_dependency 'minitest-rails-capybara'
   s.add_dependency 'capybara'
   s.add_dependency 'capybara-webkit'
   s.add_dependency 'capybara-screenshot'
-  s.add_dependency 'shoulda-matchers'
-  s.add_dependency 'guard'
-  s.add_dependency 'guard-livereload'
-  s.add_dependency 'guard-rspec'
+  s.add_dependency 'shoulda'
+
+  # s.add_dependency 'rspec-rails'
+  # s.add_dependency 'capybara'
+  # s.add_dependency 'shoulda-matchers'
+  # s.add_dependency 'guard'
+  # s.add_dependency 'guard-livereload'
+  # s.add_dependency 'guard-rspec'
 end
