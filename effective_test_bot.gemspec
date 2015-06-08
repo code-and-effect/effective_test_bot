@@ -21,10 +21,12 @@ Gem::Specification.new do |s|
   s.add_dependency 'minitest-rails'
   s.add_dependency 'minitest-capybara'
   s.add_dependency 'minitest-rails-capybara'
+  s.add_dependency 'minitest-reporters'
   s.add_dependency 'capybara'
   s.add_dependency 'capybara-webkit'
   s.add_dependency 'capybara-screenshot'
   s.add_dependency 'shoulda'
+  s.add_dependency 'shoulda-matchers' #, '~> 2.6'
 
   # s.add_dependency 'rspec-rails'
   # s.add_dependency 'capybara'

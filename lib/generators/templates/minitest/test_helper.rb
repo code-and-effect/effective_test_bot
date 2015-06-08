@@ -1,9 +1,13 @@
-ENV["RAILS_ENV"] = "test"
+ENV['RAILS_ENV'] = 'test'
 require File.expand_path("../../config/environment", __FILE__)
-require "rails/test_help"
-require "minitest/rails"
-require "minitest/rails/capybara"
-require "minitest/pride"
+require 'rails/test_help'
+require 'minitest/rails'
+require 'minitest/rails/capybara'
+require 'minitest/pride'
+require 'minitest/reporters'
+
+require 'shoulda-matchers'
+require 'shoulda'
 
 require 'capybara/webkit'
 require 'capybara-screenshot/minitest'
@@ -27,3 +31,4 @@ Capybara::Screenshot.autosave_on_failure = true
 Capybara::Screenshot.prune_strategy = :keep_last_run
 Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
 
+#Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
