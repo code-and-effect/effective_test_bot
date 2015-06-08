@@ -11,7 +11,7 @@ if defined?(Devise) && defined?(User)
       User.new()
     end
 
-    test "User fails validation when password and confirmation mismatch" do
+    test "user fails validation when password and confirmation mismatch" do
       user.password = '123456789'
       user.password_confirmation = '987654321'
 
