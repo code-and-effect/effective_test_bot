@@ -31,4 +31,20 @@ Capybara::Screenshot.autosave_on_failure = true
 Capybara::Screenshot.prune_strategy = :keep_last_run
 Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
 
+Rake::Task['db:seed'].invoke
+
 #Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
+
+
+
+# # Make all database transactions use the same thread
+# class ActiveRecord::Base
+#   mattr_accessor :shared_connection
+#   @@shared_connection = nil
+
+#   def self.connection
+#     @@shared_connection || retrieve_connection
+#   end
+# end
+
+# ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection

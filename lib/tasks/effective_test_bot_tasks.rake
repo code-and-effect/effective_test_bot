@@ -29,3 +29,8 @@ namespace :test do
     t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/**/*_test.rb"]
   end
 end
+
+# Rake::Task['db:fixtures:load'].enhance do
+#   Rake::Task['db:seed'].invoke
+# end
+

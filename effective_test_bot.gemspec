@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'capybara-screenshot'
   s.add_dependency 'shoulda'
   s.add_dependency 'shoulda-matchers' #, '~> 2.6'
+  s.add_dependency 'faker'
 
   # s.add_dependency 'rspec-rails'
   # s.add_dependency 'capybara'

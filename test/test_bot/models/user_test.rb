@@ -13,7 +13,7 @@ if defined?(Devise) && defined?(User)
         user.password = '123456789'
         user.password_confirmation = '987654321'
 
-        refute user.valid?, 'user should be invalid'
+        refute user.valid?, 'user should be invalid with mismatched passwords'
       end
     end
   end

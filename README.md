@@ -84,3 +84,4 @@ rake spec
 5. Bonus points for test coverage
 6. Create new Pull Request
 
+#page.save_screenshot('sign-in-test-1.png')
