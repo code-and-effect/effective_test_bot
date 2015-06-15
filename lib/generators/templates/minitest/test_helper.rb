@@ -23,6 +23,7 @@ class ActionDispatch::IntegrationTest
   include Capybara::DSL
   include Capybara::Assertions
   include Capybara::Screenshot::MiniTestPlugin
+  include Warden::Test::Helpers if defined?(Devise)
 end
 
 Capybara.default_driver = :webkit
