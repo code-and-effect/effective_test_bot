@@ -88,8 +88,9 @@ module EffectiveTestBotHelper
     when 'input_password'
       Faker::Internet.password
     when 'input_tel'
-      dig = (1..9).to_a
-      "#{dig.sample}#{dig.sample}#{dig.sample}-#{dig.sample}#{dig.sample}#{dig.sample}-#{dig.sample}#{dig.sample}#{dig.sample}#{dig.sample}"
+      digits = ('1'..'9').to_a
+      d = 10.times.map { digits.sample }
+      d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
     when 'input_text'
       classes = field['class'].to_s.split(' ')
 
@@ -107,13 +108,13 @@ module EffectiveTestBotHelper
         Faker::Lorem.word
       end
     when 'select'
-      if fill_value.present? # It might be a value or a label
+      if fill_value.present? # accept a value or label
         field.all('option').each do |option|
           return option.text if option.text == fill_value || option.value.to_s == fill_value.to_s
         end
       end
 
-      field.all('option').select { |option| option.value.present? }.sample.try(:text) || ''
+      field.all('option').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
     when 'textarea'
       Faker::Lorem.sentence
     when 'input_checkbox'
