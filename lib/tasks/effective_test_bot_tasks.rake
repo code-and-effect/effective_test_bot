@@ -9,7 +9,10 @@ namespace :test do
 
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
     t.libs << 'test'
-    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/**/*_test.rb"]
+    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/**/*_test.rb"].exclude("#{File.dirname(__FILE__)}/../../test/**/external/*_test.rb")
   end
+
+
+
 end
 
