@@ -34,19 +34,8 @@ class ActionDispatch::IntegrationTest
   def teardown
     Capybara.reset_sessions!
   end
-
 end
 
-# Make all database transactions use the same thread, otherwise signing up in capybara won't get rolled back
-class ActiveRecord::Base
-  mattr_accessor :shared_connection
-  @@shared_connection = nil
-
-  def self.connection
-    @@shared_connection || retrieve_connection
-  end
-end
-ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
 
 Capybara.default_driver = :webkit
 Capybara.javascript_driver = :webkit
@@ -71,3 +60,14 @@ Rake::Task['db:schema:load'].invoke
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke
 
+# Make all database transactions use the same thread, otherwise signing up in capybara won't get rolled back
+# This must be run after the Rake::Tasks above
+class ActiveRecord::Base
+  mattr_accessor :shared_connection
+  @@shared_connection = nil
+
+  def self.connection
+    @@shared_connection || retrieve_connection
+  end
+end
+ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
