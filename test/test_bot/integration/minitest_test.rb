@@ -1,6 +1,13 @@
 require 'test_helper'
 
 class MinitestTest < ActionDispatch::IntegrationTest
+  @@original_users_count = User.count
+  let(:original_users_count) { @@original_users_count }
+
+  let(:email) { 'unique@testbot.com'}
+  let(:password) { '!Password123' }
+  let(:create_user!) { User.new(email: email, password: password, password_confirmation: password).save(validate: false) }
+
   def self.test_order
     :alpha
   end
@@ -10,8 +17,8 @@ class MinitestTest < ActionDispatch::IntegrationTest
   end
 
   test 'B: i can use activerecord to create a user' do
-    User.new(:email => 'another@agilestyle.com').save(:validate => false)
-    assert_equal 3, User.count
+    create_user!
+    assert_equal (original_users_count + 1), User.count
   end
 
   test 'C: the test database is back to normal' do
@@ -20,10 +27,9 @@ class MinitestTest < ActionDispatch::IntegrationTest
 
   test 'D: i can use capybara to create a user' do
     user = sign_up()
-
     assert user.kind_of?(User)
-    assert_equal 3, User.count
 
+    assert_equal (original_users_count + 1), User.count
     assert_signed_in
   end
 
@@ -32,22 +38,26 @@ class MinitestTest < ActionDispatch::IntegrationTest
   end
 
   test 'F: i am in a new capybara session, not currently signed in (after signing up in D)' do
+    create_user!
     assert_signed_out
-    sign_in('admin@agilestyle.com')
+    sign_in(email)
     assert_signed_in
   end
 
   test 'G: i am still in a new capybara session, not currently signed in' do
     assert_signed_out
-    sign_in_manually('normal@agilestyle.com', 'password')
+
+    sign_up(email, password) and teardown()
+    assert_signed_out
+
+    sign_in_manually(email, password)
     assert_signed_in
   end
 
   test 'H: i can use the with_user helper' do
+    create_user!
     assert_signed_out
-    as_user(User.first) do
-      assert_signed_in
-    end
+    as_user(User.first) { assert_signed_in }
     assert_signed_out
   end
 
@@ -56,14 +66,7 @@ class MinitestTest < ActionDispatch::IntegrationTest
   def assert_normal
     visit root_path
     assert_equal page.status_code, 200
-
-    assert_equal 2, User.count
-    assert_equal 1, Effective::Menu.count
-
-    assert_equal 'normal@agilestyle.com', User.first.email
-    assert_equal 'admin@agilestyle.com', User.last.email
-
-    assert_equal users(:normal).email, 'normal@agilestyle.com'
+    assert_equal original_users_count, User.count
   end
 
   def assert_signed_in
