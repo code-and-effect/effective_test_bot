@@ -3,6 +3,14 @@ module EffectiveTestBotHelper
     sign_in(user); yield; logout
   end
 
+  def synchronized(&block)
+    synchronize!; yield
+  end
+
+  def synchronize!
+    find('html') # This makes sure capybara is done
+  end
+
   def sign_in(user) # Warden::Test::Helpers
     user.kind_of?(String) == true ? login_as(User.find_by_email(user)) : login_as(user)
   end
@@ -24,13 +32,10 @@ module EffectiveTestBotHelper
       submit_form
     end
 
-    # These lines seem to need to be here, or minitest.rb 23 blows up.
-    # Some kind of threading issue is fucking with me.
-    assert_equal page.status_code, 200
-    assert_content I18n.t('devise.registrations.signed_up')
-
-    User.find_by_email(email)
+    synchronized { User.find_by_email(email) }
   end
+
+
 
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
   def fill_form(fills = {})

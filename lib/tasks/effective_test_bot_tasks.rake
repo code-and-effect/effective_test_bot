@@ -20,17 +20,9 @@ namespace :test do
     Rake::Task["test:effective_test_bot"].invoke
   end
 
-  #Rake::Task["db:seed"].invoke
-  # Or in rails 3 add to test/test_helper.rb
-  # Rails.application.load_seed
-
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
     t.libs << 'test'
     t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/**/*_test.rb"]
   end
 end
-
-# Rake::Task['db:fixtures:load'].enhance do
-#   Rake::Task['db:seed'].invoke
-# end
 

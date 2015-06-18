@@ -20,7 +20,10 @@ class MinitestTest < ActionDispatch::IntegrationTest
 
   test 'D: i can use capybara to create a user' do
     user = sign_up()
+
+    assert user.kind_of?(User)
     assert_equal 3, User.count
+
     assert_signed_in
   end
 

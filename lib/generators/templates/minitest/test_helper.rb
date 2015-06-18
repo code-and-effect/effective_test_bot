@@ -50,6 +50,7 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 # So the very first thing I do is set up a consistent database
 Rake::Task['db:schema:load'].invoke
+ActiveRecord::Migration.maintain_test_schema!
 
 # or the following 3:
 
