@@ -1,0 +1,3 @@
+normal:
+  email: 'normal@agilestyle.com'
+  encrypted_password: <%= puts "FIXTURES RUN"; Devise::Encryptor.digest(User, 'password') %>

@@ -16,16 +16,16 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib,spec,test}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
 
-  s.add_development_dependency 'rails'
-  s.add_development_dependency 'minitest'
-  s.add_development_dependency 'minitest-rails'
-  s.add_development_dependency 'minitest-capybara'
-  s.add_development_dependency 'minitest-rails-capybara'
-  s.add_development_dependency 'minitest-reporters'
-  s.add_development_dependency 'capybara'
-  s.add_development_dependency 'capybara-webkit'
-  s.add_development_dependency 'capybara-screenshot'
-  s.add_development_dependency 'shoulda'
-  s.add_development_dependency 'shoulda-matchers' #, '~> 2.6'
-  s.add_development_dependency 'faker'
+  s.add_dependency 'rails'
+  s.add_dependency 'minitest'
+  s.add_dependency 'minitest-rails'
+  s.add_dependency 'minitest-capybara'
+  s.add_dependency 'minitest-rails-capybara'
+  s.add_dependency 'minitest-reporters'
+  s.add_dependency 'capybara'
+  s.add_dependency 'capybara-webkit'
+  s.add_dependency 'capybara-screenshot'
+  s.add_dependency 'shoulda'
+  s.add_dependency 'shoulda-matchers' #, '~> 2.6'
+  s.add_dependency 'faker'
 end

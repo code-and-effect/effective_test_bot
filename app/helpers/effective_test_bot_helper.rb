@@ -1,4 +1,21 @@
 module EffectiveTestBotHelper
+  def as_user(user)
+    sign_in(user); yield; logout
+  end
+
+  def sign_in(user) # Warden::Test::Helpers
+    user.kind_of?(String) == true ? login_as(User.find_by_email(user)) : login_as(user)
+  end
+
+  def sign_in_manually(email, password)
+    visit new_user_session_path
+
+    within('form#new_user') do
+      fill_form(:email => email, :password => password)
+      submit_form
+    end
+  end
+
   def sign_up(email = Faker::Internet.email, password = Faker::Internet.password)
     visit new_user_registration_path
 
@@ -7,33 +24,13 @@ module EffectiveTestBotHelper
       submit_form
     end
 
+    # These lines seem to need to be here, or minitest.rb 23 blows up.
+    # Some kind of threading issue is fucking with me.
     assert_equal page.status_code, 200
     assert_content I18n.t('devise.registrations.signed_up')
 
     User.find_by_email(email)
   end
-
-  def sign_in(user) # Warden::Test::Helpers
-    if user.kind_of?(String)
-      login_as(User.find_by_email(user))
-    else
-      login_as(user)
-    end
-  end
-
-  # def sign_in(user)
-  #   visit new_user_session_path
-
-  #   within('form#new_user') do
-  #     fill_form(:email => email, :password => password)
-  #     page.save_screenshot('signin.png')
-  #     submit_form
-  #     page.save_screenshot('signin2.png')
-  #   end
-
-  #   assert_equal page.status_code, 200
-  #   assert_content I18n.t('devise.sessions.signed_in')
-  # end
 
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
   def fill_form(fills = {})

@@ -16,6 +16,7 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
   # Add more helper methods to be used by all tests here...
+  use_transactional_fixtures = true
 end
 
 class ActionDispatch::IntegrationTest
@@ -24,7 +25,28 @@ class ActionDispatch::IntegrationTest
   include Capybara::Assertions
   include Capybara::Screenshot::MiniTestPlugin
   include Warden::Test::Helpers if defined?(Devise)
+
+  # called before every single test
+  # def setup
+  # end
+
+  # called after every single test
+  def teardown
+    Capybara.reset_sessions!
+  end
+
 end
+
+# Make all database transactions use the same thread, otherwise signing up in capybara won't get rolled back
+class ActiveRecord::Base
+  mattr_accessor :shared_connection
+  @@shared_connection = nil
+
+  def self.connection
+    @@shared_connection || retrieve_connection
+  end
+end
+ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
 
 Capybara.default_driver = :webkit
 Capybara.javascript_driver = :webkit
@@ -32,20 +54,20 @@ Capybara::Screenshot.autosave_on_failure = true
 Capybara::Screenshot.prune_strategy = :keep_last_run
 Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
 
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
+
+### So this is EffectiveTestBot 'code' here
+### That gets run just once before the whole test suite loads
+
+# So the very first thing I do is set up a consistent database
+Rake::Task['db:schema:load'].invoke
+
+# or the following 3:
+
+#Rake::Task['db:drop'].invoke
+#Rake::Task['db:create'].invoke
+#Rake::Task['db:migrate'].invoke
+
+Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke
 
-#Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
-
-
-
-# # Make all database transactions use the same thread
-# class ActiveRecord::Base
-#   mattr_accessor :shared_connection
-#   @@shared_connection = nil
-
-#   def self.connection
-#     @@shared_connection || retrieve_connection
-#   end
-# end
-
-# ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection

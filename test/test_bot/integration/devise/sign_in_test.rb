@@ -23,8 +23,6 @@ if defined?(Devise) && defined?(User)
       test 'invalid sign in' do
         visit new_user_session_path
 
-        binding.pry
-
         within('form#new_user') do
           fill_in 'user_email', with: user.email
           fill_in 'user_password', with: 'not-correct-password'
