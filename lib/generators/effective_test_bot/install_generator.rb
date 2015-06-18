@@ -13,19 +13,6 @@ module EffectiveTestBot
         run 'bundle exec rails generate minitest:install'
       end
 
-      # def install_rspec
-      #   return if File.exists?('spec/spec_helper.rb')
-      #   puts '[effective_test_bot] installing rspec'
-      #   run 'bundle exec rails generate rspec:install'
-      # end
-
-      # def install_guard
-      #   return if File.exists?('Guardfile')
-      #   puts '[effective_test_bot] installing guard'
-      #   run 'bundle exec guard init'
-      #   puts ""
-      # end
-
       def explain_overwrite
         puts '[effective_test_bot] Successfully installed/detected: minitest'
         puts ""
@@ -49,14 +36,8 @@ module EffectiveTestBot
       end
 
       def overwrite_minitest
-        template 'minitest/test_helper.rb', 'test/test_helper.rb'
+        template 'test_helper.rb', 'test/test_helper.rb'
       end
-
-      # def overwrite_rspec
-      #   template 'rspec/.rspec', '.rspec'
-      #   template 'rspec/rails_helper.rb', 'spec/rails_helper.rb'
-      #   template 'rspec/spec_helper.rb', 'spec/spec_helper.rb'
-      # end
 
       def thank_you
         puts "Thanks for using EffectiveTestBot"
