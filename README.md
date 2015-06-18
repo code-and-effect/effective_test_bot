@@ -2,7 +2,7 @@
 
 A shared library of rails model & capybara-based feature tests that should pass in every Rails application.
 
-Also provides a one-liner installation & configuration of rspec-rails, guard, and capybara test environment.
+Also provides a one-liner installation & configuration of minitest and capybara test environment.
 
 Rails 3.2.x and 4.x
 
@@ -27,33 +27,29 @@ Then run the generator:
 rails generate effective_test_bot:install
 ```
 
-The above command will first invoke the default `rspec-rails` and `guard` installation tasks, if they haven't already been run.
+The above command will first invoke the default `minitest` installation tasks, if they haven't already been run.
 
-It will then copy the packaged `spec_helper.rb`, `rails_helper.rb` and other rspec/testing configuration files that match this gem author's opinionated testing environment.
+It will then copy the packaged `test_helper.rb` that matches this gem author's opinionated testing environment.
 
-Run the test suite with either rspec, or guard, or as you normally would:
-
-```ruby
-bundle exec guard # (then press ENTER)
-```
-
-or
+Run the test suite with:
 
 ```ruby
-bundle exec rspec
+bundle exec rake test:bot
 ```
 
 You should now see multiple -- hopefully passing -- tests that you didn't write!
 
 
-### Existing rspec installation
+## Fixtures
 
-If you already have an existing rspec installation that works with `capybara` and `capybara-webkit`, you will only need to add this one line to your `spec/spec_helper.rb`:
+TODO
 
-```
-RSpec.configure do |config|
-  config.files_or_directories_to_run = ['spec', '../effective_test_bot/spec']
-end
+users.yml:
+
+```yaml
+normal:
+  email: 'normal@agilestyle.com'
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
 ```
 
 
@@ -64,17 +60,6 @@ MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
 Code and Effect is the product arm of [AgileStyle](http://www.agilestyle.com/), an Edmonton-based shop that specializes in building custom web applications with Ruby on Rails.
 
 
-## Testing
-
-The test suite for this gem is unfortunately not yet complete.
-
-Run tests by:
-
-```ruby
-rake spec
-```
-
-
 ## Contributing
 
 1. Fork it
@@ -83,5 +68,3 @@ rake spec
 4. Push to the branch (`git push origin my-new-feature`)
 5. Bonus points for test coverage
 6. Create new Pull Request
-
-#page.save_screenshot('sign-in-test-1.png')
