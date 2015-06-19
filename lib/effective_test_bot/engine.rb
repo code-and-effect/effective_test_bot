@@ -2,7 +2,7 @@ module EffectiveTestBot
   class Engine < ::Rails::Engine
     engine_name 'effective_test_bot'
 
-    config.autoload_paths += Dir["#{config.root}/app/models/**/"]
+    config.autoload_paths += Dir["#{config.root}/test/concerns/**/"]
     config.autoload_paths += Dir["#{config.root}/test/support/**/"]
     config.autoload_paths += Dir["#{config.root}/test/test_botable/**/"]
 

@@ -1,7 +1,8 @@
 module EffectiveTestBotTestHelper
 
+  # This makes sure capybara is done, and breaks out of any 'within' blocks
   def synchronize!
-    page.document.find('html') # This makes sure capybara is done, and breaks out of any 'within' blocks
+    page.document.find('html')
   end
 
   # Because capybara-webkit can't make delete requests, we need to use rack_test
