@@ -9,7 +9,7 @@ if defined?(Devise) && defined?(User)
       should validate_presence_of(:password)
       should validate_presence_of(:encrypted_password)
 
-      test "user fails validation when password and confirmation mismatch" do
+      test "user invalid when password and confirmation mismatch" do
         user.password = '123456789'
         user.password_confirmation = '987654321'
 

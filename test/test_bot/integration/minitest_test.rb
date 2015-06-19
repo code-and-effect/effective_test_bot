@@ -13,20 +13,20 @@ module TestBot
       :alpha
     end
 
-    test 'A: seeds and fixtures loaded' do
+    test '1: seeds and fixtures loaded' do
       assert_normal
     end
 
-    test 'B: i can use activerecord to create a user' do
+    test '2: activerecord can create a user' do
       create_user!
       assert_equal (original_users_count + 1), User.count
     end
 
-    test 'C: the test database is back to normal' do
+    test '3: test database is back to normal' do
       assert_normal
     end
 
-    test 'D: i can use capybara to create a user' do
+    test '4: capybara can create a user' do
       user = sign_up()
       assert user.kind_of?(User)
 
@@ -34,32 +34,27 @@ module TestBot
       assert_signed_in
     end
 
-    test 'E: the test database is back to normal' do
+    test '5: test database is back to normal' do
       assert_normal
     end
 
-    test 'F: i am in a new capybara session, not currently signed in (after signing up in D)' do
-      create_user!
+    test '6: capybara session has been reset after manual sign up' do
       assert_signed_out
+      create_user!
       sign_in(email)
       assert_signed_in
     end
 
-    test 'G: i am still in a new capybara session, not currently signed in' do
-      assert_signed_out
-
-      sign_up(email, password) and teardown()
-      assert_signed_out
-
-      sign_in_manually(email, password)
-      assert_signed_in
+    test '7: test database is back to normal' do
+      assert_normal
     end
 
-    test 'H: i can use the with_user helper' do
-      create_user!
+    test '8: capybara session has been reset after warden login_as' do
       assert_signed_out
-      as_user(User.first) { assert_signed_in }
-      assert_signed_out
+    end
+
+    test '9: test database is back to normal' do
+      assert_normal
     end
 
     private
@@ -72,14 +67,13 @@ module TestBot
 
     def assert_signed_in
       visit new_user_session_path
-      assert_content 'You are already signed in. '
+      assert_content I18n.t('devise.failure.already_authenticated')
       refute page.has_selector?('form#new_user')
     end
 
     def assert_signed_out
       visit new_user_session_path
-      refute_content 'You are already signed in. '
-      assert_content 'Log in'
+      refute_content I18n.t('devise.failure.already_authenticated')
       assert page.has_selector?('form#new_user')
     end
 

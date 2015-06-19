@@ -1,23 +1,4 @@
 module EffectiveTestBotHelper
-
-  module ClassMethods
-    def crud_test(klass, user)
-      instance_exec do
-        let(:user) { user }
-        include CrudTest
-      end
-
-      instance_exec do
-        # This will run any CrudTest method, in order, as it's defined in the file
-        # Then the rest of the methods with whatever order they're originally defined as (:random, :alpha, :sorted)
-        def self.runnable_methods
-          CrudTest.public_instance_methods.map { |name| name.to_s if name.to_s.starts_with?('test_bot') }.compact + super.select { |name| !name.starts_with?('test_bot') }
-        end
-      end
-
-    end
-  end
-
   def as_user(user)
     sign_in(user); yield; logout
   end
