@@ -27,14 +27,16 @@ class ActionDispatch::IntegrationTest
   include Capybara::Screenshot::MiniTestPlugin
   include Warden::Test::Helpers if defined?(Devise)
 
-  # called before every single test
-  # def setup
+  # def setup # Called before every test
   # end
 
-  # called after every single test
-  def teardown
-    Capybara.reset_sessions!
+  # def teardown # Called after every single test
+  # end
+
+  def after_teardown # I reset sessions here so capybara-screenshot can still make screenshots when tests fail
+    super() and Capybara.reset_sessions!
   end
+
 end
 
 
