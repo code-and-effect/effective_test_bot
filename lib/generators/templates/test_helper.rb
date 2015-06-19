@@ -11,6 +11,7 @@ require 'shoulda'
 
 require 'capybara/webkit'
 require 'capybara-screenshot/minitest'
+require 'capybara/slow_finder_errors'
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.

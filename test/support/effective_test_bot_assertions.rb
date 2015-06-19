@@ -2,7 +2,7 @@ module EffectiveTestBotAssertions
   def assert_signed_in
     visit new_user_session_path
     assert_content I18n.t('devise.failure.already_authenticated')
-    refute page.has_selector?('form#new_user')
+    assert page.has_no_selector?('form#new_user')
   end
 
   def assert_signed_out
