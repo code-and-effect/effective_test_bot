@@ -2,65 +2,47 @@ module ActsAsTestBotable
   extend ActiveSupport::Concern
 
   module ClassMethods
-    def crud_test(object_or_class, user, options = {})
-      if options.kind_of?(Hash) == false
-        puts "effective_test_bot: crud_test() third argument expecting a Hash of options"
-        puts "effective_test_bot: crud_test(Post, User.first, namespace: :admin, except: [:show])"
-        return
+    CRUD_ACTIONS = [:index, :new, :create, :edit, :update, :show, :destroy]
+
+    def crud_test(obj, user, options = {})
+      # Check for expected usage
+      unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
+        puts 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)' and return
       end
 
-      actions = [:index, :new, :create, :edit, :update, :show, :destroy]
+      # Make sure Obj.new() works
+      if obj.kind_of?(Class) && (obj.new() rescue false) == false
+        puts "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed" and return
+      end
 
-      if options[:only] && options[:except]
-        puts "effective_test_bot: cannot use both :only and :except" and return
-      elsif options[:only]
-        actions = Array(options[:only]).flatten.compact.map(&:to_sym)
+      # Set up the crud_actions_to_test
+      crud_actions_to_test = if options[:only]
+        Array(options[:only]).flatten.compact.map(&:to_sym)
       elsif options[:except]
-        actions = (actions - Array(options[:except]).flatten.compact.map(&:to_sym))
-      end
-
-      let(:crud_actions_to_test) { actions }
-      let(:controller_namespace) { options[:namespace] }
-      let(:user) { user }
-
-      if user.kind_of?(User) == false
-        puts 'effective_test_bot: crud_test() second argument must be a User object' and return
-      end
-
-      if object_or_class.kind_of?(Class)
-        if object_or_class.ancestors.include?(ActiveRecord::Base) == false
-          puts "effective_test_bot: crud_test() first argument must be an ActiveRecord object" and return
-        end
-
-        if ((object_or_class.new().kind_of?(object_or_class) == false) rescue true)
-          puts "effective_test_bot: failed to call #{object_or_class}.new(), unable to proceed" and return
-        end
-
-        resource_class = object_or_class
-        resource = object_or_class.new()
-      elsif object_or_class.kind_of?(ActiveRecord::Base)
-        resource_class = object_or_class.class
-        resource = object_or_class
+        (CRUD_ACTIONS - Array(options[:except]).flatten.compact.map(&:to_sym))
       else
-        puts 'effective_test_bot: first paramater must be an ActiveRecord object or class' and return
+        CRUD_ACTIONS
       end
 
+      # Parse the resource and resourece class
+      resource = obj.kind_of?(Class) ? obj.new() : obj
+      resource_class = obj.kind_of?(Class) ? obj : obj.class
+
+      # If obj is an ActiveRecord object with attributes, Post.new(:title => 'My Title')
+      # then compute any explicit attributes, so forms will be filled with those values
+      resource_attributes = if obj.kind_of?(ActiveRecord::Base)
+        empty = resource_class.new()
+        {}.tap { |atts| resource.attributes.each { |k, v| atts[k] = v if empty.attributes[k] != v } }
+      end || {}
+
+      # Assign variables to be used in test/test_botable/crud_test.rb
+      let(:resource) { resource }
       let(:resource_class) { resource_class }
       let(:resource_name) { resource_class.name.underscore }
-      let(:resource) { resource }
-
-      # Compute any explicitly passed attributes
-      if object_or_class.kind_of?(ActiveRecord::Base)
-        new_resource = resource_class.new()
-
-        resource_attributes = {}.tap do |atts|
-          resource.attributes.each { |k, v| atts[k] = v if new_resource.attributes[k] != v }
-        end
-
-        let(:resource_attributes) { resource_attributes }
-      else
-        let(:resource_attributes) { Hash.new() }
-      end
+      let(:resource_attributes) { resource_attributes }
+      let(:user) { user }
+      let(:controller_namespace) { options[:namespace] }
+      let(:crud_actions_to_test) { crud_actions_to_test }
 
       include ::CrudTest
 

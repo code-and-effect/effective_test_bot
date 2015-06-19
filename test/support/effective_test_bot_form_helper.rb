@@ -34,7 +34,6 @@ module EffectiveTestBotFormHelper
     field_name = [field.tag_name, field['type']].compact.join('_')
     fill_value = nil
 
-
     if fills.present?
       key = nil
       attributes.reverse_each do |name|
@@ -42,12 +41,7 @@ module EffectiveTestBotFormHelper
 
         if fills.key?(key)
           fill_value = fills[key]
-
-          if field_name == 'select'
-            break
-          else
-            return fill_value
-          end
+          ['select'].include?(field_name) ? break : (return fill_value)
         end
       end
     end
@@ -93,7 +87,7 @@ module EffectiveTestBotFormHelper
     when 'input_checkbox'
       [true, false].sample
     when 'input_radio'
-      binding.pry
+      [true, false].sample
     else
       raise "fill_value unsupported field type: #{field['type']}"
     end
@@ -102,7 +96,6 @@ module EffectiveTestBotFormHelper
   def submit_form(label = nil)
     if label.present?
       click_on(label)
-      #find_field(label).click
     else
       first(:css, "input[type='submit']").click
     end
