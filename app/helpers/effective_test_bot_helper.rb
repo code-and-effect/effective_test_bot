@@ -1,4 +1,7 @@
 module EffectiveTestBotHelper
+  DIGITS = ('1'..'9').to_a
+  LETTERS = ('A'..'Z').to_a
+
   def as_user(user)
     sign_in(user); yield; logout
   end
@@ -8,7 +11,7 @@ module EffectiveTestBotHelper
   end
 
   def synchronize!
-    find('html') # This makes sure capybara is done
+    page.document.find('html') # This makes sure capybara is done, and breaks out of any 'within' blocks
   end
 
   def sign_in(user) # Warden::Test::Helpers
@@ -63,6 +66,7 @@ module EffectiveTestBotHelper
     field_name = [field.tag_name, field['type']].compact.join('_')
     fill_value = nil
 
+
     if fills.present?
       key = nil
       attributes.reverse_each do |name|
@@ -88,8 +92,7 @@ module EffectiveTestBotHelper
     when 'input_password'
       Faker::Internet.password
     when 'input_tel'
-      digits = ('1'..'9').to_a
-      d = 10.times.map { digits.sample }
+      d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
     when 'input_text'
       classes = field['class'].to_s.split(' ')
@@ -104,6 +107,8 @@ module EffectiveTestBotHelper
         Faker::Name.last_name
       elsif attributes.last.to_s.include?('name')
         Faker::Name.name
+      elsif attributes.last.to_s.include?('postal') # Make a Canadian Postal Code
+        LETTERS.sample + DIGITS.sample + LETTERS.sample + ' ' + DIGITS.sample + LETTERS.sample + DIGITS.sample
       else
         Faker::Lorem.word
       end
@@ -133,6 +138,20 @@ module EffectiveTestBotHelper
     else
       first(:css, "input[type='submit']").click
     end
+    page.document.find('html')
+  end
+
+  def assert_page_title(title = nil)
+    if title.present?
+      assert_title(title) # Capybara TitleQuery, match this text
+    else
+      title = (page.find(:xpath, '//title', visible: false) rescue nil)
+      assert title.present?, 'page title is blank'
+    end
+  end
+
+  def assert_page_status(status=200)
+    assert_equal page.status_code, status, "page failed to load with #{status} HTTP status code"
   end
 
 end

@@ -1,6 +1,6 @@
 # EffectiveTestBot Rails Engine
 
-if defined?(EffectiveTestBot) # It might not be in your main environment
+if Rails.env.test?
   EffectiveTestBot.setup do |config|
   end
 end
