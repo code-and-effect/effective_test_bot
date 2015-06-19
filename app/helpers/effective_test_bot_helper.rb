@@ -52,12 +52,16 @@ module EffectiveTestBotHelper
         field.select(fill_value(field, fills), match: :first)
       when 'input_file'
         puts "Warning, input_file not yet supported"
-      when 'input_submit'
+      when 'input_submit', 'input_search'
         # Do nothing
       else
         raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
       end
     end
+  end
+
+  def clear_form
+    all('input,select,textarea').each { |field| field.set('') }
   end
 
   # Operates on just string keys
@@ -138,20 +142,42 @@ module EffectiveTestBotHelper
     else
       first(:css, "input[type='submit']").click
     end
-    page.document.find('html')
+    synchronize!
   end
 
-  def assert_page_title(title = nil)
-    if title.present?
+  # Because capybara-webkit can't make delete requests, we need to use rack_test
+  # Makes a DELETE request to the given path as the given user
+  # It leaves any existing Capybara sessions untouched
+  def visit_delete(path, user)
+    session = Capybara::Session.new(:rack_test, Rails.application)
+    sign_in(user)
+    session.driver.submit :delete, path, {}
+    session.document.find('html')
+  end
+
+  def assert_signed_in
+    visit new_user_session_path
+    assert_content I18n.t('devise.failure.already_authenticated')
+    refute page.has_selector?('form#new_user')
+  end
+
+  def assert_signed_out
+    visit new_user_session_path
+    refute_content I18n.t('devise.failure.already_authenticated')
+    assert page.has_selector?('form#new_user')
+  end
+
+  def assert_page_title(title = :any, message = 'page title is blank')
+    if title.present? && title != :any
       assert_title(title) # Capybara TitleQuery, match this text
     else
       title = (page.find(:xpath, '//title', visible: false) rescue nil)
-      assert title.present?, 'page title is blank'
+      assert title.present?, message
     end
   end
 
   def assert_page_status(status=200)
-    assert_equal page.status_code, status, "page failed to load with #{status} HTTP status code"
+    assert_equal status, page.status_code, "page failed to load with #{status} HTTP status code"
   end
 
 end

@@ -65,17 +65,5 @@ module TestBot
       assert_equal original_users_count, User.count
     end
 
-    def assert_signed_in
-      visit new_user_session_path
-      assert_content I18n.t('devise.failure.already_authenticated')
-      refute page.has_selector?('form#new_user')
-    end
-
-    def assert_signed_out
-      visit new_user_session_path
-      refute_content I18n.t('devise.failure.already_authenticated')
-      assert page.has_selector?('form#new_user')
-    end
-
   end
 end
