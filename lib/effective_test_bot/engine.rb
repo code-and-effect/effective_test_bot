@@ -3,6 +3,7 @@ module EffectiveTestBot
     engine_name 'effective_test_bot'
 
     config.autoload_paths += Dir["#{config.root}/app/models/**/"]
+    config.autoload_paths += Dir["#{config.root}/test/support/**/"]
     config.autoload_paths += Dir["#{config.root}/test/test_botable/**/"]
 
     # Set up our default configuration options.
@@ -14,7 +15,11 @@ module EffectiveTestBot
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
         ActionDispatch::IntegrationTest.send(:include, ActsAsTestBotable)
-        ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotHelper)
+
+        ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotAssertions)
+        ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotFormHelper)
+        ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotLoginHelper)
+        ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotTestHelper)
       end
     end
 
