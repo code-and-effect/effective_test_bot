@@ -6,6 +6,11 @@ module EffectiveTestBotFormHelper
   def fill_form(fills = {})
     fills = HashWithIndifferentAccess.new(fills)
 
+    # Support for the cocoon gem
+    all('a.add_fields[data-association-insertion-template]').each do |cocoon_add_field|
+      [1,2].sample.times { cocoon_add_field.click() }
+    end
+
     all('input,select,textarea').each do |field|
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'
