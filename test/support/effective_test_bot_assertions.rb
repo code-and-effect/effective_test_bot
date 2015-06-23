@@ -23,4 +23,10 @@ module EffectiveTestBotAssertions
   def assert_page_status(status = 200)
     assert_equal status, page.status_code, "page failed to load with #{status} HTTP status code"
   end
+
+  def assert_no_js_errors
+    errors = page.driver.error_messages
+    assert_equal 0, errors.size, errors.ai
+  end
+
 end

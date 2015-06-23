@@ -6,6 +6,7 @@ module CrudTest
 
     assert_page_status
     assert_page_title
+    assert_no_js_errors
 
     # Make sure there's a form with a submit button
     form_selector = "form#new_#{resource_name}"
@@ -21,33 +22,33 @@ module CrudTest
 
     sign_in(user) and visit(new_resource_path)
 
-    before = { count: resource_class.count, url: page.current_url }
+    before = { count: resource_class.count, path: page.current_path }
 
     within("form#new_#{resource_name}") do
       fill_form(resource_attributes)
       submit_form
     end
 
-    after = { count: resource_class.count, url: page.current_url }
+    after = { count: resource_class.count, path: page.current_path }
 
     refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
-    refute_equal before[:url], after[:url], "unable to create #{resource_class} object"
+    refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
   end
 
   define_method 'test_bot: #create invalid' do
     should_skip!(:create)
 
     sign_in(user) and visit(new_resource_path)
-    before = { count: resource_class.count, url: page.current_url }
+    before = { count: resource_class.count }
 
     within("form#new_#{resource_name}") do
-      submit_form # Submit an empty form
+      submit_novalidate_form
     end
 
-    after = { count: resource_class.count, url: page.current_url }
+    after = { count: resource_class.count }
 
     assert_equal before[:count], after[:count], 'unexpectedly created object anyway'
-    assert_equal before[:url], after[:url], 'did not return to #new action'
+    assert_equal resources_path, page.current_path, 'did not return to #create url'
     assert_page_title :any, 'page title missing after failed validation'
   end
 
@@ -58,6 +59,7 @@ module CrudTest
 
     assert_page_status
     assert_page_title
+    assert_no_js_errors
 
     # Make sure there's a form with a submit button
     form_selector = "form#edit_#{resource_name}_#{resource.id}"
@@ -73,7 +75,7 @@ module CrudTest
 
     visit(edit_resource_path(resource))
 
-    before = { count: resource_class.count, url: page.current_url, updated_at: (resource.updated_at rescue nil) }
+    before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     within("form#edit_#{resource_name}_#{resource.id}") do
       fill_form(resource_attributes)
@@ -81,7 +83,7 @@ module CrudTest
     end
     resource = resource_class.find(resource.id)
 
-    after = { count: resource_class.count, url: page.current_url, updated_at: (resource.updated_at rescue nil) }
+    after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
     assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
@@ -92,19 +94,19 @@ module CrudTest
 
     visit(edit_resource_path(resource))
 
-    before = { count: resource_class.count, url: page.current_url, updated_at: (resource.updated_at rescue nil) }
+    before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     within("form#edit_#{resource_name}_#{resource.id}") do
       clear_form
-      submit_form
+      submit_novalidate_form
     end
     resource = resource_class.find(resource.id)
 
-    after = { count: resource_class.count, url: page.current_url, updated_at: (resource.updated_at rescue nil) }
+    after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
     assert_equal(after[:updated_at], before[:updated_at], 'unexpectedly updated object anyway') if resource.respond_to?(:updated_at)
-    assert_equal before[:url], after[:url], 'did not return to #edit action'
+    assert_equal resource_path(resource), page.current_path, 'did not return to #update url'
     assert_page_title :any, 'page title missing after failed validation'
   end
 
@@ -115,6 +117,7 @@ module CrudTest
 
     assert_page_status
     assert_page_title
+    assert_no_js_errors
   end
 
   define_method 'test_bot: #show' do
@@ -124,6 +127,7 @@ module CrudTest
 
     assert_page_status
     assert_page_title
+    assert_no_js_errors
   end
 
   define_method 'test_bot: #destroy' do
@@ -138,7 +142,7 @@ module CrudTest
     if resource.respond_to?(:archived)
       assert after[:archived] == true, "expected #{resource_class}.archived == true"
     else
-      assert(false, "Unable to delete #{resource_class}") if before[:count] == after[:count]
+      refute_equal before[:count], after[:count], "unable to delete #{resource_class}"
     end
   end
 
