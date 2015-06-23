@@ -1,3 +1,5 @@
+require 'timeout'
+
 module EffectiveTestBotFormHelper
   DIGITS = ('1'..'9').to_a
   LETTERS = ('A'..'Z').to_a
@@ -20,7 +22,8 @@ module EffectiveTestBotFormHelper
       when 'select'
         field.select(fill_value(field, fills), match: :first)
       when 'input_file'
-        puts "Warning, input_file not yet supported"
+        file_path = fill_value(field, fills)
+        field['class'].include?('asset-box-uploader-fileinput') ? upload_effective_asset(field, file_path) : field.set(file_path)
       when 'input_submit', 'input_search'
         # Do nothing
       else
@@ -30,7 +33,7 @@ module EffectiveTestBotFormHelper
   end
 
   def clear_form
-    all('input,select,textarea').each { |field| field.set('') }
+    all('input,select,textarea').each { |field| (field.set('') rescue false) }
   end
 
   # Operates on just string keys
@@ -93,11 +96,14 @@ module EffectiveTestBotFormHelper
       [true, false].sample
     when 'input_radio'
       [true, false].sample
+    when 'input_file'
+      "#{File.dirname(__FILE__)}/effective_assets_upload_file._test"
     else
       raise "fill_value unsupported field type: #{field['type']}"
     end
   end
 
+  # page.execute_script "$('form#new_#{resource_name}').submit();"
   def submit_form(label = nil)
     if label.present?
       click_on(label)
@@ -105,5 +111,50 @@ module EffectiveTestBotFormHelper
       first(:css, "input[type='submit']").click
     end
     synchronize!
+  end
+
+  # Submit form after disabling any HTML5 validations
+  def submit_novalidate_form(label = nil)
+    page.execute_script "for(var f=document.forms,i=f.length;i--;)f[i].setAttribute('novalidate','');"
+    submit_form(label)
+  end
+
+  # The field here is going to be the %input{:type => file}. Files can be one or more pathnames
+  # http://stackoverflow.com/questions/5188240/using-selenium-to-imitate-dragging-a-file-onto-an-upload-element/11203629#11203629
+  def upload_effective_asset(field, files)
+    files = Array(files)
+    uid = field['id']
+
+    page.driver.allow_url(Effective::Asset.s3_base_path)
+
+    js = "fileList = Array();"
+
+    files.each_with_index do |file, i|
+      # Generate a fake input selector
+      page.execute_script("if($('#effectiveAssetsPlaceholder#{i}').length == 0) {effectiveAssetsPlaceholder#{i} = window.$('<input/>').attr({id: 'effectiveAssetsPlaceholder#{i}', type: 'file'}).appendTo('body'); }")
+
+      # Attach file to the fake input selector through Capybara
+      page.document.attach_file("effectiveAssetsPlaceholder#{i}", files[i])
+
+      # Build up the fake js event
+      js = "#{js} fileList.push(effectiveAssetsPlaceholder#{i}.get(0).files[0]);"
+    end
+
+    # Trigger the fake drop event
+    page.execute_script("#{js} e = $.Event('drop'); e.originalEvent = {dataTransfer : { files : fileList } }; $('#s3_#{uid}').trigger(e);")
+
+    # Wait till the Uploader bar goes away
+    begin
+      Timeout.timeout(files.length * 5) do
+        within("#asset-box-input-#{uid}") do
+          within('.uploads') do
+            sleep(0.25) while (first('.upload').present? rescue false)
+          end
+        end
+      end
+    rescue Timeout::Error
+      puts "file upload timed out after #{files.length * 5}s"
+    end
+
   end
 end
