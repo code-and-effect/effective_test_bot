@@ -63,6 +63,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke
+Rake::Task['test:load_fixture_seeds'].invoke # This is included by effective_test_bot.  It just runs the app's test/fixtures/seeds.rb if it exists
 
 # Make all database transactions use the same thread, otherwise signing up in capybara won't get rolled back
 # This must be run after the Rake::Tasks above

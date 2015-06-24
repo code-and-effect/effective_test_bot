@@ -4,6 +4,9 @@ module ActsAsTestBotable
   module ClassMethods
     CRUD_ACTIONS = [:index, :new, :create, :edit, :update, :show, :destroy]
 
+    # Calling crud_test just checks all your options
+    # Makes some assigns
+    # and includes test_botable/crud_test.rb
     def crud_test(obj, user, options = {})
       # Check for expected usage
       unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)

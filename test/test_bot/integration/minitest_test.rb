@@ -63,6 +63,11 @@ module TestBot
       visit root_path
       assert_equal page.status_code, 200
       assert_equal original_users_count, User.count
+
+      # Someitmes it's nice to assert your environment...
+      #assert users(:normal).present?
+      #assert 2, User.count
+      #assert 3, Physician.count
     end
 
   end
