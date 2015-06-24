@@ -160,7 +160,6 @@ module CrudTest
       fill_form(resource_attributes) and submit_form
     end
 
-    refute_equal new_resource_path, page.current_url
     resource_class.last
   end
 
