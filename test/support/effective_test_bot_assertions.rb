@@ -11,7 +11,7 @@ module EffectiveTestBotAssertions
     assert page.has_selector?('form#new_user')
   end
 
-  def assert_page_title(title = :any, message = 'page title is blank')
+  def assert_page_title(title = :any, message = 'expected page title to be present')
     if title.present? && title != :any
       assert_title(title) # Capybara TitleQuery, match this text
     else
@@ -21,12 +21,25 @@ module EffectiveTestBotAssertions
   end
 
   def assert_page_status(status = 200)
-    assert_equal status, page.status_code, "page failed to load with #{status} HTTP status code"
+    assert_equal status, page.status_code, "expected page to load with #{status} HTTP status code"
   end
 
   def assert_no_js_errors
     errors = page.driver.error_messages
     assert_equal 0, errors.size, errors.ai
+  end
+
+  # assert_flash
+  # assert_flash :success
+  # assert_flash :error, 'there was a specific error'
+  def assert_flash(level = nil, message = nil)
+    if message.present?
+      assert_equal message, flash[level.to_s]
+    elsif level.present?
+      assert flash[level.to_s].present?, "expected flash[#{level}] to be present"
+    else
+      assert flash.present?, 'expected flash to be present'
+    end
   end
 
 end

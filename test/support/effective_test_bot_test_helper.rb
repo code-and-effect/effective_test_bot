@@ -15,4 +15,13 @@ module EffectiveTestBotTestHelper
     session.document.find('html')
   end
 
+  # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
+  # that encodes the flash message, and some of the assigns
+  def flash
+    @flash ||= (
+      header = page.driver.browser.response_headers['Flash']
+      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
+    )
+  end
+
 end

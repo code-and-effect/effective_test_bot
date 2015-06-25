@@ -31,6 +31,7 @@ module CrudTest
 
     after = { count: resource_class.count, path: page.current_path }
 
+    assert_flash :success
     refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
     refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
   end
@@ -47,6 +48,7 @@ module CrudTest
 
     after = { count: resource_class.count }
 
+    assert_flash :danger
     assert_equal before[:count], after[:count], 'unexpectedly created object anyway'
     assert_equal resources_path, page.current_path, 'did not return to #create url'
     assert_page_title :any, 'page title missing after failed validation'
@@ -85,6 +87,7 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
+    assert_flash :success
     assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
     assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
   end
@@ -104,6 +107,7 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
+    assert_flash :danger
     assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
     assert_equal(after[:updated_at], before[:updated_at], 'unexpectedly updated object anyway') if resource.respond_to?(:updated_at)
     assert_equal resource_path(resource), page.current_path, 'did not return to #update url'
@@ -138,6 +142,8 @@ module CrudTest
     visit_delete(resource_path(resource), user)
 
     after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
+
+    assert_flash :success
 
     if resource.respond_to?(:archived)
       assert after[:archived] == true, "expected #{resource_class}.archived == true"

@@ -23,5 +23,14 @@ module EffectiveTestBot
       end
     end
 
+    initializer 'effective_test_bot.assign_assign_headers' do
+      ActiveSupport.on_load :action_controller do
+        if Rails.env.test?
+          ActionController::Base.send :include, ::EffectiveTestBotControllerHelper
+          ActionController::Base.send :after_filter, :assign_test_bot_http_headers
+        end
+      end
+    end
+
   end
 end
