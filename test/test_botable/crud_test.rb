@@ -7,6 +7,7 @@ module CrudTest
     assert_page_status
     assert_page_title
     assert_no_js_errors
+    assert_assigns resource_name
 
     # Make sure there's a form with a submit button
     form_selector = "form#new_#{resource_name}"
@@ -31,9 +32,12 @@ module CrudTest
 
     after = { count: resource_class.count, path: page.current_path }
 
-    assert_flash :success
     refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
     refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
+
+    assert_flash :success
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].blank?
   end
 
   define_method 'test_bot: #create invalid' do
@@ -48,10 +52,13 @@ module CrudTest
 
     after = { count: resource_class.count }
 
-    assert_flash :danger
     assert_equal before[:count], after[:count], 'unexpectedly created object anyway'
     assert_equal resources_path, page.current_path, 'did not return to #create url'
     assert_page_title :any, 'page title missing after failed validation'
+
+    assert_flash :danger
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].present?
   end
 
   define_method 'test_bot: #edit' do
@@ -62,6 +69,7 @@ module CrudTest
     assert_page_status
     assert_page_title
     assert_no_js_errors
+    assert_assigns resource_name
 
     # Make sure there's a form with a submit button
     form_selector = "form#edit_#{resource_name}_#{resource.id}"
@@ -70,6 +78,8 @@ module CrudTest
     within(form_selector) do
       assert_selector 'input[type=submit]', 'page form does not contain a submit button'
     end
+
+    assert_assigns resource_name
   end
 
   define_method 'test_bot: #update valid' do
@@ -87,9 +97,12 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_flash :success
     assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
     assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
+
+    assert_flash :success
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].blank?
   end
 
   define_method 'test_bot: #update invalid' do
@@ -107,11 +120,14 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_flash :danger
     assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
     assert_equal(after[:updated_at], before[:updated_at], 'unexpectedly updated object anyway') if resource.respond_to?(:updated_at)
     assert_equal resource_path(resource), page.current_path, 'did not return to #update url'
     assert_page_title :any, 'page title missing after failed validation'
+
+    assert_flash :danger
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].present?
   end
 
   define_method 'test_bot: #index' do
@@ -122,6 +138,7 @@ module CrudTest
     assert_page_status
     assert_page_title
     assert_no_js_errors
+    assert (assigns['datatable'].present? || assigns[resource_name.pluralize].present?), "expected @datatable or @#{resource_name.pluralize} to be set"
   end
 
   define_method 'test_bot: #show' do
@@ -132,6 +149,7 @@ module CrudTest
     assert_page_status
     assert_page_title
     assert_no_js_errors
+    assert_assigns resource_name
   end
 
   define_method 'test_bot: #destroy' do
@@ -144,6 +162,8 @@ module CrudTest
     after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
 
     assert_flash :success
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].blank?
 
     if resource.respond_to?(:archived)
       assert after[:archived] == true, "expected #{resource_class}.archived == true"
@@ -186,5 +206,4 @@ module CrudTest
   def edit_resource_path(resource) # edit
     edit_polymorphic_path([*controller_namespace, resource])
   end
-
 end

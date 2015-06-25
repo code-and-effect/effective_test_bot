@@ -32,14 +32,28 @@ module EffectiveTestBotAssertions
   # assert_flash
   # assert_flash :success
   # assert_flash :error, 'there was a specific error'
-  def assert_flash(level = nil, message = nil)
-    if message.present?
-      assert_equal message, flash[level.to_s]
-    elsif level.present?
-      assert flash[level.to_s].present?, "expected flash[#{level}] to be present"
+  def assert_flash(key = nil, value = nil)
+    if key.present? && value.present?
+      assert_equal value, flash[key.to_s]
+    elsif key.present?
+      assert flash[key.to_s].present?, "expected flash[#{key}] to be present"
     else
       assert flash.present?, 'expected flash to be present'
     end
   end
+
+  # assert_assigns
+  # assert_assigns :current_user
+  # assert_assigns :current_user, true
+  def assert_assigns(key = nil, value = nil)
+    if key.present? && value.present?
+      assert_equal value, assigns[key.to_s]
+    elsif key.present?
+      assert assigns[key.to_s].present?, "expected @#{key} to be assigned"
+    else
+      assert assigns.present?, 'expected assigns to be present'
+    end
+  end
+
 
 end

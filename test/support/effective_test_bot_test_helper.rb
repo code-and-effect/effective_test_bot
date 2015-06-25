@@ -19,7 +19,14 @@ module EffectiveTestBotTestHelper
   # that encodes the flash message, and some of the assigns
   def flash
     @flash ||= (
-      header = page.driver.browser.response_headers['Flash']
+      header = page.driver.browser.response_headers['Test-Bot-Flash']
+      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
+    )
+  end
+
+  def assigns
+    @assigns ||= (
+      header = page.driver.browser.response_headers['Test-Bot-Assigns']
       header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
     )
   end
