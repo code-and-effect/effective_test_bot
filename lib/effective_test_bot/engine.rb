@@ -14,7 +14,9 @@ module EffectiveTestBot
 
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
+        ActionDispatch::IntegrationTest.extend(ActsAsTestBotable::ActionDispatch)
         ActionDispatch::IntegrationTest.send(:include, ActsAsTestBotable)
+        ActionDispatch::IntegrationTest.send(:include, ::CrudTest)
 
         ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotAssertions)
         ActionDispatch::IntegrationTest.send(:include, EffectiveTestBotFormHelper)

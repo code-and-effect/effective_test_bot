@@ -1,13 +1,12 @@
 module ActsAsTestBotable
   extend ActiveSupport::Concern
 
-  module ClassMethods
-    CRUD_ACTIONS = [:index, :new, :create, :edit, :update, :show, :destroy]
+  module ActionDispatch
+    CRUD_ACTIONS = [:new, :create, :edit, :update, :index, :show, :destroy]
 
-    # Calling crud_test just checks all your options
-    # Makes some assigns
-    # and includes test_botable/crud_test.rb
     def crud_test(obj, user, options = {})
+      puts "crud_test called with user #{user.email}"
+
       # Check for expected usage
       unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
         puts 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)' and return
@@ -18,16 +17,7 @@ module ActsAsTestBotable
         puts "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed" and return
       end
 
-      # Set up the crud_actions_to_test
-      crud_actions_to_test = if options[:only]
-        Array(options[:only]).flatten.compact.map(&:to_sym)
-      elsif options[:except]
-        (CRUD_ACTIONS - Array(options[:except]).flatten.compact.map(&:to_sym))
-      else
-        CRUD_ACTIONS
-      end
-
-      # Parse the resource and resourece class
+      # Parse the resource and resource class
       resource = obj.kind_of?(Class) ? obj.new() : obj
       resource_class = obj.kind_of?(Class) ? obj : obj.class
 
@@ -38,23 +28,54 @@ module ActsAsTestBotable
         {}.tap { |atts| resource.attributes.each { |k, v| atts[k] = v if empty.attributes[k] != v } }
       end || {}
 
-      # Assign variables to be used in test/test_botable/crud_test.rb
-      let(:resource) { resource }
-      let(:resource_class) { resource_class }
-      let(:resource_name) { resource_class.name.underscore }
-      let(:resource_attributes) { resource_attributes }
-      let(:user) { user }
-      let(:controller_namespace) { options[:namespace] }
-      let(:crud_actions_to_test) { crud_actions_to_test }
+      # Final options to call each test with
+      test_lets = {
+        resource: resource,
+        resource_class: resource_class,
+        resource_name: resource_class.name.underscore,
+        resource_attributes: resource_attributes,
+        controller_namespace: options[:namespace],
+        user: user
+      }
 
-      include ::CrudTest
+      # Set up the crud_actions_to_test
+      test_actions = if options[:only]
+        CRUD_ACTIONS & Array(options[:only]).flatten.compact.map(&:to_sym)
+      elsif options[:except]
+        CRUD_ACTIONS - Array(options[:except]).flatten.compact.map(&:to_sym)
+      else
+        CRUD_ACTIONS
+      end
 
-      # This will run any CrudTest methods, in order, as it's defined in the file
-      # Then the rest of the methods in whatever order they occur originally (:random, :alpha, :sorted)
-      def self.runnable_methods
-        ::CrudTest.public_instance_methods.map { |name| name.to_s if name.to_s.starts_with?('test_bot') }.compact + super.select { |name| !name.starts_with?('test_bot') }
+      # Define the methods to actually call
+      test_actions.each do |action|
+        case action
+        when :new
+          define_method("test_bot: #new #{user.email}") { run_test_bot_test(:new, test_lets) }
+        when :create
+        end
       end
     end
-
   end
+
+  # included do
+  #   test_lets = @test_lets.dup
+
+  #   @test_actions.each do |action|
+  #     case action
+  #     when :new
+  #       define_method('test_bot: #new') { run_test_bot_test(:new, test_lets) }
+  #     when :create
+  #       define_method('test_bot: #create valid') { run_test_bot_test(:create_valid, test_lets) }
+  #     end
+  #   end
+  # end
+
+  def run_test_bot_test(test, options = {})
+    puts "RUN TEST BOT TEST CALLED #{options.keys.inspect}"
+
+    options.each { |k, v| self.class.let(k) { v } }
+    self.send(test)
+  end
+
 end
