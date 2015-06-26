@@ -1,198 +1,173 @@
 module CrudTest
   def new
-    puts "TEST NEW!!"
-    puts user.email
+    sign_in(user) and visit(new_resource_path)
 
-    assert true
-    assert_equal user.email, 'admin@agilestyle.com'
+    assert_page_status
+    assert_page_title
+    assert_no_js_errors
+    assert_assigns resource_name
 
-    # # should_skip!(:new)
+    # Make sure there's a form with a submit button
+    form_selector = "form#new_#{resource_name}"
 
-    # sign_in(user) and visit(new_resource_path)
-
-    # assert_page_status
-    # assert_page_title
-    # assert_no_js_errors
-    # assert_assigns resource_name
-
-    # puts assigns['current_user']['email']
-
-    # # Make sure there's a form with a submit button
-    # form_selector = "form#new_#{resource_name}"
-
-    # assert_selector form_selector, "page does not contain a form with selector #{form_selector}"
-    # within(form_selector) do
-    #   assert_selector 'input[type=submit]', 'page form does not contain a submit button'
-    # end
+    assert_selector form_selector, "page does not contain a form with selector #{form_selector}"
+    within(form_selector) do
+      assert_selector 'input[type=submit]', 'page form does not contain a submit button'
+    end
   end
 
   def create_valid
-    puts "TEST CREATE VALID!!"
-    puts user.email
-    assert true
+    sign_in(user) and visit(new_resource_path)
+
+    before = { count: resource_class.count, path: page.current_path }
+
+    within("form#new_#{resource_name}") do
+      fill_form(resource_attributes)
+      submit_form
+    end
+
+    after = { count: resource_class.count, path: page.current_path }
+
+    refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
+    refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
+
+    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
+    # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
+    assert_assigns(resource_name) if after[:path].include?('/edit/')
+    assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
   end
 
-  # def test_create_valid
-  #   should_skip!(:create)
+  def create_invalid
+    sign_in(user) and visit(new_resource_path)
+    before = { count: resource_class.count }
 
-  #   sign_in(user) and visit(new_resource_path)
+    within("form#new_#{resource_name}") do
+      submit_novalidate_form
+    end
 
-  #   before = { count: resource_class.count, path: page.current_path }
+    after = { count: resource_class.count }
 
-  #   within("form#new_#{resource_name}") do
-  #     fill_form(resource_attributes)
-  #     submit_form
-  #   end
+    assert_equal before[:count], after[:count], 'unexpectedly created object anyway'
+    assert_equal resources_path, page.current_path, 'did not return to #create url'
+    assert_page_title :any, 'page title missing after failed validation'
 
-  #   after = { count: resource_class.count, path: page.current_path }
+    assert_flash :danger
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].present?
+  end
 
-  #   refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
-  #   refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
+  def edit
+    sign_in(user) and (resource = find_or_create_resource!)
 
-  #   # In a rails controller, if i redirect to resources_path it may not assign the instance variable
-  #   # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
-  #   assert_assigns(resource_name) if after[:path].include?('/edit/')
-  #   assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
-  # end
+    visit(edit_resource_path(resource))
 
-  # def test_create_invalid
-  #   should_skip!(:create)
+    assert_page_status
+    assert_page_title
+    assert_no_js_errors
+    assert_assigns resource_name
 
-  #   sign_in(user) and visit(new_resource_path)
-  #   before = { count: resource_class.count }
+    # Make sure there's a form with a submit button
+    form_selector = "form#edit_#{resource_name}_#{resource.id}"
 
-  #   within("form#new_#{resource_name}") do
-  #     submit_novalidate_form
-  #   end
+    assert_selector form_selector, "page does not contain a form with selector #{form_selector}"
+    within(form_selector) do
+      assert_selector 'input[type=submit]', 'page form does not contain a submit button'
+    end
 
-  #   after = { count: resource_class.count }
+    assert_assigns resource_name
+  end
 
-  #   assert_equal before[:count], after[:count], 'unexpectedly created object anyway'
-  #   assert_equal resources_path, page.current_path, 'did not return to #create url'
-  #   assert_page_title :any, 'page title missing after failed validation'
+  def update_valid
+    sign_in(user) and (resource = find_or_create_resource!)
 
-  #   assert_flash :danger
-  #   assert_assigns resource_name
-  #   assert assigns[resource_name]['errors'].present?
-  # end
+    visit(edit_resource_path(resource))
 
-  # def test_edit
-  #   should_skip!(:edit) and sign_in(user) and (resource = find_or_create_resource!)
+    before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-  #   visit(edit_resource_path(resource))
+    within("form#edit_#{resource_name}_#{resource.id}") do
+      fill_form(resource_attributes)
+      submit_form
+    end
+    resource = resource_class.find(resource.id)
 
-  #   assert_page_status
-  #   assert_page_title
-  #   assert_no_js_errors
-  #   assert_assigns resource_name
+    after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-  #   # Make sure there's a form with a submit button
-  #   form_selector = "form#edit_#{resource_name}_#{resource.id}"
+    assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
+    assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
 
-  #   assert_selector form_selector, "page does not contain a form with selector #{form_selector}"
-  #   within(form_selector) do
-  #     assert_selector 'input[type=submit]', 'page form does not contain a submit button'
-  #   end
+    assert_flash :success
+    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
+    # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
+    assert_assigns(resource_name) if after[:path] == edit_resource_path(resource)
+    assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
+  end
 
-  #   assert_assigns resource_name
-  # end
+  def update_invalid
+    sign_in(user) and (resource = find_or_create_resource!)
 
-  # def test_update_valid
-  #   should_skip!(:update) and sign_in(user) and (resource = find_or_create_resource!)
+    visit(edit_resource_path(resource))
 
-  #   visit(edit_resource_path(resource))
+    before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-  #   before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
+    within("form#edit_#{resource_name}_#{resource.id}") do
+      clear_form
+      submit_novalidate_form
+    end
+    resource = resource_class.find(resource.id)
 
-  #   within("form#edit_#{resource_name}_#{resource.id}") do
-  #     fill_form(resource_attributes)
-  #     submit_form
-  #   end
-  #   resource = resource_class.find(resource.id)
+    after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-  #   after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
+    assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
+    assert_equal(after[:updated_at], before[:updated_at], 'unexpectedly updated object anyway') if resource.respond_to?(:updated_at)
+    assert_equal resource_path(resource), page.current_path, 'did not return to #update url'
+    assert_page_title :any, 'page title missing after failed validation'
 
-  #   assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
-  #   assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
+    assert_flash :danger
+    assert_assigns resource_name
+    assert assigns[resource_name]['errors'].present?
+  end
 
-  #   assert_flash :success
-  #   # In a rails controller, if i redirect to resources_path it may not assign the instance variable
-  #   # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
-  #   assert_assigns(resource_name) if after[:path] == edit_resource_path(resource)
-  #   assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
-  # end
+  def index
+    sign_in(user) and (resource = find_or_create_resource!)
 
-  # def test_update_invalid
-  #   should_skip!(:update) and sign_in(user) and (resource = find_or_create_resource!)
+    visit resources_path
 
-  #   visit(edit_resource_path(resource))
+    assert_page_status
+    assert_page_title
+    assert_no_js_errors
+    assert (assigns['datatable'].present? || assigns[resource_name.pluralize].present?), "expected @datatable or @#{resource_name.pluralize} to be set"
+  end
 
-  #   before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
+  def show
+    sign_in(user) and (resource = create_resource!)
 
-  #   within("form#edit_#{resource_name}_#{resource.id}") do
-  #     clear_form
-  #     submit_novalidate_form
-  #   end
-  #   resource = resource_class.find(resource.id)
+    visit resource_path(resource)
 
-  #   after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
+    assert_page_status
+    assert_page_title
+    assert_no_js_errors
+    assert_assigns resource_name
+  end
 
-  #   assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
-  #   assert_equal(after[:updated_at], before[:updated_at], 'unexpectedly updated object anyway') if resource.respond_to?(:updated_at)
-  #   assert_equal resource_path(resource), page.current_path, 'did not return to #update url'
-  #   assert_page_title :any, 'page title missing after failed validation'
+  def destroy
+    sign_in(user) and (resource = find_or_create_resource!)
 
-  #   assert_flash :danger
-  #   assert_assigns resource_name
-  #   assert assigns[resource_name]['errors'].present?
-  # end
+    before = { count: resource_class.count, archived: (resource.archived rescue nil) }
 
-  # def test_index
-  #   should_skip!(:index) and sign_in(user) and (resource = find_or_create_resource!)
+    visit_delete(resource_path(resource), user)
 
-  #   visit resources_path
+    after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
 
-  #   assert_page_status
-  #   assert_page_title
-  #   assert_no_js_errors
-  #   assert (assigns['datatable'].present? || assigns[resource_name.pluralize].present?), "expected @datatable or @#{resource_name.pluralize} to be set"
-  # end
+    assert_flash :success
 
-  # def test_show
-  #   should_skip!(:show) and sign_in(user) and (resource = create_resource!)
-
-  #   visit resource_path(resource)
-
-  #   assert_page_status
-  #   assert_page_title
-  #   assert_no_js_errors
-  #   assert_assigns resource_name
-  # end
-
-  # def test_destroy
-  #   should_skip!(:destroy) and sign_in(user) and (resource = find_or_create_resource!)
-
-  #   before = { count: resource_class.count, archived: (resource.archived rescue nil) }
-
-  #   visit_delete(resource_path(resource), user)
-
-  #   after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
-
-  #   assert_flash :success
-
-  #   if resource.respond_to?(:archived)
-  #     assert after[:archived] == true, "expected #{resource_class}.archived == true"
-  #   else
-  #     refute_equal before[:count], after[:count], "unable to delete #{resource_class}"
-  #   end
-  # end
+    if resource.respond_to?(:archived)
+      assert after[:archived] == true, "expected #{resource_class}.archived == true"
+    else
+      refute_equal before[:count], after[:count], "unable to delete #{resource_class}"
+    end
+  end
 
   protected
-
-  def should_skip!(action)
-    skip('skipped') unless crud_actions_to_test.include?(action)
-    true
-  end
 
   def find_or_create_resource!
     existing = resource_class.last

@@ -2,80 +2,67 @@ module ActsAsTestBotable
   extend ActiveSupport::Concern
 
   included do
-    include CrudTest # The CrudTest module below
+    include ActsAsTestBotable::CrudTest # The CrudTest module below
     include ::CrudTest # test/test_botable/crud_test.rb
   end
 
   module CrudTest
     extend ActiveSupport::Concern
 
-    CRUD_ACTIONS = [:new, :create, :edit, :update, :index, :show, :destroy]
+    CRUD_TESTS = [:new, :create_valid, :create_invalid, :edit, :update_valid, :update_invalid, :index, :show, :destroy]
 
     module ClassMethods
       def crud_test(obj, user, options = {})
-        puts "crud_test called with user #{user.email}"
 
         # Check for expected usage
         unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
-          puts 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)' and return
+          raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
         end
 
-        # Make sure Obj.new() works
-        if obj.kind_of?(Class) && (obj.new() rescue false) == false
-          puts "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed" and return
-        end
+        test_options = parse_crud_test_options(obj, user, options)
+        tests_to_run = parse_crud_tests_to_run(options)
 
-        # Parse the resource and resource class
-        resource = obj.kind_of?(Class) ? obj.new() : obj
-        resource_class = obj.kind_of?(Class) ? obj : obj.class
-
-        # If obj is an ActiveRecord object with attributes, Post.new(:title => 'My Title')
-        # then compute any explicit attributes, so forms will be filled with those values
-        resource_attributes = if obj.kind_of?(ActiveRecord::Base)
-          empty = resource_class.new()
-          {}.tap { |atts| resource.attributes.each { |k, v| atts[k] = v if empty.attributes[k] != v } }
-        end || {}
-
-        # Final options to call each test with
-        test_lets = {
-          resource: resource,
-          resource_class: resource_class,
-          resource_name: resource_class.name.underscore,
-          resource_attributes: resource_attributes,
-          controller_namespace: options[:namespace],
-          user: user
-        }
-
-        # Set up the crud_actions_to_test
-        test_actions = if options[:only]
-          CRUD_ACTIONS & Array(options[:only]).flatten.compact.map(&:to_sym)
-        elsif options[:except]
-          CRUD_ACTIONS - Array(options[:except]).flatten.compact.map(&:to_sym)
+        # You can't define a method with the exact same name
+        # So we need to create a unique name here, that still looks good in MiniTest output
+        @defined_crud_tests = (@defined_crud_tests || 0) + 1
+        if options[:label].present?
+          test_prefix = "test_bot: (#{label})"
+        elsif @defined_crud_tests > 1
+          test_prefix = "test_bot: (#{@defined_crud_tests})"
         else
-          CRUD_ACTIONS
+          test_prefix = 'test_bot:'
         end
 
-        # Define the methods to actually call
-        test_actions.each do |action|
-          case action
+        tests_to_run.each do |test|
+          case test
           when :new
-            define_method("test_bot: #new #{user.email}") { crud_test(:new, nil, nil, nil, test_lets) }
-          when :create
+            define_method("#{test_prefix} #new") { crud_action_test(:new, test_options) }
+          when :create_valid
+            define_method("#{test_prefix} #create valid") { crud_action_test(:create_valid, test_options) }
+          when :create_invalid
+            define_method("#{test_prefix} #create invalid") { crud_action_test(:create_invalid, test_options) }
+          when :edit
+            define_method("#{test_prefix} #edit") { crud_action_test(:edit, test_options) }
+          when :update_valid
+            define_method("#{test_prefix} #update valid") { crud_action_test(:update_valid, test_options) }
+          when :update_invalid
+            define_method("#{test_prefix} #update invalid") { crud_action_test(:update_invalid, test_options) }
+          when :index
+            define_method("#{test_prefix} #index") { crud_action_test(:index, test_options) }
+          when :show
+            define_method("#{test_prefix} #show") { crud_action_test(:show, test_options) }
+          when :destroy
+            define_method("#{test_prefix} #destroy") { crud_action_test(:destroy, test_options) }
+          else
+            puts "unknown test passed to crud_test: #{test}"
           end
         end
       end
 
       def parse_crud_test_options(obj, user, options = {})
-        # Check for expected usage
-        unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
-          puts 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
-          return false
-        end
-
         # Make sure Obj.new() works
         if obj.kind_of?(Class) && (obj.new() rescue false) == false
-          puts "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed"
-          return false
+          raise "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed"
         end
 
         # Parse the resource and resource class
@@ -90,7 +77,7 @@ module ActsAsTestBotable
         end || {}
 
         # Final options to call each test with
-        test_lets = {
+        {
           resource: resource,
           resource_class: resource_class,
           resource_name: resource_class.name.underscore,
@@ -98,17 +85,48 @@ module ActsAsTestBotable
           controller_namespace: options[:namespace],
           user: user
         }
-
       end
 
+      private
+
+      def parse_crud_tests_to_run(options)
+        if options[:only]
+          options[:only] = Array(options[:only]).flatten.compact.map(&:to_sym)
+          options[:only] = options[:only] + [:create_valid, :create_invalid] if options[:only].delete(:create)
+          options[:only] = options[:only] + [:update_valid, :update_invalid] if options[:only].delete(:update)
+
+          CRUD_TESTS & options[:only]
+        elsif options[:except]
+          options[:except] = Array(options[:except]).flatten.compact.map(&:to_sym)
+          options[:except] = options[:except] + [:create_valid, :create_invalid] if options[:except].delete(:create)
+          options[:except] = options[:except] + [:update_valid, :update_invalid] if options[:except].delete(:update)
+
+          CRUD_TESTS - options[:except]
+        else
+          CRUD_TESTS
+        end
+      end
     end
 
-    # Instance Method
-    def crud_test(test, obj, user, options = {}, lets = {})
+    # Instance Methods
 
+    # This should allow you to run a crud_test method in a test
+    # crud_test(:new, Clinic, User.first)
+    #
+    # If obj is a Hash {:resource => ...} just skip over parsing options
+    # And assume it's already been done (by the ClassMethod crud_test)
+    def crud_action_test(test, obj, user = nil, options = {})
+      if obj.kind_of?(Hash) && obj.key?(:resource)
+        obj
+      else
+        # Check for expected usage
+        unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
+          raise 'invalid parameters passed to crud_action_test(), expecting crud_action_test(:new, Post || Post.new(), User.first, options_hash)'
+        end
 
+        self.class.parse_crud_test_options(obj, user, options)
+      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      options.each { |k, v| self.class.let(k) { v } }
       self.send(test)
     end
 
