@@ -13,6 +13,17 @@ module EffectiveTestBotTestHelper
     sign_in(user)
     session.driver.submit :delete, path, {}
     session.document.find('html')
+
+    # Assign the Flash and Assigns
+    @flash = (
+      header = session.driver.response_headers['Test-Bot-Flash']
+      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
+    )
+
+    @assigns = (
+      header = session.driver.response_headers['Test-Bot-Assigns']
+      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
+    )
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header

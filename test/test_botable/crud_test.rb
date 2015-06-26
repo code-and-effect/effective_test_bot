@@ -63,7 +63,7 @@ module CrudTest
   end
 
   define_method 'test_bot: #edit' do
-    should_skip!(:edit) and sign_in(user) and (resource = create_resource!)
+    should_skip!(:edit) and sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
 
@@ -84,7 +84,7 @@ module CrudTest
   end
 
   define_method 'test_bot: #update valid' do
-    should_skip!(:update) and sign_in(user) and (resource = create_resource!)
+    should_skip!(:update) and sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
 
@@ -109,7 +109,7 @@ module CrudTest
   end
 
   define_method 'test_bot: #update invalid' do
-    should_skip!(:update) and sign_in(user) and (resource = create_resource!)
+    should_skip!(:update) and sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
 
@@ -134,7 +134,7 @@ module CrudTest
   end
 
   define_method 'test_bot: #index' do
-    should_skip!(:index) and sign_in(user) and (resource = create_resource!)
+    should_skip!(:index) and sign_in(user) and (resource = find_or_create_resource!)
 
     visit resources_path
 
@@ -156,7 +156,7 @@ module CrudTest
   end
 
   define_method 'test_bot: #destroy' do
-    should_skip!(:destroy) and sign_in(user) and (resource = create_resource!)
+    should_skip!(:destroy) and sign_in(user) and (resource = find_or_create_resource!)
 
     before = { count: resource_class.count, archived: (resource.archived rescue nil) }
 
@@ -165,8 +165,6 @@ module CrudTest
     after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
 
     assert_flash :success
-    assert_assigns resource_name
-    assert assigns[resource_name]['errors'].blank?
 
     if resource.respond_to?(:archived)
       assert after[:archived] == true, "expected #{resource_class}.archived == true"
@@ -180,6 +178,11 @@ module CrudTest
   def should_skip!(action)
     skip('skipped') unless crud_actions_to_test.include?(action)
     true
+  end
+
+  def find_or_create_resource!
+    existing = resource_class.last
+    existing.present? ? existing : create_resource!
   end
 
   def create_resource!
