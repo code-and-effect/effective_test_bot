@@ -1,7 +1,6 @@
 module ActsAsTestBotable
-  extend ActiveSupport::Concern
 
-  module ActionDispatch
+  module ClassMethods
     CRUD_ACTIONS = [:new, :create, :edit, :update, :index, :show, :destroy]
 
     def crud_test(obj, user, options = {})
@@ -51,29 +50,15 @@ module ActsAsTestBotable
       test_actions.each do |action|
         case action
         when :new
-          define_method("test_bot: #new #{user.email}") { run_test_bot_test(:new, test_lets) }
+          define_method("test_bot: #new #{user.email}") { crud_test(:new, test_lets) }
         when :create
         end
       end
     end
   end
 
-  # included do
-  #   test_lets = @test_lets.dup
-
-  #   @test_actions.each do |action|
-  #     case action
-  #     when :new
-  #       define_method('test_bot: #new') { run_test_bot_test(:new, test_lets) }
-  #     when :create
-  #       define_method('test_bot: #create valid') { run_test_bot_test(:create_valid, test_lets) }
-  #     end
-  #   end
-  # end
-
-  def run_test_bot_test(test, options = {})
-    puts "RUN TEST BOT TEST CALLED #{options.keys.inspect}"
-
+  # Instance Method
+  def crud_test(test, options = {})
     options.each { |k, v| self.class.let(k) { v } }
     self.send(test)
   end
