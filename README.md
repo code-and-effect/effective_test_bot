@@ -40,6 +40,10 @@ bundle exec rake test:bot
 You should now see multiple -- hopefully passing -- tests that you didn't write!
 
 
+
+rake test TEST=test/integration/clinic_assets_test.rb
+
+
 ## Fixtures
 
 TODO
