@@ -35,9 +35,10 @@ module CrudTest
     refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
     refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
 
-    assert_flash :success
-    assert_assigns resource_name
-    assert assigns[resource_name]['errors'].blank?
+    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
+    # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
+    assert_assigns(resource_name) if after[:path].include?('/edit/')
+    assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
   end
 
   define_method 'test_bot: #create invalid' do
@@ -101,8 +102,10 @@ module CrudTest
     assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
 
     assert_flash :success
-    assert_assigns resource_name
-    assert assigns[resource_name]['errors'].blank?
+    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
+    # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
+    assert_assigns(resource_name) if after[:path] == edit_resource_path(resource)
+    assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
   end
 
   define_method 'test_bot: #update invalid' do

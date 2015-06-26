@@ -7,7 +7,7 @@ module EffectiveTestBotControllerHelper
     # Anything that's a simple object can be serialized
     test_bot_assigns = {}
 
-    view_context.assigns.each do |key, object|
+    view_assigns.each do |key, object|
       case object
       when ActiveRecord::Base
         test_bot_assigns[key] = object.attributes
