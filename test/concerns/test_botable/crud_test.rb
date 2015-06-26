@@ -129,7 +129,7 @@ module TestBotable
         self.class.crud_test_options(obj, user, options)
       end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      self.send(test)
+      self.public_send(test)
     end
   end
 end
