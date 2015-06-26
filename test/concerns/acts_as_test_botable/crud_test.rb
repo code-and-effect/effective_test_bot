@@ -1,11 +1,4 @@
 module ActsAsTestBotable
-  extend ActiveSupport::Concern
-
-  included do
-    include ActsAsTestBotable::CrudTest # The CrudTest module below
-    include ::CrudTest # test/test_botable/crud_test.rb
-  end
-
   module CrudTest
     extend ActiveSupport::Concern
 
@@ -13,6 +6,8 @@ module ActsAsTestBotable
 
     module ClassMethods
       def crud_test(obj, user, options = {})
+        include ::CrudTest # test/test_botable/crud_test.rb
+
         # Check for expected usage
         unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
           raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
@@ -38,6 +33,8 @@ module ActsAsTestBotable
         end
       end
 
+      # Parses and validates lots of options
+      # The output is what gets sent to each test and defined as lets
       def crud_test_options(obj, user, options = {})
         # Make sure Obj.new() works
         if obj.kind_of?(Class) && (obj.new() rescue false) == false
@@ -75,6 +72,8 @@ module ActsAsTestBotable
 
       private
 
+      # Parses the incoming options[:only] and [:except]
+      # To only define the appropriate methods
       # This guarantees the functions will be defined in the same order as CRUD_TESTS
       def crud_tests_to_define(options)
         to_run = if options[:only]
@@ -94,13 +93,13 @@ module ActsAsTestBotable
         end
       end
 
-      # You can't define a method with the exact same name
-      # So we need to create a unique name here, that still looks good in MiniTest output
+      # You can't define multiple methods with the same name
+      # So we need to create a unique name, where appropriate, that still looks good in MiniTest output
       def crud_tests_prefix(options)
         @num_defined_crud_tests = (@num_defined_crud_tests || 0) + 1
 
         if options[:label].present?
-          "test_bot: (#{label})"
+          "test_bot: (#{options[:label]})"
         elsif @num_defined_crud_tests > 1
           "test_bot: (#{@num_defined_crud_tests})"
         else
@@ -113,7 +112,7 @@ module ActsAsTestBotable
     # Instance Methods
 
     # This should allow you to run a crud_test method in a test
-    # crud_test(:create_valid, Clinic, User.first)
+    # crud_action_test(:create_valid, Clinic, User.first)
     #
     # If obj is a Hash {:resource => ...} just skip over parsing options
     # And assume it's already been done (by the ClassMethod crud_test)
@@ -131,7 +130,5 @@ module ActsAsTestBotable
 
       self.send(test)
     end
-
-  end # / CrudTest module
-
+  end
 end

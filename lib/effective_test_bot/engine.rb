@@ -2,9 +2,9 @@ module EffectiveTestBot
   class Engine < ::Rails::Engine
     engine_name 'effective_test_bot'
 
+    config.autoload_paths += Dir["#{config.root}/test/test_botable/**/"] # Must be first
     config.autoload_paths += Dir["#{config.root}/test/concerns/**/"]
     config.autoload_paths += Dir["#{config.root}/test/support/**/"]
-    config.autoload_paths += Dir["#{config.root}/test/test_botable/**/"]
 
     # Set up our default configuration options.
     initializer "effective_test_bot.defaults", :before => :load_config_initializers do |app|
@@ -14,8 +14,7 @@ module EffectiveTestBot
 
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
-        # ClassMethods get extended, InstanceMethods get included
-        ActionDispatch::IntegrationTest.include ActsAsTestBotable
+        ActionDispatch::IntegrationTest.include ActsAsTestBotable::CrudTest
 
         # A whole bunch of helper methods
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
