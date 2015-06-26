@@ -13,7 +13,6 @@ module ActsAsTestBotable
 
     module ClassMethods
       def crud_test(obj, user, options = {})
-
         # Check for expected usage
         unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
           raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
@@ -85,6 +84,13 @@ module ActsAsTestBotable
           controller_namespace: options[:namespace],
           user: user
         }
+      end
+
+      # Run any test_bot tests first, in the order they're defined
+      # then the rest of the tests with whatever order they come in
+      def runnable_methods
+        self.public_instance_methods.select { |name| name.to_s.starts_with?('test_bot') }.map(&:to_s) +
+          super.reject { |name| name.starts_with?('test_bot') }
       end
 
       private
