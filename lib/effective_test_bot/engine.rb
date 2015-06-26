@@ -15,11 +15,7 @@ module EffectiveTestBot
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
         # ClassMethods get extended, InstanceMethods get included
-        ActionDispatch::IntegrationTest.extend ActsAsTestBotable::ClassMethods
         ActionDispatch::IntegrationTest.include ActsAsTestBotable
-
-        # Define Crud Tests, so we're only including it once
-        ActionDispatch::IntegrationTest.include CrudTest
 
         # A whole bunch of helper methods
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions

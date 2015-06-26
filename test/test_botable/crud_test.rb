@@ -6,7 +6,7 @@ module CrudTest
     assert true
     assert_equal user.email, 'admin@agilestyle.com'
 
-    # should_skip!(:new)
+    # # should_skip!(:new)
 
     # sign_in(user) and visit(new_resource_path)
 
