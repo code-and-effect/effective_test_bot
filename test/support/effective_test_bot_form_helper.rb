@@ -30,10 +30,13 @@ module EffectiveTestBotFormHelper
         raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
       end
     end
+
+    true
   end
 
   def clear_form
     all('input,select,textarea').each { |field| (field.set('') rescue false) }
+    true
   end
 
   # Operates on just string keys
@@ -111,6 +114,7 @@ module EffectiveTestBotFormHelper
       first(:css, "input[type='submit']").click
     end
     synchronize!
+    true
   end
 
   # Submit form after disabling any HTML5 validations
