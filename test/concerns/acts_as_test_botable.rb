@@ -18,47 +18,27 @@ module ActsAsTestBotable
           raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
         end
 
-        test_options = parse_crud_test_options(obj, user, options)
-        tests_to_run = parse_crud_tests_to_run(options)
+        test_options = crud_test_options(obj, user, options)
+        tests_prefix = crud_tests_prefix(options)
 
-        # You can't define a method with the exact same name
-        # So we need to create a unique name here, that still looks good in MiniTest output
-        @defined_crud_tests = (@defined_crud_tests || 0) + 1
-        if options[:label].present?
-          test_prefix = "test_bot: (#{label})"
-        elsif @defined_crud_tests > 1
-          test_prefix = "test_bot: (#{@defined_crud_tests})"
-        else
-          test_prefix = 'test_bot:'
-        end
-
-        tests_to_run.each do |test|
-          case test
-          when :new
-            define_method("#{test_prefix} #new") { crud_action_test(:new, test_options) }
-          when :create_valid
-            define_method("#{test_prefix} #create valid") { crud_action_test(:create_valid, test_options) }
-          when :create_invalid
-            define_method("#{test_prefix} #create invalid") { crud_action_test(:create_invalid, test_options) }
-          when :edit
-            define_method("#{test_prefix} #edit") { crud_action_test(:edit, test_options) }
-          when :update_valid
-            define_method("#{test_prefix} #update valid") { crud_action_test(:update_valid, test_options) }
-          when :update_invalid
-            define_method("#{test_prefix} #update invalid") { crud_action_test(:update_invalid, test_options) }
-          when :index
-            define_method("#{test_prefix} #index") { crud_action_test(:index, test_options) }
-          when :show
-            define_method("#{test_prefix} #show") { crud_action_test(:show, test_options) }
-          when :destroy
-            define_method("#{test_prefix} #destroy") { crud_action_test(:destroy, test_options) }
-          else
-            puts "unknown test passed to crud_test: #{test}"
+        crud_tests_to_define(options).each do |test|
+          test_name = case test
+            when :new               ; "#{tests_prefix} #new"
+            when :create_valid      ; "#{tests_prefix} #create valid"
+            when :create_invalid    ; "#{tests_prefix} #create invalid"
+            when :edit              ; "#{tests_prefix} #edit"
+            when :update_valid      ; "#{tests_prefix} #update valid"
+            when :update_invalid    ; "#{tests_prefix} #update invalid"
+            when :index             ; "#{tests_prefix} #index"
+            when :show              ; "#{tests_prefix} #show"
+            when :destroy           ; "#{tests_prefix} #destroy"
           end
+
+          define_method(test_name) { crud_action_test(test, test_options) }
         end
       end
 
-      def parse_crud_test_options(obj, user, options = {})
+      def crud_test_options(obj, user, options = {})
         # Make sure Obj.new() works
         if obj.kind_of?(Class) && (obj.new() rescue false) == false
           raise "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed"
@@ -95,8 +75,9 @@ module ActsAsTestBotable
 
       private
 
-      def parse_crud_tests_to_run(options)
-        if options[:only]
+      # This guarantees the functions will be defined in the same order as CRUD_TESTS
+      def crud_tests_to_define(options)
+        to_run = if options[:only]
           options[:only] = Array(options[:only]).flatten.compact.map(&:to_sym)
           options[:only] = options[:only] + [:create_valid, :create_invalid] if options[:only].delete(:create)
           options[:only] = options[:only] + [:update_valid, :update_invalid] if options[:only].delete(:update)
@@ -112,12 +93,27 @@ module ActsAsTestBotable
           CRUD_TESTS
         end
       end
+
+      # You can't define a method with the exact same name
+      # So we need to create a unique name here, that still looks good in MiniTest output
+      def crud_tests_prefix(options)
+        @num_defined_crud_tests = (@num_defined_crud_tests || 0) + 1
+
+        if options[:label].present?
+          "test_bot: (#{label})"
+        elsif @num_defined_crud_tests > 1
+          "test_bot: (#{@num_defined_crud_tests})"
+        else
+          'test_bot:'
+        end
+      end
+
     end
 
     # Instance Methods
 
     # This should allow you to run a crud_test method in a test
-    # crud_test(:new, Clinic, User.first)
+    # crud_test(:create_valid, Clinic, User.first)
     #
     # If obj is a Hash {:resource => ...} just skip over parsing options
     # And assume it's already been done (by the ClassMethod crud_test)
@@ -130,7 +126,7 @@ module ActsAsTestBotable
           raise 'invalid parameters passed to crud_action_test(), expecting crud_action_test(:new, Post || Post.new(), User.first, options_hash)'
         end
 
-        self.class.parse_crud_test_options(obj, user, options)
+        self.class.crud_test_options(obj, user, options)
       end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
       self.send(test)
