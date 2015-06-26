@@ -1,20 +1,21 @@
-module ActsAsTestBotable
+module TestBotable
   module CrudTest
     extend ActiveSupport::Concern
 
     CRUD_TESTS = [:new, :create_valid, :create_invalid, :edit, :update_valid, :update_invalid, :index, :show, :destroy]
 
     module ClassMethods
-      def crud_test(obj, user, options = {})
-        include ::CrudTest # test/test_botable/crud_test.rb
 
+      # All this does is define a 'test_bot' method for each required action on this class
+      # So that MiniTest will see the test functions and run them
+      def crud_test(obj, user, options = {})
         # Check for expected usage
         unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
           raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
         end
 
-        test_options = crud_test_options(obj, user, options)
-        tests_prefix = crud_tests_prefix(options)
+        test_options = crud_test_options(obj, user, options) # returns a Hash of let! options
+        tests_prefix = crud_tests_prefix(options) # returns a string something like "test_bot (3)"
 
         crud_tests_to_define(options).each do |test|
           test_name = case test

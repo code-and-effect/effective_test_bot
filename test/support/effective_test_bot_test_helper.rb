@@ -15,31 +15,18 @@ module EffectiveTestBotTestHelper
     session.document.find('html')
 
     # Assign the Flash and Assigns
-    @flash = (
-      header = session.driver.response_headers['Test-Bot-Flash']
-      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
-    )
-
-    @assigns = (
-      header = session.driver.response_headers['Test-Bot-Assigns']
-      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
-    )
+    @flash = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Flash'])) rescue {})
+    @assigns = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Assigns'])) rescue {})
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # that encodes the flash message, and some of the assigns
   def flash
-    @flash ||= (
-      header = page.driver.browser.response_headers['Test-Bot-Flash']
-      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
-    )
+    @flash ||= (JSON.parse(Base64.decode64(page.driver.browser.response_headers['Test-Bot-Flash'])) rescue {})
   end
 
   def assigns
-    @assigns ||= (
-      header = page.driver.browser.response_headers['Test-Bot-Assigns']
-      header.present? ? (JSON.parse(Base64.decode64(header)) rescue {}) : {}
-    )
+    @assigns ||= (JSON.parse(Base64.decode64(page.driver.browser.response_headers['Test-Bot-Assigns'])) rescue {})
   end
 
 end
