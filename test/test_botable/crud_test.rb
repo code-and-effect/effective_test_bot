@@ -5,14 +5,14 @@ module CrudTest
     assert_page_status
     assert_page_title
     assert_no_js_errors
-    assert_assigns resource_name
+    assert_assigns(resource_name)
 
     # Make sure there's a form with a submit button
     form_selector = "form#new_#{resource_name}"
 
-    assert_selector form_selector, "page does not contain a form with selector #{form_selector}"
+    assert_selector form_selector, "Expected form with selector #{form_selector}"
     within(form_selector) do
-      assert_selector 'input[type=submit]', 'page form does not contain a submit button'
+      assert_selector 'input[type=submit]', 'Expected submit button to be present'
     end
   end
 
@@ -28,13 +28,13 @@ module CrudTest
 
     after = { count: resource_class.count, path: page.current_path }
 
-    refute_equal before[:count], after[:count], "unable to create #{resource_class} object"
-    refute_equal before[:path], after[:path], "unable to create #{resource_class} object"
+    refute_equal before[:count], after[:count], "Expected fill_form to create a #{resource_class} object"
+    refute_equal(before[:path], after[:path], "[create_valid: :path] Expected unique before and after paths") unless skip?(:path)
 
-    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
+    # In a rails controller, if I redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if after[:path].include?('/edit/')
-    assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
+    assert_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be blank") if assigns[resource_name].present?
   end
 
   def create_invalid
@@ -42,18 +42,20 @@ module CrudTest
     before = { count: resource_class.count }
 
     within("form#new_#{resource_name}") do
+      clear_form
       submit_novalidate_form
     end
 
     after = { count: resource_class.count }
 
-    assert_equal before[:count], after[:count], 'unexpectedly created object anyway'
-    assert_equal resources_path, page.current_path, 'did not return to #create url'
-    assert_page_title :any, 'page title missing after failed validation'
+    assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
+    assert_page_title :any, 'Expected page title to be present after failed validation'
 
     assert_flash :danger
     assert_assigns resource_name
-    assert assigns[resource_name]['errors'].present?
+    refute_equal nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be present"
+
+    assert_equal(resources_path, page.current_path, "[create_invalid: :path] Expected current_path to match resource #create path") unless skip?(:path)
   end
 
   def edit
@@ -69,12 +71,10 @@ module CrudTest
     # Make sure there's a form with a submit button
     form_selector = "form#edit_#{resource_name}_#{resource.id}"
 
-    assert_selector form_selector, "page does not contain a form with selector #{form_selector}"
+    assert_selector form_selector, "Expected form with selector #{form_selector}"
     within(form_selector) do
-      assert_selector 'input[type=submit]', 'page form does not contain a submit button'
+      assert_selector 'input[type=submit]', 'Expected submit button to be present'
     end
-
-    assert_assigns resource_name
   end
 
   def update_valid
@@ -92,14 +92,15 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
-    assert(after[:updated_at] > before[:updated_at], "failed to update resource") if resource.respond_to?(:updated_at)
+    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
+    refute_equal(before[:updated_at], after[:updated_at], "Expected @#{resource_name}.updated_at to have changed") if resource.respond_to?(:updated_at)
 
     assert_flash :success
+
     # In a rails controller, if i redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if after[:path] == edit_resource_path(resource)
-    assert(assigns[resource_name]['errors'].blank?) if assigns[resource_name].present?
+    assert_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be blank") if assigns[resource_name].present?
   end
 
   def update_invalid
@@ -117,14 +118,15 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_equal before[:count], after[:count], "updating resource unexpectedly changed #{resource_class}.count"
-    assert_equal(after[:updated_at], before[:updated_at], 'unexpectedly updated object anyway') if resource.respond_to?(:updated_at)
-    assert_equal resource_path(resource), page.current_path, 'did not return to #update url'
-    assert_page_title :any, 'page title missing after failed validation'
+    assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
+    assert_equal(before[:updated_at], after[:updated_at], "Expected @#{resource_name}.updated_at to be unchanged") if resource.respond_to?(:updated_at)
+    assert_page_title :any, 'Expected page title to be present after failed validation'
 
     assert_flash :danger
     assert_assigns resource_name
-    assert assigns[resource_name]['errors'].present?
+    refute_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be present") if assigns[resource_name].present?
+
+    assert_equal(resource_path(resource), page.current_path, "[update_invalid: :path] Expected current_path to match resource #update path") unless skip?(:path)
   end
 
   def index
@@ -135,7 +137,7 @@ module CrudTest
     assert_page_status
     assert_page_title
     assert_no_js_errors
-    assert (assigns['datatable'].present? || assigns[resource_name.pluralize].present?), "expected @datatable or @#{resource_name.pluralize} to be set"
+    assert((assigns['datatable'].present? || assigns[resource_name.pluralize].present?), "[index: :assigns] Expected @#{resource_name.pluralize} or @datatable to be present") unless skip?(:assigns)
   end
 
   def show
@@ -161,17 +163,21 @@ module CrudTest
     assert_flash :success
 
     if resource.respond_to?(:archived)
-      assert after[:archived] == true, "expected #{resource_class}.archived == true"
+      assert after[:archived] == true, "Expected #{resource_class}.archived? to be true"
     else
-      refute_equal before[:count], after[:count], "unable to delete #{resource_class}"
+      refute_equal before[:count], after[:count], "Expected: #{resource_class}.count to decrement by 1"
     end
   end
 
   protected
 
+  def skip?(test)
+    skips.include?(test)
+  end
+
   def find_or_create_resource!
     existing = resource_class.last
-    existing.present? ? existing : create_resource!
+    (existing.present? && !existing.kind_of?(User)) ? existing : create_resource!
   end
 
   def create_resource!

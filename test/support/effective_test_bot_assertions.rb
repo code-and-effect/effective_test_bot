@@ -11,7 +11,7 @@ module EffectiveTestBotAssertions
     assert page.has_selector?('form#new_user')
   end
 
-  def assert_page_title(title = :any, message = 'expected page title to be present')
+  def assert_page_title(title = :any, message = 'Expected page title to be present')
     if title.present? && title != :any
       assert_title(title) # Capybara TitleQuery, match this text
     else
@@ -20,8 +20,8 @@ module EffectiveTestBotAssertions
     end
   end
 
-  def assert_page_status(status = 200)
-    assert_equal status, page.status_code, "expected page to load with #{status} HTTP status code"
+  def assert_page_status(status = 200, message = 'Expected :status: HTTP status code')
+    assert_equal status, page.status_code, message.sub(':status:', status.to_s)
   end
 
   def assert_no_js_errors
@@ -36,9 +36,9 @@ module EffectiveTestBotAssertions
     if key.present? && value.present?
       assert_equal value, flash[key.to_s]
     elsif key.present?
-      assert flash[key.to_s].present?, "expected flash[#{key}] to be present"
+      assert flash[key.to_s].present?, "Expected flash[#{key}] to be present"
     else
-      assert flash.present?, 'expected flash to be present'
+      assert flash.present?, 'Expected flash to be present'
     end
   end
 
@@ -49,9 +49,9 @@ module EffectiveTestBotAssertions
     if key.present? && value.present?
       assert_equal value, assigns[key.to_s]
     elsif key.present?
-      assert assigns[key.to_s].present?, "expected @#{key} to be assigned"
+      assert assigns[key.to_s].present?, "Expected @#{key} to be assigned"
     else
-      assert assigns.present?, 'expected assigns to be present'
+      assert assigns.present?, 'Expected assigns to be present'
     end
   end
 
