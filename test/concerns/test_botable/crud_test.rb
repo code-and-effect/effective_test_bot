@@ -14,6 +14,11 @@ module TestBotable
           raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
         end
 
+        if (options[:skip] || options[:skips]).present? && (options[:skip] || options[:skips]).kind_of?(Hash) == false
+          raise 'invalid skip syntax, expecting skip: {create_invalid: [:path]}'
+        end
+
+        skips = options.delete(:skip) || options.delete(:skips) || {} # So you can skip sub tests
         test_options = crud_test_options(obj, user, options) # returns a Hash of let! options
         tests_prefix = crud_tests_prefix(options) # returns a string something like "test_bot (3)"
 
@@ -30,7 +35,11 @@ module TestBotable
             when :destroy           ; "#{tests_prefix} #destroy"
           end
 
-          define_method(test_name) { crud_action_test(test, test_options) }
+          if skips[test].present?
+            define_method(test_name) { crud_action_test(test, test_options.merge(skips: Array(skips[test]))) }
+          else
+            define_method(test_name) { crud_action_test(test, test_options) }
+          end
         end
       end
 
@@ -60,14 +69,15 @@ module TestBotable
           resource_name: resource_class.name.underscore,
           resource_attributes: resource_attributes,
           controller_namespace: options[:namespace],
-          user: user
+          user: user,
+          skips: Array(options[:skip] || options[:skips])
         }
       end
 
       # Run any test_bot tests first, in the order they're defined
       # then the rest of the tests with whatever order they come in
       def runnable_methods
-        self.public_instance_methods.select { |name| name.to_s.starts_with?('test_bot') }.map(&:to_s) +
+        self.public_instance_methods.select { |name| name.to_s.starts_with?('crud_test') }.map(&:to_s) +
           super.reject { |name| name.starts_with?('test_bot') }
       end
 
@@ -100,11 +110,11 @@ module TestBotable
         @num_defined_crud_tests = (@num_defined_crud_tests || 0) + 1
 
         if options[:label].present?
-          "test_bot: (#{options[:label]})"
+          "crud_test: (#{options[:label]})"
         elsif @num_defined_crud_tests > 1
-          "test_bot: (#{@num_defined_crud_tests})"
+          "crud_test: (#{@num_defined_crud_tests})"
         else
-          'test_bot:'
+          'crud_test:'
         end
       end
 
