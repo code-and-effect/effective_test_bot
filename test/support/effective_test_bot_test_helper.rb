@@ -22,11 +22,11 @@ module EffectiveTestBotTestHelper
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # that encodes the flash message, and some of the assigns
   def flash
-    @flash ||= (JSON.parse(Base64.decode64(page.driver.browser.response_headers['Test-Bot-Flash'])) rescue {})
+    @flash ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Flash'])) rescue {})
   end
 
   def assigns
-    @assigns ||= (JSON.parse(Base64.decode64(page.driver.browser.response_headers['Test-Bot-Assigns'])) rescue {})
+    @assigns ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Assigns'])) rescue {})
   end
 
 end
