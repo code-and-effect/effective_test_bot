@@ -63,7 +63,7 @@ module EffectiveTestBotFormHelper
     when 'input_number'
       Faker::Number.number(4)
     when 'input_password'
-      Faker::Internet.password
+      @test_bot_password ||= Faker::Internet.password  # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
     when 'input_tel'
       d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
@@ -128,8 +128,6 @@ module EffectiveTestBotFormHelper
   def upload_effective_asset(field, files)
     files = Array(files)
     uid = field['id']
-
-    page.driver.allow_url(Effective::Asset.s3_base_path)
 
     js = "fileList = Array();"
 
