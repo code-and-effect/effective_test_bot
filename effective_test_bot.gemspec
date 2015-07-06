@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'minitest-rails-capybara'
   s.add_dependency 'minitest-reporters'
   s.add_dependency 'capybara'
-  s.add_dependency 'capybara-webkit'
+  s.add_dependency 'capybara-webkit', '>= 1.6.0'
   s.add_dependency 'capybara-screenshot'
   s.add_dependency 'capybara-slow_finder_errors'
   s.add_dependency 'shoulda'
