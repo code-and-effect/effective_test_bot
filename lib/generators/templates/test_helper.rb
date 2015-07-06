@@ -45,6 +45,7 @@ Capybara.javascript_driver = :webkit
 Capybara::Screenshot.autosave_on_failure = true
 Capybara::Screenshot.prune_strategy = :keep_last_run
 Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
+Capybara::Webkit.configure { |config| config.allow_unknown_urls }
 
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
