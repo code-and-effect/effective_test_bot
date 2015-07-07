@@ -123,6 +123,21 @@ module EffectiveTestBotFormHelper
     submit_form(label)
   end
 
+  def with_raised_unpermitted_params_exceptions(&block)
+    action = nil
+
+    begin  # This will only work with Rails >= 4.0
+      action = ActionController::Parameters.action_on_unpermitted_parameters
+      ActionController::Parameters.action_on_unpermitted_parameters = :raise
+    rescue => e
+      puts 'unable to assign config.action_on_unpermitted_parameters = :raise, unpermitted params assertions disabled.'
+    end
+
+    yield
+
+    ActionController::Parameters.action_on_unpermitted_parameters = action if action.present?
+  end
+
   # The field here is going to be the %input{:type => file}. Files can be one or more pathnames
   # http://stackoverflow.com/questions/5188240/using-selenium-to-imitate-dragging-a-file-onto-an-upload-element/11203629#11203629
   def upload_effective_asset(field, files)

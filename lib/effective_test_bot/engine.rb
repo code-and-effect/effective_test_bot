@@ -25,30 +25,18 @@ module EffectiveTestBot
       end
     end
 
-    initializer 'effective_test_bot.assign_unpermitted_params_headers' do
-      Rails.application.config.to_prepare do
-        if Rails.env.test?
-          begin
-            ActionController::Parameters.action_on_unpermitted_parameters = :raise
-
-            ApplicationController.instance_exec do
-              rescue_from ActionController::UnpermittedParameters do |exception|
-                assign_test_bot_unpermitted_params_headers(exception)
-              end
-            end
-          rescue => e
-            puts 'unable to assign config.action_on_unpermitted_params = :raise, so unpermitted params tests will not work'
-          end
-        end
-      end
-    end
-
-
     initializer 'effective_test_bot.assign_assign_headers' do
       ActiveSupport.on_load :action_controller do
         if Rails.env.test?
           ActionController::Base.send :include, ::EffectiveTestBotControllerHelper
           ActionController::Base.send :after_filter, :assign_test_bot_http_headers
+
+          ApplicationController.instance_exec do
+            rescue_from ActionController::UnpermittedParameters do |exception|
+              assign_test_bot_unpermitted_params_headers(exception)
+            end
+          end
+
         end
       end
     end

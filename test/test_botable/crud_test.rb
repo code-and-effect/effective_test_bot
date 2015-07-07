@@ -23,7 +23,7 @@ module CrudTest
 
     within("form#new_#{resource_name}") do
       fill_form(resource_attributes)
-      submit_form
+      skip?(:unpermitted_params) == true ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
     end
 
     after = { count: resource_class.count, path: page.current_path }
@@ -88,7 +88,7 @@ module CrudTest
 
     within("form#edit_#{resource_name}_#{resource.id}") do
       fill_form(resource_attributes)
-      submit_form
+      skip?(:unpermitted_params) == true ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
     end
     resource = resource_class.find(resource.id)
 

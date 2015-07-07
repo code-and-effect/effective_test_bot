@@ -17,6 +17,7 @@ module EffectiveTestBotTestHelper
     # Assign the Flash and Assigns
     @flash = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Flash'])) rescue {})
     @assigns = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Assigns'])) rescue {})
+    @unpermitted_params = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
