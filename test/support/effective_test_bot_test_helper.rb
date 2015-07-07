@@ -29,4 +29,8 @@ module EffectiveTestBotTestHelper
     @assigns ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Assigns'])) rescue {})
   end
 
+  def unpermitted_params
+    @unpermitted_params ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
+  end
+
 end

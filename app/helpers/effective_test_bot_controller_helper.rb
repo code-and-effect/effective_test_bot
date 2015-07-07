@@ -22,4 +22,12 @@ module EffectiveTestBotControllerHelper
 
     response.headers['Test-Bot-Assigns'] = Base64.encode64(test_bot_assigns.to_hash.to_json)
   end
+
+  # We get here if ApplicationController raised a ActionController::UnpermittedParameters error
+  def assign_test_bot_unpermitted_params_headers(exception)
+    if exception.kind_of?(ActionController::UnpermittedParameters)
+      response.headers['Test-Bot-Unpermitted-Params'] = Base64.encode64(exception.params.to_json)
+    end
+  end
+
 end

@@ -29,6 +29,10 @@ module EffectiveTestBotAssertions
     assert_equal 0, errors.size, errors.ai
   end
 
+  def assert_no_unpermitted_params(message = 'Expected no unpermitted params')
+    assert_equal [], unpermitted_params, message
+  end
+
   # assert_flash
   # assert_flash :success
   # assert_flash :error, 'there was a specific error'

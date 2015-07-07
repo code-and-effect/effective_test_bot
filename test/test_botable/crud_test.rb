@@ -28,6 +28,8 @@ module CrudTest
 
     after = { count: resource_class.count, path: page.current_path }
 
+    assert_no_unpermitted_params '[create_valid: :unpermitted_params] Expected no unpermitted params' unless skip?(:unpermitted_params)
+
     refute_equal before[:count], after[:count], "Expected fill_form to create a #{resource_class} object"
     refute_equal(before[:path], after[:path], "[create_valid: :path] Expected unique before and after paths") unless skip?(:path)
 
@@ -91,6 +93,8 @@ module CrudTest
     resource = resource_class.find(resource.id)
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
+
+    assert_no_unpermitted_params '[update_valid: :unpermitted_params] Expected no unpermitted params' unless skip?(:unpermitted_params)
 
     assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
     refute_equal(before[:updated_at], after[:updated_at], "Expected @#{resource_name}.updated_at to have changed") if resource.respond_to?(:updated_at)
