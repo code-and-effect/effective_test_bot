@@ -39,11 +39,11 @@ module TestBot
       assert_equal (original_users_count + 1), User.count
     end
 
-    test '05: test database is back to normal' do
+    test '05: test database has reset' do
       assert_normal
     end
 
-    test '06: capybara can create a user' do
+    test '06: capybara can sign up a user' do
       user = sign_up()
       assert user.kind_of?(User)
 
@@ -51,26 +51,19 @@ module TestBot
       assert_signed_in
     end
 
-    test '07: test database is back to normal' do
+    test '07: database and session have reset' do
+      assert_signed_out
       assert_normal
     end
 
-    test '08: capybara session has been reset after manual sign up' do
-      assert_signed_out
+    test '08: capybara can login_as via warden test helper' do
       create_user!
       sign_in(email)
       assert_signed_in
     end
 
-    test '09: test database is back to normal' do
-      assert_normal
-    end
-
-    test '10: capybara session has been reset after warden login_as' do
+    test '09: database and session have reset' do
       assert_signed_out
-    end
-
-    test '11: test database is back to normal' do
       assert_normal
     end
 
@@ -78,8 +71,9 @@ module TestBot
 
     def assert_normal
       visit root_path
-      assert_equal page.status_code, 200
-      assert_equal original_users_count, User.count
+      assert_page_status
+      assert_equal original_users_count, User.count, 'Epected User.count to be back to original'
+      assert assigns[:current_user].blank?, 'Expected current_user to be blank'
 
       # Someitmes it's nice to assert your environment...
       #assert users(:normal).present?
