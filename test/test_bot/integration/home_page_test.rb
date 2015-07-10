@@ -4,7 +4,7 @@ module TestBot
   class HomePageTest < ActionDispatch::IntegrationTest
     test 'home page loads successfully' do
       visit root_path
-      assert_equal page.status_code, 200
+      assert_page_status
     end
   end
 end
