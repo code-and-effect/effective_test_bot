@@ -1,7 +1,7 @@
 module PageTest
   private
 
-  def page_test
+  def test_bot_page
     sign_in(user) and visit(send(page_path))
 
     assert_page_status

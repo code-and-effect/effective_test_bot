@@ -66,7 +66,7 @@ module TestBotable
 
       self.class.page_test_options(path, user, options).each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      self.send(:page_test) # Just the one test so far
+      self.send(:test_bot_page) # Just the one test so far
     end
   end
 end

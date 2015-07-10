@@ -13,7 +13,7 @@ module TestBot
     initialize_tests
 
     def self.runnable_methods
-      self.public_instance_methods.select { |name| name.to_s.starts_with?('app_test') }.map(&:to_s)
+      public_instance_methods.select { |name| name.to_s.starts_with?('app_test') }.map(&:to_s) + super
     end
 
     private
