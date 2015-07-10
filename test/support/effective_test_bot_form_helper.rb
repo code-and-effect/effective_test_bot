@@ -40,6 +40,7 @@ module EffectiveTestBotFormHelper
   end
 
   # Operates on just string keys
+  # This function receives the same fill values that you call fill_form with
   def fill_value(field, fills = nil)
     attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
     field_name = [field.tag_name, field['type']].compact.join('_')
@@ -47,11 +48,12 @@ module EffectiveTestBotFormHelper
 
     if fills.present?
       key = nil
-      attributes.reverse_each do |name|
-        key = (key.present? ? "#{name}.#{key}" : name)
+      attributes.reverse_each do |name|  # match last_name, then something_attributes.last_name, then user.something_attributes.last_name
+        key = (key.present? ? "#{name}.#{key}" : name) # builds up the string as we go along
 
         if fills.key?(key)
           fill_value = fills[key]
+          # select is treated differently, because we want the passed prefill to match both the html text or value (which is implemented below)
           ['select'].include?(field_name) ? break : (return fill_value)
         end
       end
@@ -86,7 +88,7 @@ module EffectiveTestBotFormHelper
         Faker::Lorem.word
       end
     when 'select'
-      if fill_value.present? # accept a value or label
+      if fill_value.present? # accept a value or text
         field.all('option').each do |option|
           return option.text if option.text == fill_value || option.value.to_s == fill_value.to_s
         end
@@ -126,7 +128,7 @@ module EffectiveTestBotFormHelper
   def with_raised_unpermitted_params_exceptions(&block)
     action = nil
 
-    begin  # This will only work with Rails >= 4.0
+    begin  # This may only work with Rails >= 4.0
       action = ActionController::Parameters.action_on_unpermitted_parameters
       ActionController::Parameters.action_on_unpermitted_parameters = :raise
     rescue => e
