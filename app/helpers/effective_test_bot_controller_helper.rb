@@ -1,4 +1,5 @@
 module EffectiveTestBotControllerHelper
+  # This is included as an after_filter
   def assign_test_bot_http_headers
     response.headers['Test-Bot-Flash'] = Base64.encode64(flash.to_hash.to_json)
 

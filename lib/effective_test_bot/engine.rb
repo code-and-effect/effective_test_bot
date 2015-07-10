@@ -14,6 +14,9 @@ module EffectiveTestBot
 
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
+        ActionDispatch::IntegrationTest.include PageTest
+        ActionDispatch::IntegrationTest.include TestBotable::PageTest
+
         ActionDispatch::IntegrationTest.include CrudTest
         ActionDispatch::IntegrationTest.include TestBotable::CrudTest
 
@@ -29,6 +32,8 @@ module EffectiveTestBot
       ActiveSupport.on_load :action_controller do
         if Rails.env.test?
           ActionController::Base.send :include, ::EffectiveTestBotControllerHelper
+
+          ActionController::Base.send :before_filter, :expires_now # Prevent 304 Not Modified caching
           ActionController::Base.send :after_filter, :assign_test_bot_http_headers
 
           ApplicationController.instance_exec do
