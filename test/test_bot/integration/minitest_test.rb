@@ -67,6 +67,17 @@ module TestBot
       assert_normal
     end
 
+    test '10: capybara can sign in manually' do
+      create_user!
+      sign_in_manually(email, password)
+      assert_signed_in
+    end
+
+    test '11: database and session have reset' do
+      assert_signed_out
+      assert_normal
+    end
+
     private
 
     def assert_normal
