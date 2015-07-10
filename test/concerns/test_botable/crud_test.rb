@@ -74,11 +74,9 @@ module TestBotable
         }
       end
 
-      # Run any test_bot tests first, in the order they're defined
-      # then the rest of the tests with whatever order they come in
+      # Run the crud_tests in order they're defined, then the rest in whatever order they're originally in
       def runnable_methods
-        self.public_instance_methods.select { |name| name.to_s.starts_with?('crud_test') }.map(&:to_s) +
-          super.reject { |name| name.starts_with?('test_bot') }
+        public_instance_methods.select { |name| name.to_s.starts_with?('crud_test') }.map(&:to_s) + super
       end
 
       private
@@ -139,7 +137,7 @@ module TestBotable
         self.class.crud_test_options(obj, user, options)
       end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      self.public_send(test)
+      self.send("#{test}_test")
     end
   end
 end
