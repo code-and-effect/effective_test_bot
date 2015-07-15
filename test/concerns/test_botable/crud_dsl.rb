@@ -19,19 +19,23 @@ module TestBotable
 
       # All this does is define a 'test_bot' method for each required action on this class
       # So that MiniTest will see the test functions and run them
-      def crud_test(obj, user, options = {})
-        # Check for expected usage
-        unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
-          raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
-        end
+      def crud_test(resource, user, options = {})
+        tests_prefix = test_bot_prefix('crud_test', options.delete(:label)) # returns a string something like "crud_test (3)" when appropriate
 
+        # In the class method, this value is a Hash, in the instance method it's expecting an Array
         skips = options.delete(:skip) || options.delete(:skips) || {} # So you can skip sub tests
         raise 'invalid skip syntax, expecting skip: {create_invalid: [:path]}' unless skips.kind_of?(Hash)
 
-        test_options = crud_test_options(obj, user, options) # returns a Hash of let! options
-        tests_prefix = crud_tests_prefix(options) # returns a string something like "test_bot (3)"
+        only = options.delete(:only)
+        except = options.delete(:except)
 
-        crud_tests_to_define(options).each do |test|
+        begin
+          test_options = parse_test_bot_options(options.merge(user: user, resource: resource)) # returns a Hash of let! options
+        rescue => e
+          raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, options_hash)"
+        end
+
+        crud_tests_to_define(only, except).each do |test|
           test_name = case test
             when :new               ; "#{tests_prefix} #new"
             when :create_valid      ; "#{tests_prefix} #create valid"
@@ -52,79 +56,28 @@ module TestBotable
         end
       end
 
-      # Parses and validates lots of options
-      # The output is what gets sent to each test and defined as lets
-      def crud_test_options(obj, user, options = {})
-        # Make sure Obj.new() works
-        if obj.kind_of?(Class) && (obj.new() rescue false) == false
-          raise "effective_test_bot: failed to initialize object with #{obj}.new(), unable to proceed"
-        end
-
-        # Parse the resource and resource class
-        resource = obj.kind_of?(Class) ? obj.new() : obj
-        resource_class = obj.kind_of?(Class) ? obj : obj.class
-
-        # If obj is an ActiveRecord object with attributes, Post.new(:title => 'My Title')
-        # then compute any explicit attributes, so forms will be filled with those values
-        resource_attributes = if obj.kind_of?(ActiveRecord::Base)
-          empty = resource_class.new()
-          {}.tap { |atts| resource.attributes.each { |k, v| atts[k] = v if empty.attributes[k] != v } }
-        end || {}
-
-        # Final options to call each test with
-        {
-          resource: resource,
-          resource_class: resource_class,
-          resource_name: resource_class.name.underscore,
-          resource_attributes: resource_attributes,
-          controller_namespace: options[:namespace],
-          user: user,
-          skips: Array(options[:skip] || options[:skips])
-        }
-      end
-
-      # Run the crud_tests in order they're defined, then the rest in whatever order they're originally in
-      def runnable_methods
-        public_instance_methods.select { |name| name.to_s.starts_with?('crud_test') }.map(&:to_s) + super
-      end
-
       private
 
       # Parses the incoming options[:only] and [:except]
       # To only define the appropriate methods
       # This guarantees the functions will be defined in the same order as CRUD_TESTS
-      def crud_tests_to_define(options)
-        if options[:only]
-          options[:only] = Array(options[:only]).flatten.compact.map(&:to_sym)
-          options[:only] = options[:only] + [:create_valid, :create_invalid] if options[:only].delete(:create)
-          options[:only] = options[:only] + [:update_valid, :update_invalid] if options[:only].delete(:update)
+      def crud_tests_to_define(only, except)
+        if only
+          only = Array(only).flatten.compact.map(&:to_sym)
+          only = only + [:create_valid, :create_invalid] if only.delete(:create)
+          only = only + [:update_valid, :update_invalid] if only.delete(:update)
 
-          CRUD_TESTS & options[:only]
-        elsif options[:except]
-          options[:except] = Array(options[:except]).flatten.compact.map(&:to_sym)
-          options[:except] = options[:except] + [:create_valid, :create_invalid] if options[:except].delete(:create)
-          options[:except] = options[:except] + [:update_valid, :update_invalid] if options[:except].delete(:update)
+          CRUD_TESTS & only
+        elsif except
+          except = Array(except).flatten.compact.map(&:to_sym)
+          except = except + [:create_valid, :create_invalid] if except.delete(:create)
+          except = except + [:update_valid, :update_invalid] if except.delete(:update)
 
-          CRUD_TESTS - options[:except]
+          CRUD_TESTS - except
         else
           CRUD_TESTS
         end
       end
-
-      # You can't define multiple methods with the same name
-      # So we need to create a unique name, where appropriate, that still looks good in MiniTest output
-      def crud_tests_prefix(options)
-        @num_defined_crud_tests = (@num_defined_crud_tests || 0) + 1
-
-        if options[:label].present?
-          "crud_test: (#{options[:label]})"
-        elsif @num_defined_crud_tests > 1
-          "crud_test: (#{@num_defined_crud_tests})"
-        else
-          'crud_test:'
-        end
-      end
-
     end
 
     # Instance Methods
@@ -138,15 +91,14 @@ module TestBotable
       if obj.kind_of?(Hash) && obj.key?(:resource)
         obj
       else
-        # Check for expected usage
-        unless (obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)) && user.kind_of?(User) && options.kind_of?(Hash)
-          raise 'invalid parameters passed to crud_action_test(), expecting crud_action_test(:new, Post || Post.new(), User.first, options_hash)'
+        begin
+          self.class.parse_test_bot_options(options.merge(user: user, resource: obj)) # returns a Hash of let! options
+        rescue => e
+          raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
         end
-
-        self.class.crud_test_options(obj, user, options)
       end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      self.send("test_bot_#{test}_test")
+      self.send("test_bot_#{test}_test") # test_label doesn't apply here, 'cause this is run inside a titled test already
     end
   end
 end

@@ -19,8 +19,9 @@ module EffectiveTestBot
         ActionDispatch::IntegrationTest.include PageTest
 
         # test/concerns/test_botable/
-        ActionDispatch::IntegrationTest.include TestBotable::PageDsl
+        ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
         ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
+        ActionDispatch::IntegrationTest.include TestBotable::PageDsl
 
         # A whole bunch of general helper methods
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
