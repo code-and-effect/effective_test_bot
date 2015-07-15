@@ -1,5 +1,16 @@
+# This DSL gives a class level and an instance level way of calling specific tests
+#
+
+# class PostsTest < ActionDispatch::IntegrationTest
+#   crud_test(Post, User.first, except: :show, skip: {create_valid: :path, update_invalid: [:path, :flash]})
+#
+#   test 'a one-off action' do
+#     crud_action_test(:new, Post, User.first, skip: :title)
+#   end
+# end
+
 module TestBotable
-  module CrudTest
+  module CrudDsl
     extend ActiveSupport::Concern
 
     CRUD_TESTS = [:new, :create_valid, :create_invalid, :edit, :update_valid, :update_invalid, :index, :show, :destroy]
@@ -14,11 +25,9 @@ module TestBotable
           raise 'invalid parameters passed to crud_test(), expecting crud_test(Post || Post.new(), User.first, options_hash)'
         end
 
-        if (options[:skip] || options[:skips]).present? && (options[:skip] || options[:skips]).kind_of?(Hash) == false
-          raise 'invalid skip syntax, expecting skip: {create_invalid: [:path]}'
-        end
-
         skips = options.delete(:skip) || options.delete(:skips) || {} # So you can skip sub tests
+        raise 'invalid skip syntax, expecting skip: {create_invalid: [:path]}' unless skips.kind_of?(Hash)
+
         test_options = crud_test_options(obj, user, options) # returns a Hash of let! options
         tests_prefix = crud_tests_prefix(options) # returns a string something like "test_bot (3)"
 
@@ -85,7 +94,7 @@ module TestBotable
       # To only define the appropriate methods
       # This guarantees the functions will be defined in the same order as CRUD_TESTS
       def crud_tests_to_define(options)
-        to_run = if options[:only]
+        if options[:only]
           options[:only] = Array(options[:only]).flatten.compact.map(&:to_sym)
           options[:only] = options[:only] + [:create_valid, :create_invalid] if options[:only].delete(:create)
           options[:only] = options[:only] + [:update_valid, :update_invalid] if options[:only].delete(:update)
@@ -137,7 +146,7 @@ module TestBotable
         self.class.crud_test_options(obj, user, options)
       end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      self.send("test_bot_#{test}")
+      self.send("test_bot_#{test}_test")
     end
   end
 end

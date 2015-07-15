@@ -26,7 +26,7 @@ module EffectiveTestBotAssertions
 
   def assert_no_js_errors
     errors = page.driver.error_messages
-    assert_equal 0, errors.size, "Unexpected javascript error: #{errors.ai}"
+    assert_equal 0, errors.size, "Unexpected javascript error: #{errors.join(', ')}"
   end
 
   def assert_no_unpermitted_params(message = 'Expected no unpermitted params')

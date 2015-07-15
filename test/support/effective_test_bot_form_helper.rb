@@ -23,7 +23,7 @@ module EffectiveTestBotFormHelper
         field.select(fill_value(field, fills), match: :first)
       when 'input_file'
         file_path = fill_value(field, fills)
-        field['class'].include?('asset-box-uploader-fileinput') ? upload_effective_asset(field, file_path) : field.set(file_path)
+        field['class'].to_s.include?('asset-box-uploader-fileinput') ? upload_effective_asset(field, file_path) : field.set(file_path)
       when 'input_submit', 'input_search'
         # Do nothing
       else

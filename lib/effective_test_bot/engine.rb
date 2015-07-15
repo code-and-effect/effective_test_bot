@@ -14,13 +14,15 @@ module EffectiveTestBot
 
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
-        ActionDispatch::IntegrationTest.include PageTest
-        ActionDispatch::IntegrationTest.include TestBotable::PageTest
-
+        # test/test_botable/
         ActionDispatch::IntegrationTest.include CrudTest
-        ActionDispatch::IntegrationTest.include TestBotable::CrudTest
+        ActionDispatch::IntegrationTest.include PageTest
 
-        # A whole bunch of helper methods
+        # test/concerns/test_botable/
+        ActionDispatch::IntegrationTest.include TestBotable::PageDsl
+        ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
+
+        # A whole bunch of general helper methods
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
         ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
         ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper

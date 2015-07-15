@@ -1,5 +1,5 @@
 module TestBotable
-  module PageTest
+  module PageDsl
     extend ActiveSupport::Concern
 
     module ClassMethods
@@ -28,6 +28,7 @@ module TestBotable
 
         # Final options to call each test with
         {
+          route: options[:route],
           page_path: path,
           user: user,
           skips: Array(options[:skip] || options[:skips])
@@ -66,7 +67,7 @@ module TestBotable
 
       self.class.page_test_options(path, user, options).each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
 
-      self.send(:test_bot_page) # Just the one test so far
+      self.send(:test_bot_page_test) # Just the one test so far
     end
   end
 end

@@ -1,7 +1,10 @@
+# All the methods in this file should not be called from the outside world
+# See the DSL files in concerns/test_botable/ for how to call these tests
+
 module CrudTest
   protected
 
-  def test_bot_new
+  def test_bot_new_test
     sign_in(user) and visit(new_resource_path)
 
     assert_page_status
@@ -18,14 +21,14 @@ module CrudTest
     end
   end
 
-  def test_bot_create_valid
+  def test_bot_create_valid_test
     sign_in(user) and visit(new_resource_path)
 
     before = { count: resource_class.count, path: page.current_path }
 
     within("form#new_#{resource_name}") do
       fill_form(resource_attributes)
-      skip?(:unpermitted_params) == true ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
+      skip?(:unpermitted_params) ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
     end
 
     after = { count: resource_class.count, path: page.current_path }
@@ -41,7 +44,7 @@ module CrudTest
     assert_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be blank") if assigns[resource_name].present?
   end
 
-  def test_bot_create_invalid
+  def test_bot_create_invalid_test
     sign_in(user) and visit(new_resource_path)
     before = { count: resource_class.count }
 
@@ -62,7 +65,7 @@ module CrudTest
     assert_equal(resources_path, page.current_path, "[create_invalid: :path] Expected current_path to match resource #create path") unless skip?(:path)
   end
 
-  def test_bot_edit
+  def test_bot_edit_test
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
@@ -81,7 +84,7 @@ module CrudTest
     end
   end
 
-  def test_bot_update_valid
+  def test_bot_update_valid_test
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
@@ -90,7 +93,7 @@ module CrudTest
 
     within("form#edit_#{resource_name}_#{resource.id}") do
       fill_form(resource_attributes)
-      skip?(:unpermitted_params) == true ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
+      skip?(:unpermitted_params) ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
     end
     resource = resource_class.find(resource.id)
 
@@ -109,7 +112,7 @@ module CrudTest
     assert_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be blank") if assigns[resource_name].present?
   end
 
-  def test_bot_update_invalid
+  def test_bot_update_invalid_test
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
@@ -135,8 +138,8 @@ module CrudTest
     assert_equal(resource_path(resource), page.current_path, "[update_invalid: :path] Expected current_path to match resource #update path") unless skip?(:path)
   end
 
-  def test_bot_index
-    sign_in(user) and (resource = find_or_create_resource!)
+  def test_bot_index_test
+    sign_in(user) and (resource = (find_or_create_resource! rescue nil))
 
     visit resources_path
 
@@ -146,8 +149,8 @@ module CrudTest
     assert((assigns['datatable'].present? || assigns[resource_name.pluralize].present?), "[index: :assigns] Expected @#{resource_name.pluralize} or @datatable to be present") unless skip?(:assigns)
   end
 
-  def test_bot_show
-    sign_in(user) and (resource = create_resource!)
+  def test_bot_show_test
+    sign_in(user) and (resource = find_or_create_resource!)
 
     visit resource_path(resource)
 
@@ -157,7 +160,7 @@ module CrudTest
     assert_assigns resource_name
   end
 
-  def test_bot_destroy
+  def test_bot_destroy_test
     sign_in(user) and (resource = find_or_create_resource!)
 
     before = { count: resource_class.count, archived: (resource.archived rescue nil) }
