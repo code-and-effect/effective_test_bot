@@ -1,3 +1,14 @@
+# This DSL gives a class level and an instance level way of calling specific tests
+#
+# class PostsTest < ActionDispatch::IntegrationTest
+#   page_test(posts_path, User.first)
+#
+#   test 'a one-off action' do
+#     page_action_test(posts_path, User.first)
+#   end
+# end
+
+
 module TestBotable
   module PageDsl
     extend ActiveSupport::Concern
