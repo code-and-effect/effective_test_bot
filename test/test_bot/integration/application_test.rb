@@ -30,7 +30,7 @@ module TestBot
               next if resource.blank?
 
               begin
-                crud_test(resource, User.first, label: controller, namespace: namespace, only: crud_actions[controller])
+                crud_test(resource, User.first, label: controller, namespace: namespace, only: crud_actions.delete(controller))
               rescue => e
                 puts e.message
               end

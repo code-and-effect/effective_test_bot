@@ -21,8 +21,6 @@ module TestBotable
           end
           retval[:skips] = Array(skips)
 
-          # If a resource key is passed, make sure Obj.new works
-
           if options[:resource].present?
             obj = options[:resource]
             raise 'expected resource to be a Class or Instance' unless obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)
@@ -63,12 +61,15 @@ module TestBotable
       # You can't define multiple methods with the same name
       # So we need to create a unique name, where appropriate, that still looks good in MiniTest output
       def test_bot_prefix(parent_label, label)
-        @num_defined_test_bot_tests = (@num_defined_test_bot_tests || 0) + 1
+        number_of_tests = if label.blank?
+          @num_defined_test_bot_tests ||= {}
+          @num_defined_test_bot_tests[parent_label] = (@num_defined_test_bot_tests[parent_label] || 0) + 1
+        end
 
         if label.present?
           "#{parent_label}: (#{label})"
-        elsif @num_defined_test_bot_tests > 1
-          "#{parent_label}: (#{@num_defined_test_bot_tests})"
+        elsif number_of_tests > 1
+          "#{parent_label}: (#{number_of_tests})"
         else
           "#{parent_label}:"
         end
