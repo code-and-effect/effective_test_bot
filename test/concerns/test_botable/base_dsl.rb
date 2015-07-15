@@ -22,6 +22,7 @@ module TestBotable
           retval[:skips] = Array(skips)
 
           # If a resource key is passed, make sure Obj.new works
+
           if options[:resource].present?
             obj = options[:resource]
             raise 'expected resource to be a Class or Instance' unless obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)

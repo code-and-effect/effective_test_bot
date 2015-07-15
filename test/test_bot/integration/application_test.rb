@@ -16,13 +16,9 @@ module TestBot
           controller = route.defaults[:controller]
           action = route.defaults[:action]
 
-          puts "#{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
-
-          binding.pry if 'workshops_events' == "#{route.name}"
+          #puts "#{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
 
           next if controller.blank? || action.blank? || controller.include?('devise')
-
-          next unless controller.include?('admin/jobs')
 
           # Accumulate all defined crud_actions on a controller, then call crud_test once we know all the actions
           if CRUD_ACTIONS.include?(action)
@@ -46,10 +42,6 @@ module TestBot
             puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
           end
         end
-      end
-
-      def runnable_methods
-        public_instance_methods.select { |name| name.to_s.starts_with?('app_test') }.map(&:to_s) + super
       end
 
       private
