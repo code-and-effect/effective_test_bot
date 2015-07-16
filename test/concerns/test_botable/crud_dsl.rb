@@ -35,7 +35,7 @@ module TestBotable
         end
 
         crud_tests_to_define(only, except).each do |test|
-          test_name = test_bot_test_name('crud_test', label || "#{test_options[:resource_name].pluralize}##{test}")
+          test_name = test_bot_test_name('crud_test', label || "#{[test_options[:controller_namespace].presence, test_options[:resource_name].pluralize].compact.join('/')}##{test}")
 
           if skips[test].present?
             define_method(test_name) { crud_action_test(test, test_options.merge(skips: Array(skips[test]))) }

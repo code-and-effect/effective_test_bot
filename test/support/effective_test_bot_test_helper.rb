@@ -1,5 +1,4 @@
 module EffectiveTestBotTestHelper
-
   # This makes sure capybara is done, and breaks out of any 'within' blocks
   def synchronize!
     page.document.find('html')
@@ -20,6 +19,10 @@ module EffectiveTestBotTestHelper
     @unpermitted_params = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
 
+  def was_redirect?(initial_path)
+    initial_path != page.current_path
+  end
+
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # that encodes the flash message, and some of the assigns
   def flash
@@ -33,5 +36,4 @@ module EffectiveTestBotTestHelper
   def unpermitted_params
     @unpermitted_params ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
-
 end

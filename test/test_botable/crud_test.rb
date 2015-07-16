@@ -41,7 +41,7 @@ module CrudTest
     # In a rails controller, if I redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if after[:path].include?('/edit/')
-    assert_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be blank") if assigns[resource_name].present?
+    assert_no_assigns_errors(resource_name)
   end
 
   def test_bot_create_invalid_test
@@ -60,7 +60,7 @@ module CrudTest
 
     assert_flash :danger
     assert_assigns resource_name
-    refute_equal nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be present"
+    assert_assigns_errors(resource_name)
 
     assert_equal(resources_path, page.current_path, "[create_invalid: :path] Expected current_path to match resource #create path") unless skip?(:path)
   end
@@ -109,7 +109,7 @@ module CrudTest
     # In a rails controller, if i redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if after[:path] == edit_resource_path(resource)
-    assert_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be blank") if assigns[resource_name].present?
+    assert_no_assigns_errors(resource_name)
   end
 
   def test_bot_update_invalid_test
@@ -133,7 +133,7 @@ module CrudTest
 
     assert_flash :danger
     assert_assigns resource_name
-    refute_equal(nil, assigns[resource_name]['errors'], "Expected @#{resource_name}['errors'] to be present") if assigns[resource_name].present?
+    assert_assigns_errors(resource_name)
 
     assert_equal(resource_path(resource), page.current_path, "[update_invalid: :path] Expected current_path to match resource #update path") unless skip?(:path)
   end
@@ -176,42 +176,5 @@ module CrudTest
     else
       refute_equal before[:count], after[:count], "Expected: #{resource_class}.count to decrement by 1"
     end
-  end
-
-  private
-
-  def skip?(test)
-    skips.include?(test)
-  end
-
-  def find_or_create_resource!
-    existing = resource_class.last
-    (existing.present? && !existing.kind_of?(User)) ? existing : create_resource!
-  end
-
-  def create_resource!
-    visit(new_resource_path)
-
-    within("form#new_#{resource_name}") do
-      fill_form(resource_attributes) and submit_form
-    end
-
-    resource_class.last
-  end
-
-  def resources_path # index, create
-    polymorphic_path([*controller_namespace, resource_class])
-  end
-
-  def resource_path(resource) # show, update, destroy
-    polymorphic_path([*controller_namespace, resource])
-  end
-
-  def new_resource_path # new
-    new_polymorphic_path([*controller_namespace, resource])
-  end
-
-  def edit_resource_path(resource) # edit
-    edit_polymorphic_path([*controller_namespace, resource])
   end
 end

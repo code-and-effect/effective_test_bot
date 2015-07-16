@@ -22,11 +22,11 @@ module TestBot
           controller = route.defaults[:controller]
           action = route.defaults[:action]
 
-          #puts "#{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
-
           next if controller.blank? || action.blank? || controller.include?('devise')
 
-          #next unless controller == 'admin/jobs'
+          next unless controller == 'admin/jobs'
+
+          puts "#{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
 
           #binding.pry
 
@@ -36,7 +36,7 @@ module TestBot
 
             if controller != (routes[index+1].defaults[:controller] rescue :last) # If the next route isn't on the same controller as mine
               begin
-                crud_test(controller, User.first, label: controller, only: crud_actions.delete(controller))
+                crud_test(controller, User.first, only: crud_actions.delete(controller))
               rescue => e
                 puts e.message
               end

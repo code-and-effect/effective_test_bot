@@ -59,5 +59,21 @@ module EffectiveTestBotAssertions
     end
   end
 
+  # assert_no_assigns_errors
+  # assert_no_assigns_errors :post
+  def assert_no_assigns_errors(key = nil)
+    if key.present?
+      assert_equal [], ((assigns[key.to_s] || {})['errors'] || []), "Expected @#{key}[:errors] to be blank"
+    else
+      assigns.each do |key, value|
+        assert_equal [], (value['errors'] || []), "Expected @#{key}[:errors] to be blank"
+      end
+    end
+  end
+
+  # assert_assigns_errors :post
+  def assert_assigns_errors(key)
+    refute_equal [], ((assigns[key.to_s] || {})['errors'] || []), "Expected @#{key}[:errors] to be present"
+  end
 
 end
