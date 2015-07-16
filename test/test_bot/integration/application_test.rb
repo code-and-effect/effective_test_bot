@@ -10,6 +10,10 @@ module TestBot
         crud_actions = Hash.new([])  # {posts: ['new', 'edit'], events: ['new', 'edit', 'show']}
 
         # ActionDispatch::Routing::PathRedirect is route.app.class for a 301, which has .defaults[:status] = 301
+          #Rails.application.routes.recognize_path('/your/path/here')
+          #Rails.application.routes.recognize_path('/admin/jobs/3/unarchive')
+          # => {:action=>"unarchive", :controller=>"admin/jobs", :id=>"3"}
+          #
 
 
         routes.each_with_index do |route, index|
@@ -20,40 +24,31 @@ module TestBot
 
           next if controller.blank? || action.blank? || controller.include?('devise')
 
+          #next unless controller == 'admin/jobs'
+
+          #binding.pry
+
           # Accumulate all defined crud_actions on a controller, then call crud_test once we know all the actions
           if CRUD_ACTIONS.include?(action)
             crud_actions[controller] += [action]
 
             if controller != (routes[index+1].defaults[:controller] rescue :last) # If the next route isn't on the same controller as mine
-              (namespace, resource) = namespace_and_resource_for(controller)
-
-              next if resource.blank?
-
               begin
-                crud_test(resource, User.first, label: controller, namespace: namespace, only: crud_actions.delete(controller))
+                crud_test(controller, User.first, label: controller, only: crud_actions.delete(controller))
               rescue => e
                 puts e.message
               end
             end
+          elsif route.name.present? && route.verb.to_s.include?('GET') && route.path.required_names == ['id']
+            # We can do a page request for whatever this is, but we need to create a resource first to have an ID
+
           elsif route.name.present? && route.verb.to_s.include?('GET')
-            page_test("#{route.name}_path", User.first, route: route)
+            page_test("#{route.name}_path", User.first, route: route, label: 'non id GET')
           else
             #define_method("app_test: #{route.name} ##{route.verb}") { page_test(route) }
             puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
           end
         end
-      end
-
-      private
-
-      def namespace_and_resource_for(controller)
-        (*namespace, klass) = controller.split('/')
-        namespace = Array(namespace).join('/').presence
-
-        # See if I can turn it into a model
-        klass = klass.classify.safe_constantize
-
-        return namespace, klass
       end
     end
 

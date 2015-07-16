@@ -23,7 +23,22 @@ module TestBotable
 
           if options[:resource].present?
             obj = options[:resource]
-            raise 'expected resource to be a Class or Instance' unless obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base)
+            raise 'expected resource to be a Class or Instance or String' unless obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base) || obj.kind_of?(String)
+
+            if obj.kind_of?(String) # Let's assume this is a controller, 'admin/jobs', or just 'jobs', or 'jobs_controller'
+              obj.sub!('_controller', '')
+
+              (*namespace, klass) = obj.split('/')
+              namespace = Array(namespace).join('/').presence
+
+              # See if I can turn it into a model
+              klass = klass.classify.safe_constantize
+
+              raise "failed to constantize resource from string #{obj}, unable to proceed" unless klass.present?
+
+              retval[:namespace] ||= namespace
+              obj = klass
+            end
 
             # Make sure Obj.new() works
             if obj.kind_of?(Class) && (obj.new() rescue false) == false
@@ -57,6 +72,8 @@ module TestBotable
           TEST_BOT_TEST_PREFIXES.any? { |prefix| name.starts_with?(prefix) }
         end.map(&:to_s) + super
       end
+
+      protected
 
       # You can't define multiple methods with the same name
       # So we need to create a unique name, where appropriate, that still looks good in MiniTest output

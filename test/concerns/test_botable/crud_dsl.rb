@@ -2,7 +2,7 @@
 #
 
 # class PostsTest < ActionDispatch::IntegrationTest
-#   crud_test(Post, User.first, except: :show, skip: {create_valid: :path, update_invalid: [:path, :flash]})
+#   crud_test(Post || 'admin/posts', User.first, except: :show, skip: {create_valid: :path, update_invalid: [:path, :flash]})
 #
 #   test 'a one-off action' do
 #     crud_action_test(:new, Post, User.first, skip: :title)
