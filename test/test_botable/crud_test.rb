@@ -41,7 +41,7 @@ module CrudTest
     # In a rails controller, if I redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if after[:path].include?('/edit/')
-    assert_no_assigns_errors(resource_name)
+    assert_no_assigns_errors resource_name
   end
 
   def test_bot_create_invalid_test
@@ -60,7 +60,7 @@ module CrudTest
 
     assert_flash :danger
     assert_assigns resource_name
-    assert_assigns_errors(resource_name)
+    assert_assigns_errors resource_name
 
     assert_equal(resources_path, page.current_path, "[create_invalid: :path] Expected current_path to match resource #create path") unless skip?(:path)
   end
@@ -109,7 +109,7 @@ module CrudTest
     # In a rails controller, if i redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if after[:path] == edit_resource_path(resource)
-    assert_no_assigns_errors(resource_name)
+    assert_no_assigns_errors resource_name
   end
 
   def test_bot_update_invalid_test
@@ -133,7 +133,7 @@ module CrudTest
 
     assert_flash :danger
     assert_assigns resource_name
-    assert_assigns_errors(resource_name)
+    assert_assigns_errors resource_name
 
     assert_equal(resource_path(resource), page.current_path, "[update_invalid: :path] Expected current_path to match resource #update path") unless skip?(:path)
   end
@@ -172,9 +172,9 @@ module CrudTest
     assert_flash :success
 
     if resource.respond_to?(:archived)
-      assert after[:archived] == true, "Expected #{resource_class}.archived? to be true"
+      assert_equal true, after[:archived], "Expected #{resource_class}.archived? to be true"
     else
-      refute_equal before[:count], after[:count], "Expected: #{resource_class}.count to decrement by 1"
+      assert_equal before[:count]-1, after[:count], "Expected: #{resource_class}.count to decrement by 1"
     end
   end
 end
