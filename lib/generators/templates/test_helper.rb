@@ -34,7 +34,7 @@ class ActionDispatch::IntegrationTest
   # end
 
   def after_teardown # I reset sessions here so capybara-screenshot can still make screenshots when tests fail
-    super() and Capybara.reset_sessions!
+    super(); Capybara.reset_sessions!
   end
 
 end
