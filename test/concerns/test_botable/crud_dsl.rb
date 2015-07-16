@@ -20,12 +20,11 @@ module TestBotable
       # All this does is define a 'test_bot' method for each required action on this class
       # So that MiniTest will see the test functions and run them
       def crud_test(resource, user, options = {})
-        tests_prefix = test_bot_prefix('crud_test', options.delete(:label)) # returns a string something like "crud_test (3)" when appropriate
-
         # In the class method, this value is a Hash, in the instance method it's expecting an Array
         skips = options.delete(:skip) || options.delete(:skips) || {} # So you can skip sub tests
         raise 'invalid skip syntax, expecting skip: {create_invalid: [:path]}' unless skips.kind_of?(Hash)
 
+        label = options.delete(:label).presence
         only = options.delete(:only)
         except = options.delete(:except)
 
@@ -36,17 +35,7 @@ module TestBotable
         end
 
         crud_tests_to_define(only, except).each do |test|
-          test_name = case test
-            when :new               ; "#{tests_prefix} #new"
-            when :create_valid      ; "#{tests_prefix} #create valid"
-            when :create_invalid    ; "#{tests_prefix} #create invalid"
-            when :edit              ; "#{tests_prefix} #edit"
-            when :update_valid      ; "#{tests_prefix} #update valid"
-            when :update_invalid    ; "#{tests_prefix} #update invalid"
-            when :index             ; "#{tests_prefix} #index"
-            when :show              ; "#{tests_prefix} #show"
-            when :destroy           ; "#{tests_prefix} #destroy"
-          end
+          test_name = test_bot_test_name('crud_test', label || "#{test_options[:resource_name].pluralize}##{test}")
 
           if skips[test].present?
             define_method(test_name) { crud_action_test(test, test_options.merge(skips: Array(skips[test]))) }

@@ -6,6 +6,8 @@ module TestBot
 
     class << self
       def initialize_tests
+        puts 'INITIALIZING APPLICATION TEST'
+
         routes = Rails.application.routes.routes.to_a
         crud_actions = Hash.new([])  # {posts: ['new', 'edit'], events: ['new', 'edit', 'show']}
 
@@ -41,7 +43,7 @@ module TestBot
             end
           elsif route.name.present? && route.verb.to_s.include?('GET') && route.path.required_names == ['id']
             # We can do a page request for whatever this is, but we need to create a resource first to have an ID
-
+            action_test(controller, action, User.first, optional_resource, hash_options)
           elsif route.name.present? && route.verb.to_s.include?('GET')
             page_test("#{route.name}_path", User.first, route: route, label: 'non id GET')
           else

@@ -18,8 +18,8 @@ module TestBotable
       # This DSL method just defines a new test that calls the instance method here
       # Lets you type this as a class method so it looks nice at the top of a test file, like shoulda :)
       def page_test(path, user, options = {})
-        tests_prefix = test_bot_prefix('page_test', options.delete(:label)) # returns a string something like "crud_test (3)" when appropriate
-        define_method("#{tests_prefix} #{path}") { page_action_test(path, user, options) }
+        test_name = test_bot_test_name('page_test', options.delete(:label) || path) # returns a string something like "crud_test (3)" when appropriate
+        define_method(test_name) { page_action_test(path, user, options) }
       end
 
     end # /ClassMethods

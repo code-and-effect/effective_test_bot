@@ -3,7 +3,7 @@ module TestBotable
     extend ActiveSupport::Concern
 
     module ClassMethods
-      TEST_BOT_TEST_PREFIXES = ['crud_test', 'page_test']
+      TEST_BOT_TEST_PREFIXES = ['crud_test', 'member_test', 'page_test']
 
       # Parses and validates lots of options
       # We translate some DSL methods into one consistent Hash here
@@ -77,7 +77,7 @@ module TestBotable
 
       # You can't define multiple methods with the same name
       # So we need to create a unique name, where appropriate, that still looks good in MiniTest output
-      def test_bot_prefix(parent_label, label)
+      def test_bot_test_name(parent_label, label)
         number_of_tests = if label.blank?
           @num_defined_test_bot_tests ||= {}
           @num_defined_test_bot_tests[parent_label] = (@num_defined_test_bot_tests[parent_label] || 0) + 1
