@@ -10,7 +10,7 @@ module MemberTest
 
     sign_in(user) and (resource = find_or_create_resource!)
 
-    path = path_for(controller: controller, action: action, id: resource.id)
+    path = url_for(controller: controller, action: action, id: resource.id, only_path: true)
     puts "URL FOR #{path}"
 
     visit(path)
