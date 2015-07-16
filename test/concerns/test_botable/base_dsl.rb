@@ -36,7 +36,9 @@ module TestBotable
 
               raise "failed to constantize resource from string #{obj}, unable to proceed" unless klass.present?
 
-              retval[:namespace] ||= namespace
+              retval[:controller_namespace] ||= namespace
+              retval[:controller] = obj.dup
+
               obj = klass
             end
 
