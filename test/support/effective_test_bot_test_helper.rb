@@ -19,8 +19,8 @@ module EffectiveTestBotTestHelper
     @unpermitted_params = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
 
-  def was_redirect?(initial_path)
-    initial_path != page.current_path
+  def was_redirect?(from_path, to_path = nil)
+    from_path != (to_path || page.current_path)
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header

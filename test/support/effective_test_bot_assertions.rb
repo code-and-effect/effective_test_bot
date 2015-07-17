@@ -24,6 +24,17 @@ module EffectiveTestBotAssertions
     assert_equal status, page.status_code, message.sub(':status:', status.to_s)
   end
 
+  # assert_redirect '/about'
+  # assert_redirect '/about', '/about-us'
+  def assert_redirect(from_path, to_path = nil, message = nil)
+    if to_path.present?
+      assert_equal to_path, page.current_path, message || "Expected redirect from #{from_path} to #{to_path}"
+    else
+      refute_equal from_path, page.current_path, message || "Expected redirect away from #{from_path}"
+    end
+  end
+
+
   def assert_no_js_errors
     errors = page.driver.error_messages
     assert_equal 0, errors.size, "Unexpected javascript error: #{errors.join(', ')}"

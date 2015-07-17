@@ -1,4 +1,4 @@
-# This DSL gives a class level and an instance level way of calling specific tests
+# This DSL gives a class level and an instance level way of calling specific test suite
 #
 # class PostsTest < ActionDispatch::IntegrationTest
 #   member_test('admin/jobs', 'unarchive', User.first, Post.first)
@@ -16,30 +16,23 @@ module TestBotable
     extend ActiveSupport::Concern
 
     module ClassMethods
-      # This DSL method just defines a new test that calls the instance method here
-      # Lets you type this as a class method so it looks nice at the top of a test file, like shoulda :)
+
       def member_test(controller, action, user, obj_to_param = nil, options = {})
-        puts "CLASS LEVEL MEMBER TEST"
-        test_name = test_bot_test_name('member_test', options.delete(:label) || "#{controller}##{action}") # returns a string something like "action_test (3)" when appropriate
+        test_name = test_bot_test_name('member_test', options.delete(:label) || "#{controller}##{action}")
         define_method(test_name) { member_action_test(controller, action, user, obj_to_param, options) }
       end
 
-    end # /ClassMethods
+    end
 
-    # Instance Methods
-
-    # This will allow you to run a page_test method in a test
+    # Instance Methods - Call me from within a test
     def member_action_test(controller, action, user, member = nil, options = {})
-        puts "INSTANCE LEVEL MEMBER_TEST"
       begin
-        test_options = self.class.parse_test_bot_options(options.merge(resource: controller, action: action, user: user, member: member)) # returns a Hash of let! options
+        self.class.parse_test_bot_options(options.merge(resource: controller, action: action, user: user, member: member))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: member_test('admin/jobs', 'unarchive', User.first, Post.first || nil)"
-      end
+      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar' } syntax
 
-      test_options.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
-
-      self.send(:test_bot_member_test) # Just the one test so far
+      self.send(:test_bot_member_test)
     end
 
   end

@@ -1,6 +1,5 @@
-# This DSL gives a class level and an instance level way of calling specific tests
+# This DSL gives a class level and an instance level way of calling specific test suite
 #
-
 # class PostsTest < ActionDispatch::IntegrationTest
 #   crud_test(Post || 'admin/posts', User.first, except: :show, skip: {create_valid: :path, update_invalid: [:path, :flash]})
 #
@@ -29,7 +28,7 @@ module TestBotable
         except = options.delete(:except)
 
         begin
-          test_options = parse_test_bot_options(options.merge(user: user, resource: resource)) # returns a Hash of let! options
+          test_options = parse_test_bot_options(options.merge(user: user, resource: resource))
         rescue => e
           raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, options_hash)"
         end
@@ -69,10 +68,7 @@ module TestBotable
       end
     end
 
-    # Instance Methods
-
-    # This should allow you to run a crud_test method in a test
-    # crud_action_test(:create_valid, Clinic, User.first)
+    # Instance Methods - Call me from within a test
     #
     # If obj is a Hash {:resource => ...} just skip over parsing options
     # And assume it's already been done (by the ClassMethod crud_test)
@@ -81,13 +77,13 @@ module TestBotable
         obj
       else
         begin
-          self.class.parse_test_bot_options(options.merge(user: user, resource: obj)) # returns a Hash of let! options
+          self.class.parse_test_bot_options(options.merge(user: user, resource: obj))
         rescue => e
           raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
         end
-      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar'} syntax
+      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar' } syntax
 
-      self.send("test_bot_#{test}_test") # test_label doesn't apply here, 'cause this is run inside a titled test already
+      self.send("test_bot_#{test}_test")
     end
   end
 end

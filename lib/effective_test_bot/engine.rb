@@ -19,12 +19,14 @@ module EffectiveTestBot
         ActionDispatch::IntegrationTest.include CrudTest
         ActionDispatch::IntegrationTest.include MemberTest
         ActionDispatch::IntegrationTest.include PageTest
+        ActionDispatch::IntegrationTest.include RedirectTest
 
         # test/concerns/test_botable/
         ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
         ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
         ActionDispatch::IntegrationTest.include TestBotable::MemberDsl
         ActionDispatch::IntegrationTest.include TestBotable::PageDsl
+        ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
 
         # test/support/
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
