@@ -8,7 +8,7 @@
 #   end
 # end
 
-# The action_test assumes route.name.present? && route.verb.to_s.include?('GET') && route.path.required_names == ['id']
+# A member_test assumes assumes route.name.present? && route.verb.to_s.include?('GET') && route.path.required_names == ['id']
 # we HAVE TO build or have available one of these resources so we can pass the ID to it and see what happens :)
 
 module TestBotable

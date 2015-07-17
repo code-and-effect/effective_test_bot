@@ -5,59 +5,78 @@ module TestBot
     CRUD_ACTIONS = %w(index create new edit show update destroy) # Same order as resources :object creates them in
 
     class << self
+
+      # Go through every route, and run an appropriate test suite on it
       def initialize_tests
-        puts 'INITIALIZING APPLICATION TEST'
+        puts 'test_bot scanning....'
 
         routes = Rails.application.routes.routes.to_a
-        crud_actions = Hash.new([])  # {posts: ['new', 'edit'], events: ['new', 'edit', 'show']}
+        seen_actions = Hash.new([])  # {posts: ['new', 'edit'], events: ['new', 'edit', 'show']}
 
-        # ActionDispatch::Routing::PathRedirect is route.app.class for a 301, which has .defaults[:status] = 301
-          #Rails.application.routes.recognize_path('/your/path/here')
-          #Rails.application.routes.recognize_path('/admin/jobs/3/unarchive')
-          # => {:action=>"unarchive", :controller=>"admin/jobs", :id=>"3"}
-          #
-
+        #Rails.application.routes.recognize_path('/your/path/here')
+        #Rails.application.routes.recognize_path('/admin/jobs/3/unarchive')
+        # => {:action=>"unarchive", :controller=>"admin/jobs", :id=>"3"}
 
         routes.each_with_index do |route, index|
           controller = route.defaults[:controller]
           action = route.defaults[:action]
-          redirect = route.app.kind_of?(ActionDispatch::Routing::PathRedirect) && route.path.required_names.blank?
-          member = route.path.required_names == ['id']
-          get = route.verb.to_s.include?('GET')
 
-          #next if controller.blank? || action.blank? || controller.include?('devise')
-          #next unless controller == 'admin/jobs'
+          # Devise Test
+          if (controller || '').include?('devise')
+            next if seen_actions['devise'].present?
 
-          next unless redirect
+            puts 'define devise test!!'
+            seen_actions['devise'] = true # So we don't repeat it
 
-          #puts "#{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
+          # Redirect Test
+          elsif route.app.kind_of?(ActionDispatch::Routing::PathRedirect) && route.path.required_names.blank?
+            path = route.path.spec.to_s
+            route.path.optional_names.each { |name| path.sub!("(.:#{name})", '') } # Removes (.:format) from path
+            redirect_test(path, route.app.path([], nil), User.first)
 
-          # Accumulate all defined crud_actions on a controller, then call crud_test once we know all the actions
-          if CRUD_ACTIONS.include?(action)
-            crud_actions[controller] += [action]
+          # CRUD Test
+          elsif is_crud_controller?(route)
+            seen_actions[controller] += [action]
 
-            if controller != (routes[index+1].defaults[:controller] rescue :last) # If the next route isn't on the same controller as mine
+            next_controller = (routes[index+1].defaults[:controller] rescue :last)
+            next_action = (routes[index+1].defaults[:action] rescue :last)
+
+            # If we're done accumulating CRUD actions, launch the crud_test with all seen actions
+            if controller != next_controller || CRUD_ACTIONS.include?(next_action) == false
               begin
-                crud_test(controller, User.first, only: crud_actions.delete(controller))
+                crud_test(controller, User.first, only: seen_actions.delete(controller))
               rescue => e
-                puts e.message
+                puts e.message # Sometimes there is an object that can't be instantiated, so we still want to continue the application test
               end
             end
-          elsif redirect
-            path = route.path.spec.to_s
-            route.path.optional_names.each { |name| path.sub!("(.:#{name})", '') }
-            redirect_test(path, route.app.path([], nil), User.first)
-          elsif member && get
-            # We can do a page request for whatever this is, but we need to create a resource first to have an ID
+
+          # Member Test
+          elsif route.verb.to_s.include?('GET') && route.path.required_names == ['id']
             member_test(controller, action, User.first)
-          elsif route.name.present? && get
-            page_test("#{route.name}_path", User.first, route: route, label: 'non id GET')
+
+          # Page Test
+          elsif route.verb.to_s.include?('GET') && route.name.present?
+            page_test("#{route.name}_path", User.first, route: route, label: "#{route.name}_path")
+
           else
-            #define_method("app_test: #{route.name} ##{route.verb}") { page_test(route) }
             puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
-          end
+
+          end # / Routes
         end
       end
+
+      private
+
+      def is_crud_controller?(route)
+        return false unless CRUD_ACTIONS.include?(route.defaults[:action])
+
+        controller_klass = (route.app.controller(route.defaults) rescue nil) if route.defaults[:controller].present? && route.app.respond_to?(:controller)
+        controller_instance = controller_klass.new() if controller_klass
+
+        # Is this a CRUD capable controller?
+        controller_instance && controller_instance.respond_to?(:new) && controller_instance.respond_to?(:create)
+      end
+
     end
 
     initialize_tests

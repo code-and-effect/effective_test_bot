@@ -13,7 +13,7 @@ module RedirectTest
     assert_page_title
     assert_no_js_errors
 
-    page.save_screenshot("#{from_path.parameterize}.png")
+    #page.save_screenshot("#{from_path.parameterize}.png")
   end
 
 end

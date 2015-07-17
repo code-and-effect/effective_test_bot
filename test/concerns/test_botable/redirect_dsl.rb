@@ -1,6 +1,6 @@
 # This DSL gives a class level and an instance level way of calling specific test suite
 #
-# class PostsTest < ActionDispatch::IntegrationTest
+# class AboutTest < ActionDispatch::IntegrationTest
 #   redirect_test('/about', '/new-about', User.first)
 #
 #   test 'a one-off action' do
