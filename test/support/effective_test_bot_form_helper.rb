@@ -14,6 +14,8 @@ module EffectiveTestBotFormHelper
     end
 
     all('input,select,textarea').each do |field|
+      next unless field.visible?
+
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'
         field.set(fill_value(field, fills))
