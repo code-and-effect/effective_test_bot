@@ -24,6 +24,11 @@ module EffectiveTestBotAssertions
     assert_equal status, page.status_code, message.sub(':status:', status.to_s)
   end
 
+  def assert_current_path(path, message = 'Expected current_path to be :path:')
+    path = public_send(path) if path.kind_of?(Symbol)
+    assert_equal path, page.current_path, message.sub(':path', path.to_s)
+  end
+
   # assert_redirect '/about'
   # assert_redirect '/about', '/about-us'
   def assert_redirect(from_path, to_path = nil, message = nil)
