@@ -5,13 +5,19 @@ module PageTest
   protected
 
   def test_bot_page_test
-    sign_in(user) and visit(public_send(page_path))
+    sign_in(user)
+
+    if page_path.kind_of?(Symbol)
+      visit(public_send(page_path))
+    else
+      visit(page_path)
+    end
 
     assert_page_status
     assert_page_title
     assert_no_js_errors
 
-    page.save_screenshot("#{page_path}.png")
+    page.save_screenshot("#{page_path.to_s.parameterize}.png")
   end
 
 end

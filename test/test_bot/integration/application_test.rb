@@ -56,7 +56,7 @@ module TestBot
 
           # Page Test
           elsif route.verb.to_s.include?('GET') && route.name.present?
-            page_test("#{route.name}_path", User.first, route: route, label: "#{route.name}_path")
+            page_test("#{route.name}_path".to_sym, User.first, route: route, label: "#{route.name}_path")
 
           else
             puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
