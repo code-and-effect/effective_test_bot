@@ -3,7 +3,7 @@ module TestBotable
     extend ActiveSupport::Concern
 
     module ClassMethods
-      TEST_BOT_TEST_PREFIXES = ['crud_test', 'member_test', 'page_test', 'redirect_test']
+      TEST_BOT_TEST_PREFIXES = ['crud_test', 'member_test', 'page_test', 'redirect_test', 'wizard_test']
 
       # Parses and validates lots of options
       # We translate some DSL methods into one consistent Hash here

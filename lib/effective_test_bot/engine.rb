@@ -20,6 +20,7 @@ module EffectiveTestBot
         ActionDispatch::IntegrationTest.include MemberTest
         ActionDispatch::IntegrationTest.include PageTest
         ActionDispatch::IntegrationTest.include RedirectTest
+        ActionDispatch::IntegrationTest.include WizardTest
 
         # test/concerns/test_botable/
         ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
@@ -27,6 +28,7 @@ module EffectiveTestBot
         ActionDispatch::IntegrationTest.include TestBotable::MemberDsl
         ActionDispatch::IntegrationTest.include TestBotable::PageDsl
         ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
+        ActionDispatch::IntegrationTest.include TestBotable::WizardDsl
 
         # test/support/
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
