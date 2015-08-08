@@ -16,8 +16,10 @@ module TestBotable
     module ClassMethods
 
       def page_test(path, user, options = {})
-        test_name = test_bot_test_name('page_test', options.delete(:label) || path)
-        define_method(test_name) { page_action_test(path, user, options) }
+        options[:current_test] = path.to_s
+        method_name = test_bot_method_name('page_test', options.delete(:label) || options[:current_test])
+
+        define_method(method_name) { page_action_test(path, user, options) }
       end
 
     end
@@ -25,10 +27,10 @@ module TestBotable
     # Instance Methods - Call me from within a test
     def page_action_test(path, user, options = {})
       begin
-        self.class.parse_test_bot_options(options.merge(user: user, page_path: path))
+        assign_test_bot_lets!(options.reverse_merge!(user: user, page_path: path))
       rescue => e
-        raise "Error: #{e.message}.  Expected usage: page_test(:about_path, User.first, options_hash)"
-      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar' } syntax
+        raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
+      end
 
       self.send(:test_bot_page_test)
     end

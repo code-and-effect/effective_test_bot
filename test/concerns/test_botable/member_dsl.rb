@@ -18,8 +18,10 @@ module TestBotable
     module ClassMethods
 
       def member_test(controller, action, user, obj_to_param = nil, options = {})
-        options[:current_test] = test_bot_test_name('member_test', options.delete(:label) || "#{controller}##{action}")
-        define_method(options[:current_test]) { member_action_test(controller, action, user, obj_to_param, options) }
+        options[:current_test] = "#{controller}##{action}"
+        method_name = test_bot_method_name('member_test', options.delete(:label) || options[:current_test])
+
+        define_method(method_name) { member_action_test(controller, action, user, obj_to_param, options) }
       end
 
     end
@@ -27,10 +29,10 @@ module TestBotable
     # Instance Methods - Call me from within a test
     def member_action_test(controller, action, user, member = nil, options = {})
       begin
-        self.class.parse_test_bot_options(options.merge(resource: controller, action: action, user: user, member: member))
+        assign_test_bot_lets!(options.reverse_merge!(resource: controller, action: action, user: user, member: member))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: member_test('admin/jobs', 'unarchive', User.first, Post.first || nil)"
-      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar' } syntax
+      end
 
       self.send(:test_bot_member_test)
     end

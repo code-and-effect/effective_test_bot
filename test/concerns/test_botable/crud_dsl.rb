@@ -19,6 +19,9 @@ module TestBotable
       # All this does is define a 'test_bot' method for each required action on this class
       # So that MiniTest will see the test functions and run them
       def crud_test(resource, user, options = {})
+        # This skips paramaters is different than the initializer skips, which affect just the rake task
+
+        # These are specificially for the DSL
         # In the class method, this value is a Hash, in the instance method it's expecting an Array
         skips = options.delete(:skip) || options.delete(:skips) || {} # So you can skip sub tests
         raise 'invalid skip syntax, expecting skip: {create_invalid: [:path]}' unless skips.kind_of?(Hash)
@@ -27,23 +30,24 @@ module TestBotable
         only = options.delete(:only)
         except = options.delete(:except)
 
-        options = parse_test_bot_options(options.merge(user: user, resource: resource))
-
-        #begin
-        #  test_options = parse_test_bot_options(options.merge(user: user, resource: resource))
-        #rescue => e
-        #  raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, options_hash)"
-        #end
+        begin
+          normalize_test_bot_options!(options.merge!(user: user, resource: resource))
+        rescue => e
+          raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, only: [:new, :create], skip: {create_invalid: [:path]})"
+        end
 
         crud_tests_to_define(only, except).each do |test|
-          options[:current_test] = [options[:controller_namespace].presence, options[:resource_name].pluralize].compact.join('/') + '#' + test.to_s
-          test_name = test_bot_test_name('crud_test', label || options[:current_test])
+          options_for_method = options.dup
 
-          if skips[test].present?
-            define_method(test_name) { crud_action_test(test, resource, user, options.merge(skips: Array(skips[test]))) }
-          else
-            define_method(test_name) { crud_action_test(test, resource, user, options) }
-          end
+          options_for_method[:skips] = Array(skips[test]) if skips[test]
+          options_for_method[:current_test] = [
+            options[:controller_namespace].presence,
+            options[:resource_name].pluralize
+          ].compact.join('/') + '#' + test.to_s
+
+          method_name = test_bot_method_name('crud_test', label || options_for_method[:current_test])
+
+          define_method(method_name) { crud_action_test(test, resource, user, options_for_method) }
         end
       end
 
@@ -54,13 +58,13 @@ module TestBotable
       # This guarantees the functions will be defined in the same order as CRUD_TESTS
       def crud_tests_to_define(only, except)
         if only
-          only = Array(only).flatten.compact.map(&:to_sym)
+          only = Array(only).flatten.compact.map { |x| x.to_sym }
           only = only + [:create_valid, :create_invalid] if only.delete(:create)
           only = only + [:update_valid, :update_invalid] if only.delete(:update)
 
           CRUD_TESTS & only
         elsif except
-          except = Array(except).flatten.compact.map(&:to_sym)
+          except = Array(except).flatten.compact.map { |x| x.to_sym }
           except = except + [:create_valid, :create_invalid] if except.delete(:create)
           except = except + [:update_valid, :update_invalid] if except.delete(:update)
 
@@ -77,10 +81,10 @@ module TestBotable
     # And assume it's already been done (by the ClassMethod crud_test)
     def crud_action_test(test, resource, user = nil, options = {})
       begin
-        self.class.parse_test_bot_options(options.merge(user: user, resource: resource))
+        assign_test_bot_lets!(options.reverse_merge!(user: user, resource: resource))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
-      end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar' } syntax
+      end
 
       self.send("test_bot_#{test}_test")
     end
