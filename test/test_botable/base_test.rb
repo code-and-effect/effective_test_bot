@@ -2,6 +2,16 @@
 # See the DSL files in concerns/test_botable/ for how to call these tests
 
 module BaseTest
+  protected
+
+  def assert_page_normal(message = nil)
+    unless test_bot_skip?(:normal)
+      assert_page_status unless test_bot_skip?(:page_status)
+      assert_page_title unless test_bot_skip?(:page_title)
+      assert_no_js_errors unless test_bot_skip?(:no_js_errors)
+    end
+  end
+
   private
 
   # I want to use this same method for the current_test rake test:bot skip functionality
@@ -13,14 +23,10 @@ module BaseTest
   def test_bot_skip?(assertion = nil)
     # Skip the whole test
     # this will put SKIP into the minitest output
-     skip if (defined?(current_test) && EffectiveTestBot.skip?(current_test))
+    skip if (defined?(current_test) && EffectiveTestBot.skip?(current_test))
 
     # Check if the individual assertion should be skipped
     EffectiveTestBot.skip?((current_test if defined?(current_test)), assertion)
-  end
-
-  def skip?(test)
-    skips.include?(test)
   end
 
   def find_or_create_resource!

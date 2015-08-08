@@ -20,9 +20,6 @@ module EffectiveTestBot
     else
       false
     end
-
-    true
-
   end
 
   private

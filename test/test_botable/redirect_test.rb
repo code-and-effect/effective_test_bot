@@ -6,13 +6,11 @@ module RedirectTest
 
   def test_bot_redirect_test
     test_bot_skip?
-    sign_in(user)
 
-    visit(from_path)
+    sign_in(user) and visit(from_path)
+
     assert_redirect(from_path, to_path)
-    assert_page_status
-    assert_page_title
-    assert_no_js_errors
+    assert_page_normal
 
     #page.save_screenshot("#{from_path.parameterize}.png")
   end

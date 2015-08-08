@@ -6,14 +6,11 @@ module WizardTest
 
   def test_bot_wizard_test
     test_bot_skip?
-    sign_in(user)
 
-    visit(from_path)
+    sign_in(user) and visit(from_path)
 
     0.upto(50) do |index|   # Can only test wizards 51 steps long
-      assert_page_status
-      assert_page_title
-      assert_no_js_errors
+      assert_page_normal
 
       if defined?(within_form)
         within(within_form) do

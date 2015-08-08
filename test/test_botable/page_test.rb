@@ -15,11 +15,9 @@ module PageTest
       visit(page_path)
     end
 
-    assert_page_status
-    assert_page_title
-    assert_no_js_errors
+    assert_page_normal
 
-    page.save_screenshot("#{page_path.to_s.parameterize}.png")
+    #page.save_screenshot("#{page_path.to_s.parameterize}.png")
   end
 
 end

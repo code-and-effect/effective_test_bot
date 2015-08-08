@@ -12,11 +12,9 @@ module MemberTest
 
     visit(path)
 
-    assert_page_status
-    assert_page_title
-    assert_no_js_errors
-    assert_flash
-    assert_assigns(resource_name) unless was_redirect?(path)
+    assert_page_normal
+    assert_flash unless test_bot_skip?(:flash)
+    assert_assigns(resource_name) unless (was_redirect?(path) || test_bot_skip?(:assigns))
   end
 
 end
