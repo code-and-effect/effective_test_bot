@@ -27,7 +27,7 @@ module EffectiveTestBot
   def self.onlies
     @@onlines ||= begin
       flatten_and_sort(
-        ENV['TEST_BOT_TEST'].present?
+        if ENV['TEST_BOT_TEST'].present?
           ENV['TEST_BOT_TEST'].to_s.gsub('[', '').gsub(']', '').split(',').map { |str| str.strip }
         else
           only
