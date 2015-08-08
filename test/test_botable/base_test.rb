@@ -4,6 +4,10 @@
 module BaseTest
   private
 
+  def test_bot_skip?(test)
+    EffectiveTestBot.skip?(test)
+  end
+
   def skip?(test)
     skips.include?(test)
   end

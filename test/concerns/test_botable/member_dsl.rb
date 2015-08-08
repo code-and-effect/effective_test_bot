@@ -18,8 +18,8 @@ module TestBotable
     module ClassMethods
 
       def member_test(controller, action, user, obj_to_param = nil, options = {})
-        test_name = test_bot_test_name('member_test', options.delete(:label) || "#{controller}##{action}")
-        define_method(test_name) { member_action_test(controller, action, user, obj_to_param, options) }
+        options[:current_test] = test_bot_test_name('member_test', options.delete(:label) || "#{controller}##{action}")
+        define_method(options[:current_test]) { member_action_test(controller, action, user, obj_to_param, options) }
       end
 
     end

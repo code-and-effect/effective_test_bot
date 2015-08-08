@@ -10,7 +10,7 @@ module TestBotable
       # The output is what gets sent to each test and defined as lets
       def parse_test_bot_options(options)
         raise 'expected options to be a Hash' unless options.kind_of?(Hash)
-        raise 'expected a user' unless options[:user].kind_of?(User)
+        raise 'expected key user to be a User' unless options[:user].kind_of?(User)
 
         options.merge({}.tap do |retval|
           retval[:controller_namespace] = options[:controller_namespace] || options[:namespace]

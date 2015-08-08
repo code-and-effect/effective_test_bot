@@ -5,6 +5,8 @@ module CrudTest
   protected
 
   def test_bot_new_test
+    puts "CURRENT_TEST: " + current_test
+
     sign_in(user) and visit(new_resource_path)
 
     assert_page_status
@@ -22,6 +24,7 @@ module CrudTest
   end
 
   def test_bot_create_valid_test
+    puts "CURRENT_TEST: " + current_test
     sign_in(user) and visit(new_resource_path)
 
     before = { count: resource_class.count, path: page.current_path }
@@ -45,6 +48,7 @@ module CrudTest
   end
 
   def test_bot_create_invalid_test
+    puts "CURRENT_TEST: " + current_test
     sign_in(user) and visit(new_resource_path)
     before = { count: resource_class.count }
 
@@ -66,6 +70,7 @@ module CrudTest
   end
 
   def test_bot_edit_test
+    puts "CURRENT_TEST: " + current_test
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))

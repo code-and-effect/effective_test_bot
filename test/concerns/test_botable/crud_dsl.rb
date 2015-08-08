@@ -27,19 +27,22 @@ module TestBotable
         only = options.delete(:only)
         except = options.delete(:except)
 
-        begin
-          test_options = parse_test_bot_options(options.merge(user: user, resource: resource))
-        rescue => e
-          raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, options_hash)"
-        end
+        options = parse_test_bot_options(options.merge(user: user, resource: resource))
+
+        #begin
+        #  test_options = parse_test_bot_options(options.merge(user: user, resource: resource))
+        #rescue => e
+        #  raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, options_hash)"
+        #end
 
         crud_tests_to_define(only, except).each do |test|
-          test_name = test_bot_test_name('crud_test', label || "#{[test_options[:controller_namespace].presence, test_options[:resource_name].pluralize].compact.join('/')}##{test}")
+          options[:current_test] = [options[:controller_namespace].presence, options[:resource_name].pluralize].compact.join('/') + '#' + test.to_s
+          test_name = test_bot_test_name('crud_test', label || options[:current_test])
 
           if skips[test].present?
-            define_method(test_name) { crud_action_test(test, test_options.merge(skips: Array(skips[test]))) }
+            define_method(test_name) { crud_action_test(test, resource, user, options.merge(skips: Array(skips[test]))) }
           else
-            define_method(test_name) { crud_action_test(test, test_options) }
+            define_method(test_name) { crud_action_test(test, resource, user, options) }
           end
         end
       end
@@ -72,15 +75,11 @@ module TestBotable
     #
     # If obj is a Hash {:resource => ...} just skip over parsing options
     # And assume it's already been done (by the ClassMethod crud_test)
-    def crud_action_test(test, obj, user = nil, options = {})
-      if obj.kind_of?(Hash) && obj.key?(:resource)
-        obj
-      else
-        begin
-          self.class.parse_test_bot_options(options.merge(user: user, resource: obj))
-        rescue => e
-          raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
-        end
+    def crud_action_test(test, resource, user = nil, options = {})
+      begin
+        self.class.parse_test_bot_options(options.merge(user: user, resource: resource))
+      rescue => e
+        raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
       end.each { |k, v| self.class.let(k) { v } } # Using the regular let(:foo) { 'bar' } syntax
 
       self.send("test_bot_#{test}_test")
