@@ -5,6 +5,7 @@ module WizardTest
   protected
 
   def test_bot_wizard_test
+    test_bot_skip?
     sign_in(user)
 
     visit(from_path)

@@ -5,6 +5,8 @@ module PageTest
   protected
 
   def test_bot_page_test
+    test_bot_skip?
+
     sign_in(user)
 
     if page_path.kind_of?(Symbol)
