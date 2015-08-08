@@ -1,9 +1,19 @@
 require 'rake/testtask'
 require 'rails/test_unit/sub_test_task'
 
+# rake test:bot
+# rake test:bot TEST=documents#new
+# rake test:bot TEST=documents#new,documents#show
+# rake test:bot TEST=documents#new path,documents#show,documents#update_valid no_unpermitted_params
+
 namespace :test do
   desc 'Runs Effective Test Bot'
   task :bot do
+    if ENV['TEST'].present?
+      ENV['TEST_BOT_TEST'] = ENV['TEST']
+      ENV['TEST'] = nil
+    end
+
     Rake::Task["test:effective_test_bot"].invoke
   end
 
@@ -17,6 +27,5 @@ namespace :test do
     seeds = "#{Rails.root}/test/fixtures/seeds.rb"
     load(seeds) if File.exists?(seeds)
   end
-
 
 end

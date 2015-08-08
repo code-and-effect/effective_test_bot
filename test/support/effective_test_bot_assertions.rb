@@ -79,7 +79,7 @@ module EffectiveTestBotAssertions
   # assert_no_assigns_errors :post
   def assert_no_assigns_errors(key = nil, message = nil)
     if key.present?
-      assert_equal [], ((assigns[key.to_s] || {})['errors'] || []), message || "(no_assigns_errors) Expected @#{key}[:errors] to be blank.  Instead, it was: #{assigns[key.to_s]['errors']}"
+      assert_equal [], ((assigns[key.to_s] || {})['errors'] || []), message || "(no_assigns_errors) Expected @#{key}[:errors] to be blank.  Instead, it was: #{assigns}"
     else
       assigns.each do |key, value|
         assert_equal [], (value['errors'] || []), message || "(no_assigns_errors) Expected @#{key}[:errors] to be blank"

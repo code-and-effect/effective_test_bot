@@ -25,7 +25,15 @@ module EffectiveTestBot
   private
 
   def self.onlies
-    @@onlies ||= flatten_and_sort(only)
+    @@onlines ||= begin
+      flatten_and_sort(
+        ENV['TEST_BOT_TEST'].present?
+          ENV['TEST_BOT_TEST'].to_s.gsub('[', '').gsub(']', '').split(',').map { |str| str.strip }
+        else
+          only
+        end
+      )
+    end
   end
 
   def self.excepts
