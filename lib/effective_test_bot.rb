@@ -14,7 +14,7 @@ module EffectiveTestBot
     return false if value.blank?
 
     if onlies.present?
-      onlies.find { |only| only == value }.blank?
+      onlies.find { |only| value.start_with?(only) }.blank? # Let partial matches work
     elsif excepts.present?
       excepts.find { |except| except == value }.present?
     else
