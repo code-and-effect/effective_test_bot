@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module TestBot
-  class MinitestTest < ActionDispatch::IntegrationTest
+  class EnvironmentTest < ActionDispatch::IntegrationTest
     @@original_users_count = User.count
     let(:original_users_count) { @@original_users_count }
 

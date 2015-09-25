@@ -6,6 +6,8 @@ require 'rails/test_unit/sub_test_task'
 # rake test:bot TEST=documents#new,documents#show
 # rake test:bot TEST=documents#new path,documents#show,documents#update_valid no_unpermitted_params
 
+# rake test:bot:environment
+
 namespace :test do
   desc 'Runs Effective Test Bot'
   task :bot do
@@ -17,9 +19,21 @@ namespace :test do
     Rake::Task["test:effective_test_bot"].invoke
   end
 
+  namespace :bot do
+    desc 'Runs Effective Test Bot environment test'
+    task :environment do
+      Rake::Task["test:effective_test_bot_environment"].invoke
+    end
+  end
+
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
     t.libs << 'test'
-    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/**/*_test.rb"]
+    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb"]
+  end
+
+  Rails::TestTask.new('effective_test_bot_environment' => 'test:prepare') do |t|
+    t.libs << 'test'
+    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb"]
   end
 
   desc 'loads test/fixtures/seeds.rb'
