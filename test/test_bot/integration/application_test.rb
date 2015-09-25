@@ -24,9 +24,9 @@ module TestBot
           # Devise Test
           if (controller || '').include?('devise')
             next if seen_actions['devise'].present?
-
-            puts 'define devise test!!'
             seen_actions['devise'] = true # So we don't repeat it
+
+            devise_test()
 
           # Redirect Test
           elsif route.app.kind_of?(ActionDispatch::Routing::PathRedirect) && route.path.required_names.blank?

@@ -17,6 +17,7 @@ module EffectiveTestBot
         # test/test_botable/
         ActionDispatch::IntegrationTest.include BaseTest
         ActionDispatch::IntegrationTest.include CrudTest
+        ActionDispatch::IntegrationTest.include DeviseTest
         ActionDispatch::IntegrationTest.include MemberTest
         ActionDispatch::IntegrationTest.include PageTest
         ActionDispatch::IntegrationTest.include RedirectTest
@@ -25,6 +26,7 @@ module EffectiveTestBot
         # test/concerns/test_botable/
         ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
         ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
+        ActionDispatch::IntegrationTest.include TestBotable::DeviseDsl
         ActionDispatch::IntegrationTest.include TestBotable::MemberDsl
         ActionDispatch::IntegrationTest.include TestBotable::PageDsl
         ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
