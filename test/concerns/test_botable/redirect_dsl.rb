@@ -15,8 +15,10 @@ module TestBotable
     module ClassMethods
 
       def redirect_test(from_path, to_path, user, options = {})
-        options[:current_test] = "#{from_path} to #{to_path}"
-        method_name = test_bot_method_name('redirect_test', options.delete(:label) || options[:current_test])
+        options[:current_test] = options.delete(:label) || "#{from_path} to #{to_path}"
+
+        method_name = test_bot_method_name('redirect_test', options[:current_test])
+        return if EffectiveTestBot.skip?(options[:current_test])
 
         define_method(method_name) { redirect_action_test(from_path, to_path, user, options) }
       end

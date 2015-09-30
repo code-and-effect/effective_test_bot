@@ -80,9 +80,9 @@ module TestBotable
           options[:resource_class] = resource_class
           options[:resource_name] = resource_class.name.underscore
           options[:resource_attributes] = resource_attributes
-
-          options[:normalized] = true
         end
+
+        options[:normalized] = true
 
         options
       end
@@ -106,6 +106,7 @@ module TestBotable
           @num_defined_test_bot_tests[test_family] = (@num_defined_test_bot_tests[test_family] || 0) + 1
         end
 
+        # If we change the format here, also update effective_test_bot.skip? method
         if current_test.present?
           "#{test_family}: (#{current_test})"
         elsif number_of_tests > 1

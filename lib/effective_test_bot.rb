@@ -9,7 +9,19 @@ module EffectiveTestBot
     yield self
   end
 
+  # Test could be something like "crud_test", "crud_test (documents#new)", "documents", documents#new"
+  # Assertion will be page_title, or flash
+
   def self.skip?(test, assertion = nil)
+    # If I get passed a method_name, extract the test from it
+    test = test.to_s
+
+    if test.include?('_test: (')  # This is how the BaseDsl test_bot_method_name formats the test names.
+      left = test.index('(') || -1
+      right = test.rindex(')') || (test.length+1)
+      test = test[(left+1)..(right-1)]
+    end
+
     value = [test.to_s.presence, assertion.to_s.presence].compact.join(' ')
     return false if value.blank?
 

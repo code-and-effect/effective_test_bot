@@ -13,10 +13,6 @@ module TestBot
         routes = Rails.application.routes.routes.to_a
         seen_actions = Hash.new([])  # {posts: ['new', 'edit'], events: ['new', 'edit', 'show']}
 
-        #Rails.application.routes.recognize_path('/your/path/here')
-        #Rails.application.routes.recognize_path('/admin/jobs/3/unarchive')
-        # => {:action=>"unarchive", :controller=>"admin/jobs", :id=>"3"}
-
         routes.each_with_index do |route, index|
           controller = route.defaults[:controller]
           action = route.defaults[:action]

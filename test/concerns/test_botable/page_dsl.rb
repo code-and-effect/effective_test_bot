@@ -16,8 +16,10 @@ module TestBotable
     module ClassMethods
 
       def page_test(path, user, options = {})
-        options[:current_test] = path.to_s
-        method_name = test_bot_method_name('page_test', options.delete(:label) || options[:current_test])
+        options[:current_test] = options.delete(:label) || path.to_s
+
+        method_name = test_bot_method_name('page_test', options[:current_test])
+        return if EffectiveTestBot.skip?(options[:current_test])
 
         define_method(method_name) { page_action_test(path, user, options) }
       end

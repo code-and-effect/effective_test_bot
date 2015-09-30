@@ -17,10 +17,13 @@ module TestBotable
     module ClassMethods
 
       def devise_test(options = {})
+        label = options.delete(:label).presence
+
         [:sign_up, :sign_in_valid, :sign_in_invalid].each do |test|
-          options[:current_test] = test
+          options[:current_test] = label || test
 
           method_name = test_bot_method_name('devise_test', options[:current_test])
+          return if EffectiveTestBot.skip?(options[:current_test])
 
           define_method(method_name) { devise_action_test(test, options) }
         end
