@@ -12,6 +12,8 @@ module EffectiveTestBotAssertions
   end
 
   def assert_page_title(title = :any, message = '(page_title) Expected page title to be present')
+    return if was_download? # If this was a download, it correctly won't have a page title
+
     if title.present? && title != :any
       assert_title(title) # Capybara TitleQuery, match this text
     else
@@ -38,7 +40,6 @@ module EffectiveTestBotAssertions
       refute_equal from_path, page.current_path, message || "(redirect) Expected redirect away from #{from_path}"
     end
   end
-
 
   def assert_no_js_errors(message = nil)
     errors = page.driver.error_messages
