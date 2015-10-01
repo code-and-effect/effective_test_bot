@@ -21,11 +21,12 @@ module BaseTest
   # if you use the action_test_ instance methods, current_test is nil, and test skips won't apply
   # Any global assertion skips will tho
   def test_bot_skip?(assertion = nil)
-    # Skip the whole test
+    # Skip the whole test 'documents#new'
     # this will put SKIP into the minitest output
     skip if (defined?(current_test) && EffectiveTestBot.skip?(current_test))
 
-    # Check if the individual assertion should be skipped
+    # Skip just this assertion sub test 'flash'
+    # this will not print anything to the minitest output
     EffectiveTestBot.skip?((current_test if defined?(current_test)), assertion)
   end
 

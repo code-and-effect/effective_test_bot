@@ -29,11 +29,11 @@ module EffectiveTestBot
     value = "#{test} #{assertion}".strip # This is the format config.excepts is flattened into
 
     # Excepts are defined in the app's config/initializers/effective_test_bot.rb file
-    return true if excepts.find { |except| [test, assertion, value].include?(except) }.present?
+    return true if excepts.any? { |except| [test, assertion, value].include?(except) }
 
     # Onlies are defined in the same config file, or on the command like rake test:bot TEST=posts#new
     # It doesn't match just 'flash' or 'page_title' assertions
-    return true if onlies.find { |only| test.start_with?(only) }.blank?
+    return true if onlies.none? { |only| test.start_with?(only) }
 
     false # Don't skip this test
   end
