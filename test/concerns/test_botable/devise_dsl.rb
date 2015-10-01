@@ -23,7 +23,7 @@ module TestBotable
           options[:current_test] = label || test
 
           method_name = test_bot_method_name('devise_test', options[:current_test])
-          return if EffectiveTestBot.skip?(options[:current_test])
+          next if EffectiveTestBot.skip?(options[:current_test])
 
           define_method(method_name) { devise_action_test(test, options) }
         end
@@ -40,7 +40,7 @@ module TestBotable
       begin
         assign_test_bot_lets!(options)
       rescue => e
-        raise "Error: #{e.message}.  Expected usage: devise_action_test(:sign_up, options_hash)"
+        raise "Error: #{e.message}.  Expected usage: devise_action_test(:sign_up)"
       end
 
       self.send("test_bot_devise_#{test}_test")
