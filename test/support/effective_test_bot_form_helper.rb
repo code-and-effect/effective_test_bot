@@ -10,6 +10,7 @@ module EffectiveTestBotFormHelper
 
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |cocoon_add_field|
+      next unless cocoon_add_field.visible?
       [1,2].sample.times { cocoon_add_field.click() }
     end
 
