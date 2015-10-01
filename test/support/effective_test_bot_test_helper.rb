@@ -17,6 +17,8 @@ module EffectiveTestBotTestHelper
     @flash = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Flash'])) rescue {})
     @assigns = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Assigns'])) rescue {})
     @unpermitted_params = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
+
+    @visit_delete_page = session
   end
 
   def was_redirect?(from_path, to_path = nil)

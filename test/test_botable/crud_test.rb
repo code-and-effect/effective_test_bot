@@ -55,6 +55,7 @@ module CrudTest
 
     after = { count: resource_class.count }
 
+    assert_page_status unless test_bot_skip?(:page_status)
     assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
     assert_page_title(:any, '(page_title) Expected page title to be present after failed validation') unless test_bot_skip?(:page_title)
 
@@ -98,6 +99,7 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
+    assert_page_status unless test_bot_skip?(:page_status)
     assert_no_js_errors unless test_bot_skip?(:no_js_errors)
     assert_no_unpermitted_params unless test_bot_skip?(:unpermitted_params)
 
@@ -127,6 +129,7 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
+    assert_page_status unless test_bot_skip?(:page_status)
     assert_no_js_errors unless test_bot_skip?(:no_js_errors)
     assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
     assert_equal(before[:updated_at], after[:updated_at], "Expected @#{resource_name}.updated_at to be unchanged") if resource.respond_to?(:updated_at)
@@ -169,6 +172,12 @@ module CrudTest
     visit_delete(resource_path(resource), user)
 
     after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
+
+    # Because of the way delete works, we can't use assert_page_normal()
+    # So we just assert the 200 status code, and page title present manually
+    # Javascript errors cannot be detected
+    assert_equal(200, @visit_delete_page.try(:status_code), '(page_status) Expected 200 HTTP status code') unless test_bot_skip?(:page_status)
+    assert((@visit_delete_page.find(:xpath, '//title', visible: false) rescue nil).present?, '(page_title) Expected page title to be present') unless test_bot_skip?(:page_title)
 
     assert_flash(:success) unless test_bot_skip?(:flash)
 
