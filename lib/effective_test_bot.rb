@@ -13,25 +13,29 @@ module EffectiveTestBot
   # Assertion will be page_title, or flash
 
   def self.skip?(test, assertion = nil)
-    # If I get passed a method_name, extract the test from it
-    test = test.to_s
+    return false if (test || assertion).blank?
 
+    test = test.to_s
+    assertion = assertion.to_s
+
+    # If I get passed a method_name, "crud_test: (posts#create_invalid)" extract the inner test name from it
+    # I dunno why this is needed really, but it might help someone one day.
     if test.include?('_test: (')  # This is how the BaseDsl test_bot_method_name formats the test names.
       left = test.index('(') || -1
       right = test.rindex(')') || (test.length+1)
       test = test[(left+1)..(right-1)]
     end
 
-    value = [test.to_s.presence, assertion.to_s.presence].compact.join(' ')
-    return false if value.blank?
+    value = "#{test} #{assertion}".strip # This is the format config.excepts is flattened into
 
-    if onlies.present?
-      onlies.find { |only| value.start_with?(only) }.blank? # Let partial matches work
-    elsif excepts.present?
-      excepts.find { |except| except == value }.present?
-    else
-      false
-    end
+    # Excepts are defined in the app's config/initializers/effective_test_bot.rb file
+    return true if excepts.find { |except| [test, assertion, value].include?(except) }.present?
+
+    # Onlies are defined in the same config file, or on the command like rake test:bot TEST=posts#new
+    # It doesn't match just 'flash' or 'page_title' assertions
+    return true if onlies.find { |only| test.start_with?(only) }.blank?
+
+    false # Don't skip this test
   end
 
   private
