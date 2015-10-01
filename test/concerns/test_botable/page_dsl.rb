@@ -31,7 +31,7 @@ module TestBotable
       begin
         assign_test_bot_lets!(options.reverse_merge!(user: user, page_path: path))
       rescue => e
-        raise "Error: #{e.message}.  Expected usage: crud_action_test(:new, Post || Post.new, User.first, options_hash)"
+        raise "Error: #{e.message}.  Expected usage: page_action_test(root_path, User.first)"
       end
 
       self.send(:test_bot_page_test)
