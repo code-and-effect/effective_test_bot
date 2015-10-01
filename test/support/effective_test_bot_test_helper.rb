@@ -23,6 +23,15 @@ module EffectiveTestBotTestHelper
     from_path != (to_path || page.current_path)
   end
 
+  def was_download?(filename = nil)
+    if filename.present?
+      page.response_headers['Content-Disposition'].to_s.include?('filename=') &&
+      page.response_headers['Content-Disposition'].to_s.include?(filename)
+    else
+      page.response_headers['Content-Disposition'].to_s.include?('filename=')
+    end
+  end
+
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # that encodes the flash message, and some of the assigns
   def flash
