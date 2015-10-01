@@ -47,4 +47,9 @@ module EffectiveTestBotTestHelper
   def unpermitted_params
     @unpermitted_params ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
+
+  def exceptions
+    @exceptions ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Exceptions'])) rescue [])
+  end
+
 end

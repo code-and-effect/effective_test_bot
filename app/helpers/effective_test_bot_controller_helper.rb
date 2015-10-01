@@ -25,10 +25,15 @@ module EffectiveTestBotControllerHelper
   end
 
   # We get here if ApplicationController raised a ActionController::UnpermittedParameters error
-  def assign_test_bot_unpermitted_params_headers(exception)
+  def assign_test_bot_unpermitted_params_header(exception)
     if exception.kind_of?(ActionController::UnpermittedParameters)
       response.headers['Test-Bot-Unpermitted-Params'] = Base64.encode64(exception.params.to_json)
     end
+  end
+
+  def assign_test_bot_exceptions_header(exception)
+    info = [exception.message] + exception.backtrace.first(8)
+    response.headers['Test-Bot-Exceptions'] = Base64.encode64(info.to_json)
   end
 
 end

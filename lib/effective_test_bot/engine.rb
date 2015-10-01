@@ -50,7 +50,12 @@ module EffectiveTestBot
 
           ApplicationController.instance_exec do
             rescue_from ActionController::UnpermittedParameters do |exception|
-              assign_test_bot_unpermitted_params_headers(exception)
+              assign_test_bot_unpermitted_params_header(exception)
+            end
+
+            rescue_from Exception do |exception|  # Not sure if I should rescue Exception or StandardError
+              assign_test_bot_exceptions_header(exception)
+              render status: 500, text: "<html><body><h1>Uncaught Exception</h1><p>#{exception.message}</p><p>#{exception.backtrace.first(20).join('<br>')}</p></body></html>"
             end
           end
 

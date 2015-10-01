@@ -50,6 +50,10 @@ module EffectiveTestBotAssertions
     assert_equal [], unpermitted_params, message
   end
 
+  def assert_no_exceptions(message = nil)
+    assert exceptions.blank?, message || "(no_exceptions) Unexpected exception:\n#{exceptions.join("\n")}\n========== End Exception ==========\n"
+  end
+
   # assert_flash
   # assert_flash :success
   # assert_flash :error, 'there was a specific error'
