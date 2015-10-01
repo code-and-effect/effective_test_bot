@@ -33,7 +33,7 @@ module EffectiveTestBot
 
     # Onlies are defined in the same config file, or on the command like rake test:bot TEST=posts#new
     # It doesn't match just 'flash' or 'page_title' assertions
-    return true if onlies.none? { |only| test.start_with?(only) }
+    return true if onlies.present? && onlies.find { |only| test.start_with?(only) }.blank?
 
     false # Don't skip this test
   end
