@@ -5,8 +5,6 @@ module WizardTest
   protected
 
   def test_bot_wizard_test
-    test_bot_skip?
-
     sign_in(user) and visit(from_path)
 
     0.upto(50) do |index|   # Can only test wizards 51 steps long

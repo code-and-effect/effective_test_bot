@@ -5,8 +5,6 @@ module RedirectTest
   protected
 
   def test_bot_redirect_test
-    test_bot_skip?
-
     sign_in(user) and visit(from_path)
 
     assert_redirect(from_path, to_path)

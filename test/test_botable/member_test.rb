@@ -5,7 +5,6 @@ module MemberTest
   protected
 
   def test_bot_member_test
-    test_bot_skip?
     sign_in(user) and (resource = find_or_create_resource!)
 
     path = url_for(controller: controller, action: action, id: resource.id, only_path: true)

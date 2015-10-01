@@ -5,7 +5,6 @@ module DeviseTest
   protected
 
   def test_bot_devise_sign_up_test
-    test_bot_skip?
     visit new_user_registration_path
 
     within('form#new_user') do
@@ -21,7 +20,6 @@ module DeviseTest
   end
 
   def test_bot_devise_sign_in_valid_test
-    test_bot_skip?
     User.new(email: email, password: password, password_confirmation: password).save(validate: false)
 
     visit new_user_session_path
@@ -39,7 +37,6 @@ module DeviseTest
   end
 
   def test_bot_devise_sign_in_invalid_test
-    test_bot_skip?
     User.new(email: email, password: password, password_confirmation: password).save(validate: false)
 
     visit new_user_session_path

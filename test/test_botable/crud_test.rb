@@ -5,7 +5,6 @@ module CrudTest
   protected
 
   def test_bot_new_test
-    test_bot_skip?
     sign_in(user) and visit(new_resource_path)
 
     assert_page_normal
@@ -21,7 +20,6 @@ module CrudTest
   end
 
   def test_bot_create_valid_test
-    test_bot_skip?
     sign_in(user) and visit(new_resource_path)
 
     before = { count: resource_class.count, path: page.current_path }
@@ -46,7 +44,6 @@ module CrudTest
   end
 
   def test_bot_create_invalid_test
-    test_bot_skip?
     sign_in(user) and visit(new_resource_path)
 
     before = { count: resource_class.count }
@@ -70,7 +67,6 @@ module CrudTest
   end
 
   def test_bot_edit_test
-    test_bot_skip?
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
@@ -88,7 +84,6 @@ module CrudTest
   end
 
   def test_bot_update_valid_test
-    test_bot_skip?
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
@@ -118,7 +113,6 @@ module CrudTest
   end
 
   def test_bot_update_invalid_test
-    test_bot_skip?
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
@@ -146,7 +140,6 @@ module CrudTest
   end
 
   def test_bot_index_test
-    test_bot_skip?
     sign_in(user) and (resource = (find_or_create_resource! rescue nil))
 
     visit resources_path
@@ -160,7 +153,6 @@ module CrudTest
   end
 
   def test_bot_show_test
-    test_bot_skip?
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit resource_path(resource)
@@ -170,7 +162,6 @@ module CrudTest
   end
 
   def test_bot_destroy_test
-    test_bot_skip?
     sign_in(user) and (resource = find_or_create_resource!)
 
     before = { count: resource_class.count, archived: (resource.archived rescue nil) }
