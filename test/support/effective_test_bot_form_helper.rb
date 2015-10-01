@@ -65,7 +65,10 @@ module EffectiveTestBotFormHelper
     when 'input_email'
       Faker::Internet.email
     when 'input_number'
-      Faker::Number.number(4)
+      min = (Float(field['min']) rescue 1)
+      max = (Float(field['max']) rescue 1000)
+      number = Random.new.rand(min..max)
+      number.kind_of?(Float) ? number.round(2) : number
     when 'input_password'
       @test_bot_password ||= Faker::Internet.password  # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
     when 'input_tel'
@@ -75,9 +78,16 @@ module EffectiveTestBotFormHelper
       classes = field['class'].to_s.split(' ')
 
       if classes.include?('date') # Let's assume this is a date input.
-        Faker::Date.backward(365).strftime('%y-%m-%d')
+        Faker::Date.backward(365).strftime('%Y-%m-%d')
       elsif classes.include?('datetime')
-        Faker::Date.backward(365).strftime('%y-%m-%d %H:%m')
+        Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
+      elsif classes.include?('price')
+        4.times.map { DIGITS.sample }.join('') + '.00'
+      elsif classes.include?('numeric')
+        min = (Float(field['min']) rescue 1)
+        max = (Float(field['max']) rescue 1000)
+        number = Random.new.rand(min..max)
+        number.kind_of?(Float) ? number.round(2) : number
       elsif attributes.last.to_s.include?('first_name')
         Faker::Name.first_name
       elsif attributes.last.to_s.include?('last_name')
