@@ -55,12 +55,11 @@ module CrudTest
 
     after = { count: resource_class.count }
 
-    assert_page_status unless test_bot_skip?(:page_status)
-    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
-    assert_page_title(:any, '(page_title) Expected page title to be present after failed validation') unless test_bot_skip?(:page_title)
+    assert_page_normal
 
-    assert_no_js_errors unless test_bot_skip?(:no_js_errors)
+    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
     assert_flash(:danger) unless test_bot_skip?(:flash)
+
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
 
@@ -99,9 +98,7 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_page_status unless test_bot_skip?(:page_status)
-    assert_no_js_errors unless test_bot_skip?(:no_js_errors)
-    assert_no_unpermitted_params unless test_bot_skip?(:unpermitted_params)
+    assert_page_normal
 
     assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
     refute_equal(before[:updated_at], after[:updated_at], "(updated_at_changed) Expected @#{resource_name}.updated_at to have changed") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at_changed))
@@ -129,13 +126,13 @@ module CrudTest
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_page_status unless test_bot_skip?(:page_status)
-    assert_no_js_errors unless test_bot_skip?(:no_js_errors)
+    assert_page_normal
+
     assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
     assert_equal(before[:updated_at], after[:updated_at], "Expected @#{resource_name}.updated_at to be unchanged") if resource.respond_to?(:updated_at)
-    assert_page_title(:any, '(page_title) Expected page title to be present after failed validation') unless test_bot_skip?(:page_title)
 
     assert_flash(:danger) unless test_bot_skip?(:flash)
+
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
 
