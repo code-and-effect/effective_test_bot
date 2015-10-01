@@ -36,7 +36,6 @@ class ActionDispatch::IntegrationTest
   def after_teardown # I reset sessions here so capybara-screenshot can still make screenshots when tests fail
     super(); Capybara.reset_sessions!
   end
-
 end
 
 
@@ -53,14 +52,19 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 ### That gets run just once before the whole test suite loads
 
 # So the very first thing I do is set up a consistent database
-Rake::Task['db:schema:load'].invoke
+silence_stream(STDOUT) do
+  Rake::Task['db:schema:load'].invoke
+end
+
 ActiveRecord::Migration.maintain_test_schema!
 
 # or the following 3:
 
-#Rake::Task['db:drop'].invoke
-#Rake::Task['db:create'].invoke
-#Rake::Task['db:migrate'].invoke
+# silence_stream(STDOUT) do
+#   Rake::Task['db:drop'].invoke
+#   Rake::Task['db:create'].invoke
+#   Rake::Task['db:migrate'].invoke
+# end
 
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke

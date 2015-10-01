@@ -35,6 +35,7 @@ Run the test suite with:
 
 ```ruby
 bundle exec rake test:bot
+bundle exec rake test:bot:environment
 ```
 
 You should now see multiple -- hopefully passing -- tests that you didn't write!
