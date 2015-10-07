@@ -5,7 +5,7 @@ module TestBot
     @@original_users_count = User.count
     let(:original_users_count) { @@original_users_count }
 
-    let(:email) { 'unique@testbot.com'}
+    let(:email) { 'unique@testbot.com' }
     let(:password) { '!Password123' }
     let(:create_user!) { User.new(email: email, password: password, password_confirmation: password).save(validate: false) }
 
@@ -85,11 +85,6 @@ module TestBot
       assert_page_status
       assert_equal original_users_count, User.count, 'Epected User.count to be back to original'
       assert assigns[:current_user].blank?, 'Expected current_user to be blank'
-
-      # Someitmes it's nice to assert your environment...
-      #assert users(:normal).present?
-      #assert 2, User.count
-      #assert 3, Physician.count
     end
 
   end

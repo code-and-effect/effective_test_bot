@@ -65,9 +65,10 @@ module TestBot
 
       def is_crud_controller?(route)
         return false unless CRUD_ACTIONS.include?(route.defaults[:action])
+        return false unless route.defaults[:controller].present? && route.app.respond_to?(:controller)
 
-        controller_klass = (route.app.controller(route.defaults) rescue nil) if route.defaults[:controller].present? && route.app.respond_to?(:controller)
-        controller_instance = controller_klass.new() if controller_klass
+        controller_klass = (route.app.controller(route.defaults) rescue nil)
+        controller_instance = controller_klass.new()
 
         # Is this a CRUD capable controller?
         controller_instance && controller_instance.respond_to?(:new) && controller_instance.respond_to?(:create)
