@@ -4,6 +4,7 @@ require "effective_test_bot/version"
 module EffectiveTestBot
   mattr_accessor :except
   mattr_accessor :only
+  mattr_accessor :screenshots
 
   def self.setup
     yield self

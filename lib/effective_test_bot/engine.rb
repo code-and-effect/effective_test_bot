@@ -36,6 +36,7 @@ module EffectiveTestBot
         ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
         ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
         ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
+        ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
         ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
       end
     end

@@ -8,6 +8,8 @@ module EffectiveTestBotFormHelper
   def fill_form(fills = {})
     fills = HashWithIndifferentAccess.new(fills)
 
+    save_test_bot_screenshot
+
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |cocoon_add_field|
       next unless cocoon_add_field.visible?
@@ -16,6 +18,8 @@ module EffectiveTestBotFormHelper
 
     all('input,select,textarea').each do |field|
       next unless field.visible?
+
+      save_test_bot_screenshot
 
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'

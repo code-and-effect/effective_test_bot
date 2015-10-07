@@ -28,5 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'capybara-slow_finder_errors'
   s.add_dependency 'shoulda'
   s.add_dependency 'shoulda-matchers'
+  s.add_dependency 'rmagick'
   s.add_dependency 'faker'
 end
