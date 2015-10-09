@@ -40,7 +40,7 @@ module BaseTest
     visit(new_resource_path)
 
     within("form#new_#{resource_name}") do
-      fill_form(resource_attributes) and submit_form
+      fill_form(resource_attributes) and submit_novalidate_form
     end
 
     resource_class.last

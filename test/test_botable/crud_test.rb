@@ -92,7 +92,7 @@ module CrudTest
 
     within("form#edit_#{resource_name}_#{resource.id}") do
       fill_form(resource_attributes)
-      submit_form
+      submit_novalidate_form
     end
 
     resource = resource_class.find(resource.id)
