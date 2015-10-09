@@ -41,10 +41,7 @@ module EffectiveTestBotFormHelper
     true
   end
 
-  def clear_form
-    all('input,select,textarea').each { |field| (field.set('') rescue false) }
-    true
-  end
+
 
   # Operates on just string keys
   # This function receives the same fill values that you call fill_form with
@@ -125,10 +122,15 @@ module EffectiveTestBotFormHelper
     end
   end
 
+  def clear_form
+    all('input,select,textarea').each { |field| (field.set('') rescue false) }
+    true
+  end
+
   # page.execute_script "$('form#new_#{resource_name}').submit();"
   # This submits the form, and checks for unpermitted_params and html5 form validation errors
   def submit_form(label = nil)
-    if test_bot_skip?(:unpermitted_params)
+    if test_bot_skip?(:no_unpermitted_params)
       label.present? ? click_on(label) : first(:css, "input[type='submit']").click
     else
       with_raised_unpermitted_params_exceptions do
@@ -139,7 +141,7 @@ module EffectiveTestBotFormHelper
     synchronize!
 
     assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
-    assert_no_unpermitted_params unless test_bot_skip?(:unpermitted_params)
+    assert_no_unpermitted_params unless test_bot_skip?(:no_unpermitted_params)
 
     true
   end
@@ -160,7 +162,7 @@ module EffectiveTestBotFormHelper
       action = ActionController::Parameters.action_on_unpermitted_parameters
       ActionController::Parameters.action_on_unpermitted_parameters = :raise
     rescue => e
-      puts 'unable to assign config.action_on_unpermitted_parameters = :raise, unpermitted params assertions disabled.'
+      puts 'unable to assign config.action_on_unpermitted_parameters = :raise, (unpermitted_params) assertions may not work.'
     end
 
     yield
