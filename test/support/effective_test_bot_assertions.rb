@@ -54,6 +54,13 @@ module EffectiveTestBotAssertions
     assert exceptions.blank?, message || "(no_exceptions) Unexpected exception:\n#{exceptions.join("\n")}\n========== End Exception ==========\n"
   end
 
+  # This must be run after submit_form()
+  # It ensures there are no HTML5 validation errors that would prevent the form from being submit
+  def assert_no_html5_form_validation_errors(message = nil)
+    errors = all(':invalid', visible: false).map { |field| field['name'] }
+    assert errors.blank?, message || "(no_html5_form_validation_errors) Unable to submit form, unexpected HTML5 validation error present on the following fields:\n#{errors.join("\n")}"
+  end
+
   # assert_flash
   # assert_flash :success
   # assert_flash :error, 'there was a specific error'
