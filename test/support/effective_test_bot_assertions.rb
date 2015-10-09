@@ -91,17 +91,19 @@ module EffectiveTestBotAssertions
   # assert_no_assigns_errors :post
   def assert_no_assigns_errors(key = nil, message = nil)
     if key.present?
-      assert_equal [], ((assigns[key.to_s] || {})['errors'] || []), message || "(no_assigns_errors) Expected @#{key}[:errors] to be blank.  Instead, it was: #{assigns}"
+      errors = (assigns[key.to_s] || {})['errors'] || []
+      assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
     else
       assigns.each do |key, value|
-        assert_equal [], (value['errors'] || []), message || "(no_assigns_errors) Expected @#{key}[:errors] to be blank"
+        errors = (value['errors'] || [])
+        assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
       end
     end
   end
 
   # assert_assigns_errors :post
   def assert_assigns_errors(key, message = nil)
-    refute_equal [], ((assigns[key.to_s] || {})['errors'] || []), message || "(assigns_errors) Expected @#{key}[:errors] to be present"
+    refute_equal [], ((assigns[key.to_s] || {})['errors'] || []), message || "(assigns_errors) Expected @#{key}.errors to be present"
   end
 
 end
