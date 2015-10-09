@@ -126,20 +126,31 @@ module EffectiveTestBotFormHelper
   end
 
   # page.execute_script "$('form#new_#{resource_name}').submit();"
+  # This submits the form, and checks for unpermitted_params and html5 form validation errors
   def submit_form(label = nil)
-    if label.present?
-      click_on(label)
+    if test_bot_skip?(:unpermitted_params)
+      label.present? ? click_on(label) : first(:css, "input[type='submit']").click
     else
-      first(:css, "input[type='submit']").click
+      with_raised_unpermitted_params_exceptions do
+        label.present? ? click_on(label) : first(:css, "input[type='submit']").click
+      end
     end
+
     synchronize!
+
+    assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
+    assert_no_unpermitted_params unless test_bot_skip?(:unpermitted_params)
+
     true
   end
 
   # Submit form after disabling any HTML5 validations
   def submit_novalidate_form(label = nil)
     page.execute_script "for(var f=document.forms,i=f.length;i--;)f[i].setAttribute('novalidate','');"
-    submit_form(label)
+
+    label.present? ? click_on(label) : first(:css, "input[type='submit']").click
+    synchronize!
+    true
   end
 
   def with_raised_unpermitted_params_exceptions(&block)

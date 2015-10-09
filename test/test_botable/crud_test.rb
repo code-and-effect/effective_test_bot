@@ -26,13 +26,12 @@ module CrudTest
 
     within("form#new_#{resource_name}") do
       fill_form(resource_attributes)
-      test_bot_skip?(:unpermitted_params) ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
+      submit_form
     end
 
     after = { count: resource_class.count, path: page.current_path }
 
     assert_page_normal
-    assert_no_unpermitted_params unless test_bot_skip?(:unpermitted_params)
 
     refute_equal before[:count], after[:count], "Expected fill_form to create a #{resource_class} object"
     refute_equal(before[:path], after[:path], "(path) Expected unique before and after paths") unless test_bot_skip?(:path)
@@ -93,18 +92,18 @@ module CrudTest
 
     within("form#edit_#{resource_name}_#{resource.id}") do
       fill_form(resource_attributes)
-      test_bot_skip?(:unpermitted_params) ? submit_form : with_raised_unpermitted_params_exceptions { submit_form }
+      submit_form
     end
+
     resource = resource_class.find(resource.id)
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     assert_page_normal
-    assert_no_unpermitted_params unless test_bot_skip?(:unpermitted_params)
 
     assert_no_assigns_errors(resource_name) unless test_bot_skip?(:no_assigns_errors)
 
-    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
+    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged" unless test_bot_skip?(:count)
     refute_equal(before[:updated_at], after[:updated_at], "(updated_at_changed) Expected @#{resource_name}.updated_at to have changed") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at_changed))
 
     assert_flash(:success) unless test_bot_skip?(:flash)

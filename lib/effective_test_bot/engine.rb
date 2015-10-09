@@ -14,6 +14,13 @@ module EffectiveTestBot
 
     initializer 'effective_test_bot.test_suite' do |app|
       Rails.application.config.to_prepare do
+        # test/support/
+        ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
+        ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
+        ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
+        ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
+        ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
+
         # test/test_botable/
         ActionDispatch::IntegrationTest.include BaseTest
         ActionDispatch::IntegrationTest.include CrudTest
@@ -31,13 +38,6 @@ module EffectiveTestBot
         ActionDispatch::IntegrationTest.include TestBotable::PageDsl
         ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
         ActionDispatch::IntegrationTest.include TestBotable::WizardDsl
-
-        # test/support/
-        ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
-        ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
-        ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
-        ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
-        ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
       end
     end
 
