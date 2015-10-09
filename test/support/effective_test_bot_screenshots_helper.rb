@@ -12,7 +12,7 @@ module EffectiveTestBotScreenshotsHelper
     ### Here we create an animated gif out of the all collected screenshots
     Dir.mkdir('test/tour') unless File.exists?('test/tour')
 
-    animation = ImageList.new(*Dir["tmp/test_bot/#{current_test}/*.png"])
+    animation = ImageList.new(*Dir["tmp/test_bot/#{current_test}/*.png"].first(@test_bot_screenshot_id))
     animation.delay = 20 # delay 1/5 of a second between images.
     animation.write("test/tour/#{current_test}.gif")
   end
