@@ -5,6 +5,8 @@ module EffectiveTestBot
   mattr_accessor :except
   mattr_accessor :only
   mattr_accessor :screenshots
+  mattr_accessor :autosave_animated_gif_on_failure
+  mattr_accessor :tour_mode
 
   def self.setup
     yield self
@@ -37,6 +39,23 @@ module EffectiveTestBot
     return true if onlies.present? && onlies.find { |only| test.start_with?(only) }.blank?
 
     false # Don't skip this test
+  end
+
+  # If you call rake test:bot TOUR=false, then disable screenshots too
+  def self.screenshots?
+    screenshots == true
+  end
+
+  def self.tour_mode?
+    if ENV['TOUR'].present?
+      ENV['TOUR'].to_s.downcase == 'true'
+    else
+      screenshots && tour_mode
+    end
+  end
+
+  def self.autosave_animated_gif_on_failure?
+    screenshots && autosave_animated_gif_on_failure
   end
 
   private
