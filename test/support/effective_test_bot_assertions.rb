@@ -51,7 +51,7 @@ module EffectiveTestBotAssertions
   end
 
   def assert_no_exceptions(message = nil)
-    assert exceptions.blank?, message || "(no_exceptions) Unexpected exception:\n#{exceptions.join("\n")}\n========== End Exception ==========\n"
+    assert exceptions.blank?, message || "(no_exceptions) Unexpected exception:\n#{exceptions.join("\n")}\n========== End of rails server exception ==========\n"
   end
 
   # This must be run after submit_form()
