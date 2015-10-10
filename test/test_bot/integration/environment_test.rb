@@ -84,7 +84,7 @@ module TestBot
     def assert_environment_normal
       visit root_path
       assert_page_status
-      assert_equal original_users_count, User.count, 'Epected User.count to be back to original'
+      assert_equal original_users_count, User.count, 'Expected User.count to be back to original'
       assert assigns[:current_user].blank?, 'Expected current_user to be blank'
     end
 

@@ -41,7 +41,8 @@ module EffectiveTestBot
 
       def thank_you
         puts "Thanks for using EffectiveTestBot"
-        puts "Run tests by typing 'rake test:bot'"
+        puts "First make sure your test environment is correctly configured by running 'rake test:bot:environment'"
+        puts "Run tests with 'rake test:bot'"
       end
     end
   end
