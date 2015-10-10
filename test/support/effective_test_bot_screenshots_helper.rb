@@ -13,8 +13,6 @@ module EffectiveTestBotScreenshotsHelper
   # def before_setup
   #   super
   #   return unless (EffectiveTestBot.screenshots? && defined?(current_test))
-
-  #   # If we're in tour mode, delete all the old screenshots
   # end
 
 

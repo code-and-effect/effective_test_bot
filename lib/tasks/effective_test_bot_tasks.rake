@@ -4,9 +4,11 @@ require 'rails/test_unit/sub_test_task'
 # rake test:bot
 # rake test:bot TEST=documents#new
 # rake test:bot TEST=documents#new,documents#show
-# rake test:bot TEST=documents#new path,documents#show,documents#update_valid no_unpermitted_params
+# rake test:bot TOUR=true
+# rake test:bot TOUR=verbose
 
 # rake test:bot:environment
+# rake test:bot:purge
 
 namespace :test do
   desc 'Runs Effective Test Bot'
@@ -24,6 +26,14 @@ namespace :test do
     task :environment do
       Rake::Task["test:effective_test_bot_environment"].invoke
     end
+
+    desc 'Deletes all temporary, failure and tour screenshots'
+    task :purge do
+      FileUtils.rm_rf(Rails.root + 'test/tour')
+      FileUtils.rm_rf(Rails.root + 'tmp/test_bot')
+      puts "Successfully purged all effective_test_bot screenshots"
+    end
+
   end
 
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|

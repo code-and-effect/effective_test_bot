@@ -17,6 +17,7 @@ module EffectiveTestBotTestHelper
     @flash = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Flash'])) rescue {})
     @assigns = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Assigns'])) rescue {})
     @unpermitted_params = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
+    @exceptions = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Exceptions'])) rescue [])
 
     @visit_delete_page = session
   end

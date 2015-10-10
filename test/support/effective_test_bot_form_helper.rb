@@ -13,6 +13,7 @@ module EffectiveTestBotFormHelper
     else
       fill_form_fields(fills)
     end
+    true
   end
 
   # This submits the form, while checking for html5 form validation errors and unpermitted params
