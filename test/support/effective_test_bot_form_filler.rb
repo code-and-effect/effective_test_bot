@@ -22,7 +22,9 @@ module EffectiveTestBotFormFiller
     # Fill everything outside of the tab_content
     active_tab = find("li.active > a[data-toggle='tab']")
     tab_content = find("div#{active_tab['href']}").find(:xpath, '..')
-    fill_form_fields(fills, tab_content.path)
+    #fill_form_fields(fills, tab_content.path)
+
+    excluding_fields_with_parent(tab_content) { fill_form_fields(fills) }
 
     # Refresh the tabs, as they may have changed
     tabs = all("a[data-toggle='tab']")
@@ -39,27 +41,17 @@ module EffectiveTestBotFormFiller
 
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
-  def fill_form_fields(fills = {}, xpath_to_skip = nil)
+  def fill_form_fields(fills = {})
     fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
 
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |field|
-      next unless (
-        field.visible? &&
-        !field.disabled? &&
-        field['data-test-bot-skip'] != 'true' &&
-        (xpath_to_skip.blank? || !field.path.include?(xpath_to_skip))
-      )
+      next if skip_form_field?(field)
       [1,2].sample.times { field.click(); save_test_bot_screenshot }
     end
 
     all('input,select,textarea').each do |field|
-      next unless (
-        field.visible? &&
-        !field.disabled? &&
-        field['data-test-bot-skip'] != 'true' &&
-        (xpath_to_skip.blank? || !field.path.include?(xpath_to_skip))
-      )
+      next if skip_form_field?(field)
 
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'
@@ -205,6 +197,22 @@ module EffectiveTestBotFormFiller
     rescue Timeout::Error
       puts "file upload timed out after #{files.length * 5}s"
     end
+  end
+
+  private
+
+  # Takes a capybara element
+  def excluding_fields_with_parent(element, &block)
+    @test_bot_excluded_fields_xpath = element.path
+    yield
+    @test_bot_excluded_fields_xpath = nil
+  end
+
+  def skip_form_field?(field)
+    field.visible? == false ||
+    field.disabled? ||
+    ['true', true, 1].include?(field['data-test-bot-skip']) ||
+    (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
   end
 
 end
