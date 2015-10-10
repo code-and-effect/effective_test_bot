@@ -7,7 +7,7 @@ module EffectiveTestBotScreenshotsHelper
   # To be used by plugins NOT test developers
   def after_teardown
     super();
-    return unless defined?(current_test)
+    return unless defined?(current_test) && (@test_bot_screenshot_id || 0) > 0
 
     ### Here we create an animated gif out of the all collected screenshots
     Dir.mkdir('test/tour') unless File.exists?('test/tour')

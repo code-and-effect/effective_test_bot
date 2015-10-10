@@ -4,48 +4,83 @@ module EffectiveTestBotFormHelper
   DIGITS = ('1'..'9').to_a
   LETTERS = ('A'..'Z').to_a
 
-  # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
   def fill_form(fills = {})
-    fills = HashWithIndifferentAccess.new(fills)
+    fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
 
     save_test_bot_screenshot
+    tabs = all("a[data-toggle='tab']")
 
-    # Support for the cocoon gem
-    all('a.add_fields[data-association-insertion-template]').each do |cocoon_add_field|
-      next unless cocoon_add_field.visible?
-      [1,2].sample.times { cocoon_add_field.click() }
+    if tabs.length > 1
+      active_tab = find("li.active > a[data-toggle='tab']")
+      tab_content = find("div#{active_tab['href']}").find(:xpath, '..')
+
+      fill_fields(fills, tab_content.path)
+    else
+      fill_fields(fills)
     end
 
-    all('input,select,textarea').each do |field|
-      next unless field.visible?
+    # Support bootstrap3 tabs
+    #tabs = all("li:not(.active) > a[data-toggle='tab']")
+    tabs = all("a[data-toggle='tab']")
 
-      save_test_bot_screenshot
-
-      case [field.tag_name, field['type']].compact.join('_')
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'
-        field.set(fill_value(field, fills))
-      when 'input_checkbox', 'input_radio'
-        field.set(fill_value(field, fills)) # TODO
-      when 'select'
-        field.select(fill_value(field, fills), match: :first)
-      when 'input_file'
-        file_path = fill_value(field, fills)
-        field['class'].to_s.include?('asset-box-uploader-fileinput') ? upload_effective_asset(field, file_path) : field.set(file_path)
-      when 'input_submit', 'input_search'
-        # Do nothing
-      else
-        raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
+    if tabs.length > 1
+      tabs.each do |tab|
+        tab.click()
+        within("div#{tab['href']}") { fill_form(fills) }
       end
     end
 
     true
   end
 
+  # Only fills in visible fields
+  # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
+  def fill_fields(fills = {}, xpath_to_skip = nil)
+    fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
+
+    # Support for the cocoon gem
+    all('a.add_fields[data-association-insertion-template]').each do |field|
+      next unless (
+        field.visible? &&
+        !field.disabled? &&
+        field['data-test-bot-skip'] != 'true' &&
+        (xpath_to_skip.blank? || !field.path.include?(xpath_to_skip))
+      )
+      [1,2].sample.times { field.click(); save_test_bot_screenshot }
+    end
+
+    all('input,select,textarea').each do |field|
+      next unless (
+        field.visible? &&
+        !field.disabled? &&
+        field['data-test-bot-skip'] != 'true' &&
+        (xpath_to_skip.blank? || !field.path.include?(xpath_to_skip))
+      )
+
+      case [field.tag_name, field['type']].compact.join('_')
+      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'
+        field.set(fill_field(field, fills))
+      when 'input_checkbox', 'input_radio'
+        field.set(fill_field(field, fills)) # TODO
+      when 'select'
+        field.select(fill_field(field, fills), match: :first)
+      when 'input_file'
+        file_path = fill_field(field, fills)
+        field['class'].to_s.include?('asset-box-uploader-fileinput') ? upload_effective_asset(field, file_path) : field.set(file_path)
+      when 'input_submit', 'input_search'
+        # Do nothing
+      else
+        raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
+      end
+
+      save_test_bot_screenshot
+    end
+  end
 
 
   # Operates on just string keys
   # This function receives the same fill values that you call fill_form with
-  def fill_value(field, fills = nil)
+  def fill_field(field, fills = nil)
     attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
     field_name = [field.tag_name, field['type']].compact.join('_')
     fill_value = nil
@@ -80,9 +115,17 @@ module EffectiveTestBotFormHelper
       classes = field['class'].to_s.split(' ')
 
       if classes.include?('date') # Let's assume this is a date input.
-        Faker::Date.backward(365).strftime('%Y-%m-%d')
+        if attributes.last.to_s.include?('end') # Make sure end dates are entered after start dates
+          Faker::Date.forward(365).strftime('%Y-%m-%d')
+        else
+          Faker::Date.backward(365).strftime('%Y-%m-%d')
+        end
       elsif classes.include?('datetime')
-        Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
+        if attributes.last.to_s.include?('end')
+          Faker::Date.forward(365).strftime('%Y-%m-%d %H:%m')
+        else
+          Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
+        end
       elsif classes.include?('price')
         4.times.map { DIGITS.sample }.join('') + '.00'
       elsif classes.include?('numeric')
@@ -108,7 +151,7 @@ module EffectiveTestBotFormHelper
         end
       end
 
-      field.all('option').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
+      field.all('option:enabled').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
     when 'textarea'
       Faker::Lorem.sentence
     when 'input_checkbox'
@@ -122,14 +165,11 @@ module EffectiveTestBotFormHelper
     end
   end
 
-  def clear_form
-    all('input,select,textarea').each { |field| (field.set('') rescue false) }
-    true
-  end
-
   # page.execute_script "$('form#new_#{resource_name}').submit();"
   # This submits the form, and checks for unpermitted_params and html5 form validation errors
   def submit_form(label = nil)
+    assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
+
     if test_bot_skip?(:no_unpermitted_params)
       label.present? ? click_on(label) : first(:css, "input[type='submit']").click
     else
@@ -139,8 +179,6 @@ module EffectiveTestBotFormHelper
     end
 
     synchronize!
-
-    assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
     assert_no_unpermitted_params unless test_bot_skip?(:no_unpermitted_params)
 
     true
@@ -152,6 +190,11 @@ module EffectiveTestBotFormHelper
 
     label.present? ? click_on(label) : first(:css, "input[type='submit']").click
     synchronize!
+    true
+  end
+
+  def clear_form
+    all('input,select,textarea').each { |field| (field.set('') rescue false) }
     true
   end
 
@@ -204,6 +247,6 @@ module EffectiveTestBotFormHelper
     rescue Timeout::Error
       puts "file upload timed out after #{files.length * 5}s"
     end
-
   end
+
 end

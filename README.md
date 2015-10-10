@@ -97,6 +97,9 @@ class PhysiciansTest < ActionDispatch::IntegrationTest
 end
 
 
+, input_html: {'data-test-bot-skip': true}
+
+
 
 
 ## Fixtures
