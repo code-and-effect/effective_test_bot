@@ -45,8 +45,9 @@ module TestBotable
             options[:resource_name].pluralize
           ].compact.join('/') + '#' + test.to_s
 
-          method_name = test_bot_method_name('crud_test', label || options_for_method[:current_test])
           next if EffectiveTestBot.skip?(label || options_for_method[:current_test])
+
+          method_name = test_bot_method_name('crud_test', label || options_for_method[:current_test])
 
           define_method(method_name) { crud_action_test(test, resource, user, options_for_method) }
         end

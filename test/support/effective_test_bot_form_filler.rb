@@ -13,16 +13,13 @@ module EffectiveTestBotFormFiller
     # If there's only 1 tab, just fill it out
     (fill_form_fields(fills) and return) unless tabs.length > 1
 
-    # If there's more than one tab, we find bootstrap3's div.tab-content, and prevent any of its contained fields
-    # from being changed.  This makes sure only inputs outside of the tabs are filled first.
-    #
-    # Then we click the first tab, and fill the fields one at a time.  For a consistent order of left to right tab order
+    # If there's more than one tab:
+    # We first fill in all fields that are outside of the tab-content
+    # Then we start at the first, and go left-to-right through all the tabs
+    # clicking each one and filling any form fields found within
 
-
-    # Fill everything outside of the tab_content
     active_tab = find("li.active > a[data-toggle='tab']")
     tab_content = find("div#{active_tab['href']}").find(:xpath, '..')
-    #fill_form_fields(fills, tab_content.path)
 
     excluding_fields_with_parent(tab_content) { fill_form_fields(fills) }
 
@@ -54,15 +51,16 @@ module EffectiveTestBotFormFiller
       next if skip_form_field?(field)
 
       case [field.tag_name, field['type']].compact.join('_')
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'textarea'
+      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
         field.set(value_for_field(field, fills))
-      when 'input_checkbox', 'input_radio'
-        field.set(value_for_field(field, fills)) # TODO
       when 'select'
         field.select(value_for_field(field, fills), match: :first)
       when 'input_file'
-        file_path = value_for_field(field, fills)
-        field['class'].to_s.include?('asset-box-uploader-fileinput') ? upload_effective_asset(field, file_path) : field.set(file_path)
+        if field['class'].to_s.include?('asset-box-uploader-fileinput')
+          upload_effective_asset(field, value_for_field(field, fills))
+        else
+          field.set(value_for_field(field, fills))
+        end
       when 'input_submit', 'input_search'
         # Do nothing
       else
@@ -79,41 +77,24 @@ module EffectiveTestBotFormFiller
   # Operates on just string keys, no symbols here
 
   def value_for_field(field, fills = nil)
-    attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
     field_name = [field.tag_name, field['type']].compact.join('_')
-    fill_value = nil
+    attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
 
-    if fills.present?
-      key = nil
-      attributes.reverse_each do |name|  # match last_name, then something_attributes.last_name, then user.something_attributes.last_name
-        key = (key.present? ? "#{name}.#{key}" : name) # builds up the string as we go along
+    fill_value = fill_value_for_field(fills, attributes)
 
-        if fills.key?(key)
-          fill_value = fills[key]
-          # select is treated differently, because we want the passed prefill to match both the html text or value (which is implemented below)
-          ['select'].include?(field_name) ? break : (return fill_value)
-        end
-      end
+    # If there is a predefined fill value for this field, return it here
+    # except for select fields which are treated differently, so we can match fill values on both the html text or value
+    # this edge case is implemented below
+    if fill_value.present? && !['select'].include?(field_name)
+      return fill_value
     end
 
     case field_name
-    when 'input_email'
-      Faker::Internet.email
-    when 'input_number'
-      min = (Float(field['min']) rescue 1)
-      max = (Float(field['max']) rescue 1000)
-      number = Random.new.rand(min..max)
-      number.kind_of?(Float) ? number.round(2) : number
-    when 'input_password'
-      @test_bot_password ||= Faker::Internet.password  # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
-    when 'input_tel'
-      d = 10.times.map { DIGITS.sample }
-      d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
     when 'input_text'
       classes = field['class'].to_s.split(' ')
 
       if classes.include?('date') # Let's assume this is a date input.
-        if attributes.last.to_s.include?('end') # Make sure end dates are entered after start dates
+        if attributes.last.to_s.include?('end') # Make sure end dates are after start dates
           Faker::Date.forward(365).strftime('%Y-%m-%d')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d')
@@ -124,7 +105,7 @@ module EffectiveTestBotFormFiller
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
         end
-      elsif classes.include?('price')
+      elsif classes.include?('price') # effective_form_inputs price
         4.times.map { DIGITS.sample }.join('') + '.00'
       elsif classes.include?('numeric')
         min = (Float(field['min']) rescue 1)
@@ -142,14 +123,28 @@ module EffectiveTestBotFormFiller
       else
         Faker::Lorem.word
       end
+
     when 'select'
       if fill_value.present? # accept a value or text
-        field.all('option').each do |option|
-          return option.text if option.text == fill_value || option.value.to_s == fill_value.to_s
+        field.all('option:enabled').each do |option|
+          return option.text if (option.text == fill_value || option.value.to_s == fill_value)
         end
       end
 
       field.all('option:enabled').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
+    when 'input_number'
+      min = (Float(field['min']) rescue 1)
+      max = (Float(field['max']) rescue 1000)
+      number = Random.new.rand(min..max)
+      number.kind_of?(Float) ? number.round(2) : number
+    when 'input_email'
+      Faker::Internet.email
+    when 'input_password'
+      # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
+      @test_bot_current_password ||= Faker::Internet.password
+    when 'input_tel'
+      d = 10.times.map { DIGITS.sample }
+      d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
     when 'textarea'
       Faker::Lorem.sentence
     when 'input_checkbox'
@@ -200,6 +195,18 @@ module EffectiveTestBotFormFiller
   end
 
   private
+
+  def fill_value_for_field(fills, attributes)
+    return if fills.blank? || attributes.blank?
+
+    key = nil
+    attributes.reverse_each do |name|  # match last_name, then something_attributes.last_name, then user.something_attributes.last_name
+      key = (key.present? ? "#{name}.#{key}" : name) # builds up the string as we go along
+      return fills[key].to_s if fills.key?(key)
+    end
+
+    nil
+  end
 
   # Takes a capybara element
   def excluding_fields_with_parent(element, &block)

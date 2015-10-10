@@ -35,7 +35,7 @@ module EffectiveTestBotTestHelper
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
-  # that encodes the flash message, and some of the assigns
+  # These values are 'from the last page submit or refresh'
   def flash
     @flash ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Flash'])) rescue {})
   end

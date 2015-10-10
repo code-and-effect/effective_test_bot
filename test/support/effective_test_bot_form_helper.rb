@@ -53,7 +53,7 @@ module EffectiveTestBotFormHelper
       action = ActionController::Parameters.action_on_unpermitted_parameters
       ActionController::Parameters.action_on_unpermitted_parameters = :raise
     rescue => e
-      puts 'unable to assign config.action_on_unpermitted_parameters = :raise, (unpermitted_params) assertions may not work.'
+      puts 'unable to assign config.action_on_unpermitted_parameters = :raise, (no_unpermitted_params) assertions may not work.'
     end
 
     yield

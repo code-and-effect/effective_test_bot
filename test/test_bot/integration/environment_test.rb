@@ -14,7 +14,7 @@ module TestBot
     end
 
     test '01: seeds and fixtures loaded' do
-      assert_normal
+      assert_environment_normal
     end
 
     test '02: all fixtures and seeds valid' do
@@ -40,7 +40,7 @@ module TestBot
     end
 
     test '05: test database has reset' do
-      assert_normal
+      assert_environment_normal
     end
 
     test '06: capybara can sign up a user' do
@@ -53,7 +53,7 @@ module TestBot
 
     test '07: database and session have reset' do
       assert_signed_out
-      assert_normal
+      assert_environment_normal
     end
 
     test '08: capybara can login_as via warden test helper' do
@@ -64,7 +64,7 @@ module TestBot
 
     test '09: database and session have reset' do
       assert_signed_out
-      assert_normal
+      assert_environment_normal
     end
 
     test '10: capybara can sign in manually' do
@@ -75,12 +75,13 @@ module TestBot
 
     test '11: database and session have reset' do
       assert_signed_out
-      assert_normal
+      assert_environment_normal
     end
 
     private
 
-    def assert_normal
+    # This is all about seeing if the cookies, session, and database are rolling back properly in between tests
+    def assert_environment_normal
       visit root_path
       assert_page_status
       assert_equal original_users_count, User.count, 'Epected User.count to be back to original'

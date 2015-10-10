@@ -21,9 +21,9 @@ module TestBotable
 
         [:sign_up, :sign_in_valid, :sign_in_invalid].each do |test|
           options[:current_test] = label || test
+          next if EffectiveTestBot.skip?(options[:current_test])
 
           method_name = test_bot_method_name('devise_test', options[:current_test])
-          next if EffectiveTestBot.skip?(options[:current_test])
 
           define_method(method_name) { devise_action_test(test, options) }
         end
