@@ -24,41 +24,37 @@ module EffectiveTestBotScreenshotsHelper
     return unless EffectiveTestBot.screenshots? && defined?(current_test) && (@test_bot_screenshot_id || 0) > 0
 
     if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
-      save_gif_for_failure
+      save_test_bot_failure_gif
     end
 
     if passed? && EffectiveTestBot.tour_mode?
-      save_gif_for_tour
+      save_test_bot_tour_gif
     end
   end
 
-  protected
-
-  def save_gif_for_failure
+  def save_test_bot_failure_gif
     Dir.mkdir(current_test_failure_path) unless File.exists?(current_test_failure_path)
-
-    full_path = (current_test_failure_path + '/' + current_test_failure_filename)
 
     animation = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
     animation.delay = 20 # delay 1/5 of a second between images.
-    animation.write(full_path)
 
+    full_path = (current_test_failure_path + '/' + current_test_failure_filename)
+    animation.write(full_path)
     puts_yellow("    Animated .gif: #{full_path}")
   end
 
-  def save_gif_for_tour
+  def save_test_bot_tour_gif
     Dir.mkdir(current_test_tour_path) unless File.exists?(current_test_tour_path)
-
-    full_path = (current_test_tour_path + '/' + current_test_tour_filename)
 
     animation = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
     animation.delay = 20 # delay 1/5 of a second between images.
-    animation.write(full_path)
 
-    puts("    TOUR .gif: #{full_path}")
+    full_path = (current_test_tour_path + '/' + current_test_tour_filename)
+    animation.write (full_path)
+    puts_green("    Tour .gif: #{full_path}") if EffectiveTestBot.tour_mode_verbose?
   end
 
-  private
+  protected
 
   # There are 3 different paths we're working with
   # current_test_temp_path: contains individually numbered .png screenshots produced by capybara
@@ -75,7 +71,7 @@ module EffectiveTestBotScreenshotsHelper
 
   def current_test_failure_filename
     # Match Capybara-screenshots format-ish
-    "#{current_test}_falure_#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
+    "#{current_test}_failure_#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
   end
 
   # Where the tour animated gif ends up
@@ -86,6 +82,8 @@ module EffectiveTestBotScreenshotsHelper
   def current_test_tour_filename
     current_test + '.gif'
   end
+
+  private
 
   # Auto incrementing counter
   def current_test_screenshot_id
@@ -102,4 +100,7 @@ module EffectiveTestBotScreenshotsHelper
     puts "\e[33m#{text}\e[0m" # 33 is yellow
   end
 
+  def puts_green(text)
+    puts "\e[32m#{text}\e[0m" # 32 is green
+  end
 end

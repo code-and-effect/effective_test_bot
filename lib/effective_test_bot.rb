@@ -46,16 +46,24 @@ module EffectiveTestBot
     screenshots == true
   end
 
+  def self.autosave_animated_gif_on_failure?
+    screenshots && autosave_animated_gif_on_failure
+  end
+
   def self.tour_mode?
     if ENV['TOUR'].present?
-      ENV['TOUR'].to_s.downcase == 'true'
+      ['true', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
-      screenshots && tour_mode
+      screenshots && (tour_mode != false)
     end
   end
 
-  def self.autosave_animated_gif_on_failure?
-    screenshots && autosave_animated_gif_on_failure
+  def self.tour_mode_verbose?
+    if ENV['TOUR'].present?
+      ['verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
+    else
+      screenshots && ['verbose', 'debug'].include?(tour_mode.to_s)
+    end
   end
 
   private
