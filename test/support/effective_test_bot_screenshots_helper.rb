@@ -50,6 +50,16 @@ module EffectiveTestBotScreenshotsHelper
     puts_green("    Tour .gif: #{full_path}") if EffectiveTestBot.tour_mode_verbose?
   end
 
+  def without_screenshots(&block)
+    original = EffectiveTestBot.screenshots
+
+    EffectiveTestBot.screenshots = false
+    yield
+    EffectiveTestBot.screenshots = original
+  end
+
+  protected
+
   def save_test_bot_gif(full_path)
     images = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
 
@@ -79,8 +89,6 @@ module EffectiveTestBotScreenshotsHelper
     animation.delay = 100  # 200 feels slow, 150 is probably right
     animation.write(full_path)
   end
-
-  protected
 
   # There are 3 different paths we're working with
   # current_test_temp_path: contains individually numbered .png screenshots produced by capybara

@@ -37,10 +37,12 @@ module BaseTest
   end
 
   def create_resource!
-    visit(new_resource_path)
+    without_screenshots do
+      visit(new_resource_path)
 
-    within("form#new_#{resource_name}") do
-      fill_form(resource_attributes) and submit_novalidate_form
+      within("form#new_#{resource_name}") do
+        fill_form(resource_attributes) and submit_novalidate_form
+      end
     end
 
     resource_class.last
