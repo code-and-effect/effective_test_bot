@@ -50,8 +50,9 @@ module EffectiveTestBotFormFiller
       2.times { field.click(); save_test_bot_screenshot }
     end
 
-    all('input,select,textarea').each do |field|
+    all('input,select,textarea', visible: false).each do |field|
       next if skip_form_field?(field)
+      skip_field_screenshot = false
 
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
@@ -70,12 +71,13 @@ module EffectiveTestBotFormFiller
           field.set(value_for_field(field, fills))
         end
       when 'input_submit', 'input_search'
+        skip_field_screenshot = true
         # Do nothing
       else
         raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
       end
 
-      save_test_bot_screenshot
+      save_test_bot_screenshot unless skip_field_screenshot
     end
   end
 
@@ -140,7 +142,7 @@ module EffectiveTestBotFormFiller
       elsif attribute.include?('zip') && attribute.include?('code') # Make a US zip code
         DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample
       else
-        Faker::Lorem.sentence
+        Faker::Lorem.words(3).join(' ').capitalize
       end
 
     when 'select'
@@ -241,6 +243,8 @@ module EffectiveTestBotFormFiller
   end
 
   def skip_form_field?(field)
+    field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
+
     field.visible? == false ||
     field.disabled? ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
