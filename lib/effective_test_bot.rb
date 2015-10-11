@@ -7,7 +7,8 @@ module EffectiveTestBot
   mattr_accessor :screenshots
   mattr_accessor :autosave_animated_gif_on_failure
   mattr_accessor :tour_mode
-  mattr_accessor :animated_gif_frame_delay
+  mattr_accessor :animated_gif_delay
+  mattr_accessor :animated_gif_background_color
 
   def self.setup
     yield self

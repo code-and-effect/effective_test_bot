@@ -80,14 +80,14 @@ module EffectiveTestBotScreenshotsHelper
 
     # Remove the PNG's alpha channel, 'cause .gifs dont support it
     # Extend the bottom/right of each image to extend upto dimension
-    delay = [(EffectiveTestBot.animated_gif_frame_delay.to_i rescue 0), 10].max
+    delay = [(EffectiveTestBot.animated_gif_delay.to_i rescue 0), 10].max
     last_image = images.last
 
     images.each do |image|
       image.alpha Magick::DeactivateAlphaChannel
-      image.delay = (image == last_image) ? (delay * 3) : delay
+      image.delay = (image == last_image) ? (delay * 4) : delay
+      image.background_color = EffectiveTestBot.animated_gif_background_color
 
-      #image.background_color = 'white'
       animation << image.extent(dimensions[:width], dimensions[:height])
     end
 

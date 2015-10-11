@@ -35,6 +35,11 @@ if Rails.env.test?
     # How long to delay in between animated gif frames
     # The last frame is applied animated_gif_frame_delay * 3
     # 100 equals 1 second. (a bit on the slow side, but suitable for a demo)
-    config.animated_gif_frame_delay = 100
+    config.animated_gif_delay = 100
+
+    # Shorter than maximum height animaged gif frames have their
+    # bottom area filled by this color
+    # For best appearance, have this match your site's background color
+    config.animated_gif_background_color = 'white'
   end
 end
