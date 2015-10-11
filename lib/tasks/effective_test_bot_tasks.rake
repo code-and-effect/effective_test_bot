@@ -36,7 +36,7 @@ namespace :test do
 
     desc 'Deletes all effective_test_bot temporary, failure and tour screenshots'
     task :purge do
-      FileUtils.rm_rf(Rails.root + 'test/tour')
+      FileUtils.rm_rf(Rails.root + 'test/tours')
       FileUtils.rm_rf(Rails.root + 'tmp/test_bot')
       puts "Successfully purged all effective_test_bot screenshots"
     end
@@ -49,7 +49,7 @@ namespace :test do
 
     desc 'Prints all effective_test_bot animated gif tour file paths'
     task :tours do
-      Dir['test/tour/*.gif'].each do |file|
+      Dir['test/tours/*.gif'].each do |file|
         file = file.to_s
 
         if ENV['TEST'].present?

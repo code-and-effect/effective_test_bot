@@ -118,7 +118,7 @@ module EffectiveTestBotScreenshotsHelper
 
   # Where the tour animated gif ends up
   def current_test_tour_path
-    File.join(Rails.root, 'test', 'tour')
+    File.join(Rails.root, 'test', 'tours')
   end
 
   def current_test_tour_filename
