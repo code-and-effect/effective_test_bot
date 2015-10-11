@@ -140,7 +140,7 @@ module EffectiveTestBotFormFiller
       elsif attribute.include?('zip') && attribute.include?('code') # Make a US zip code
         DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample
       else
-        Faker::Lorem.words
+        Faker::Lorem.sentence
       end
 
     when 'select'
@@ -165,7 +165,7 @@ module EffectiveTestBotFormFiller
       d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
     when 'textarea'
-      Faker::Lorem.sentence
+      Faker::Lorem.paragraph
     when 'input_checkbox'
       [true, false].sample
     when 'input_radio'
