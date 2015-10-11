@@ -39,13 +39,13 @@ module CrudTest
 
     assert_page_normal
 
-    refute_equal before[:count], after[:count], "Expected fill_form to create a #{resource_class} object"
-    refute_equal(before[:path], after[:path], "(path) Expected unique before and after paths") unless test_bot_skip?(:path)
-
     # In a rails controller, if I redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
     assert_assigns(resource_name) if (after[:path].include?('/edit/') && !test_bot_skip?(:assigns))
     assert_no_assigns_errors(resource_name) unless test_bot_skip?(:no_assigns_errors)
+
+    refute_equal before[:count], after[:count], "Expected fill_form to create a #{resource_class} object"
+    refute_equal(before[:path], after[:path], "(path) Expected unique before and after paths") unless test_bot_skip?(:path)
   end
 
   def test_bot_create_invalid_test
@@ -64,14 +64,13 @@ module CrudTest
 
     assert_page_normal
 
-    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
-
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
 
-    assert_flash(:danger) unless test_bot_skip?(:flash)
-
+    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
     assert_equal(resources_path, page.current_path, "(path) Expected current_path to match resource #create path #{resources_path}") unless test_bot_skip?(:path)
+
+    assert_flash(:danger) unless test_bot_skip?(:flash)
   end
 
   def test_bot_edit_test
@@ -81,7 +80,7 @@ module CrudTest
     save_test_bot_screenshot
 
     assert_page_normal
-    assert_assigns(resource_name) unless test_bot_skip?(:assigns)
+    assert_assigns(resource_name) # unskippable
 
     # Make sure there's a form with a submit button
     form_selector = "form#edit_#{resource_name}_#{resource.id}"
@@ -114,16 +113,17 @@ module CrudTest
 
     assert_page_normal
 
+    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
+    # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
+    if after[:path] == edit_resource_path(resource)
+      assert_assigns(resource_name) unless !test_bot_skip?(:assigns)
+    end
     assert_no_assigns_errors(resource_name) unless test_bot_skip?(:no_assigns_errors)
 
     assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged" unless test_bot_skip?(:count)
     refute_equal(before[:updated_at], after[:updated_at], "(updated_at) Expected @#{resource_name}.updated_at to have changed") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at))
 
     assert_flash(:success) unless test_bot_skip?(:flash)
-
-    # In a rails controller, if i redirect to resources_path it may not assign the instance variable
-    # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
-    assert_assigns(resource_name) if (after[:path] == edit_resource_path(resource) && !test_bot_skip?(:assigns))
   end
 
   def test_bot_update_invalid_test
@@ -146,15 +146,17 @@ module CrudTest
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     assert_page_normal
-    assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
 
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
+
+    assert_equal(resource_path(resource), page.current_path, "(path) Expected current_path to match resource #update path") unless test_bot_skip?(:path)
+
+    assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
     assert_equal(before[:updated_at], after[:updated_at], "(updated_at) Expected @#{resource_name}.updated_at to be unchanged") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at))
 
     assert_flash(:danger) unless test_bot_skip?(:flash)
 
-    assert_equal(resource_path(resource), page.current_path, "(path) Expected current_path to match resource #update path") unless test_bot_skip?(:path)
   end
 
   def test_bot_index_test
