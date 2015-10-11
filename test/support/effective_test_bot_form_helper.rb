@@ -39,9 +39,12 @@ module EffectiveTestBotFormHelper
 
   def clear_form
     all('input,select,textarea').each do |field|
+      if field.tag_name == 'select' && field['class'].to_s.include?('select2') # effective_select
+        within(field.parent) { first(:css, '.select2-selection__clear').click }
+      end
+
       begin
-        field.set('')
-        save_test_bot_screenshot
+        field.set(''); save_test_bot_screenshot
       rescue => e; end
     end
 
