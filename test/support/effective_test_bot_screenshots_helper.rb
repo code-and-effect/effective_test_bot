@@ -91,8 +91,7 @@ module EffectiveTestBotScreenshotsHelper
       animation << image.extent(dimensions[:width], dimensions[:height])
     end
 
-    # Run it through optimize layers.
-    # https://rmagick.github.io/ilist.html#optimize_layers
+    # Run it through https://rmagick.github.io/ilist.html#optimize_layers
     animation = animation.optimize_layers(Magick::OptimizeLayer)
 
     # Write the final animated gif
