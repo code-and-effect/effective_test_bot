@@ -6,7 +6,6 @@ module CrudTest
 
   def test_bot_new_test
     sign_in(user) and visit(new_resource_path)
-
     save_test_bot_screenshot
 
     assert_page_normal
@@ -24,7 +23,6 @@ module CrudTest
 
   def test_bot_create_valid_test
     sign_in(user) and visit(new_resource_path)
-
     save_test_bot_screenshot
 
     before = { count: resource_class.count, path: page.current_path }
@@ -59,6 +57,8 @@ module CrudTest
       submit_novalidate_form
     end
 
+    save_test_bot_screenshot
+
     after = { count: resource_class.count }
 
     assert_page_normal
@@ -77,6 +77,7 @@ module CrudTest
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
+    save_test_bot_screenshot
 
     assert_page_normal
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
@@ -94,6 +95,7 @@ module CrudTest
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
+    save_test_bot_screenshot
 
     before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
@@ -101,6 +103,8 @@ module CrudTest
       fill_form(resource_attributes)
       submit_form
     end
+
+    save_test_bot_screenshot
 
     resource = resource_class.find(resource.id)
 
@@ -124,6 +128,7 @@ module CrudTest
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit(edit_resource_path(resource))
+    save_test_bot_screenshot
 
     before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
@@ -131,6 +136,9 @@ module CrudTest
       clear_form
       submit_novalidate_form
     end
+
+    save_test_bot_screenshot
+
     resource = resource_class.find(resource.id)
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
@@ -151,6 +159,7 @@ module CrudTest
     sign_in(user) and (resource = (find_or_create_resource! rescue nil))
 
     visit resources_path
+    save_test_bot_screenshot
 
     assert_page_normal
 
@@ -164,6 +173,7 @@ module CrudTest
     sign_in(user) and (resource = find_or_create_resource!)
 
     visit resource_path(resource)
+    save_test_bot_screenshot
 
     assert_page_normal
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
@@ -175,6 +185,7 @@ module CrudTest
     before = { count: resource_class.count, archived: (resource.archived rescue nil) }
 
     visit_delete(resource_path(resource), user)
+    save_test_bot_screenshot
 
     after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
 

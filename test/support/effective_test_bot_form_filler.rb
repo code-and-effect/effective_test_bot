@@ -46,7 +46,7 @@ module EffectiveTestBotFormFiller
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |field|
       next if skip_form_field?(field)
-      [1, 2].sample.times { field.click(); save_test_bot_screenshot }
+      [1, 2].sample.times { field.click() }
     end
 
     all('input,select,textarea').each do |field|
@@ -54,7 +54,6 @@ module EffectiveTestBotFormFiller
 
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
-        field.click(); save_test_bot_screenshot
         field.set(value_for_field(field, fills))
       when 'select'
         if field['class'].to_s.include?('select2') # effective_select

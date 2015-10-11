@@ -19,8 +19,6 @@ module EffectiveTestBotScreenshotsHelper
   def before_setup
     super
     return unless (EffectiveTestBot.screenshots? && defined?(current_test))
-
-    page.driver.resize_window(1024, 1200)
   end
 
 
