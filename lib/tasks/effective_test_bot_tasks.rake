@@ -7,8 +7,15 @@ require 'rails/test_unit/sub_test_task'
 # rake test:bot TOUR=true
 # rake test:bot TOUR=verbose
 
+# rake test:bot:tour
+# rake test:bot:tour TEST=documents#new
+
 # rake test:bot:environment
 # rake test:bot:purge
+
+# rake test:bot:tours
+# rake test:bot:tours TEST=documents
+
 
 namespace :test do
   desc 'Runs the effective_test_bot'
@@ -33,7 +40,26 @@ namespace :test do
       FileUtils.rm_rf(Rails.root + 'tmp/test_bot')
       puts "Successfully purged all effective_test_bot screenshots"
     end
-  end
+
+    desc 'Runs effective_test_bot environment test with tour mode (auto animated gifs) enabled'
+    task :tour do
+      ENV['TOUR'] ||= 'true'
+      Rake::Task['test:bot'].invoke
+    end
+
+    desc 'Prints all effective_test_bot animated gif tour file paths'
+    task :tours do
+      Dir['test/tour/*.gif'].each do |file|
+        file = file.to_s
+
+        if ENV['TEST'].present?
+          next unless file.include?(ENV['TEST'])
+        end
+
+        puts "\e[32m#{Rails.root + file}\e[0m" # 32 is green
+      end
+    end
+  end # /namespace bot
 
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
     t.libs << 'test'
