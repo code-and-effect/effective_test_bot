@@ -53,7 +53,7 @@ module CrudTest
     before = { count: resource_class.count }
 
     within("form#new_#{resource_name}") do
-      clear_form
+      without_screenshots { clear_form }
       submit_novalidate_form
     end
 
@@ -115,7 +115,7 @@ module CrudTest
     assert_no_assigns_errors(resource_name) unless test_bot_skip?(:no_assigns_errors)
 
     assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged" unless test_bot_skip?(:count)
-    refute_equal(before[:updated_at], after[:updated_at], "(updated_at_changed) Expected @#{resource_name}.updated_at to have changed") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at_changed))
+    refute_equal(before[:updated_at], after[:updated_at], "(updated_at) Expected @#{resource_name}.updated_at to have changed") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at))
 
     assert_flash(:success) unless test_bot_skip?(:flash)
 
@@ -148,7 +148,7 @@ module CrudTest
 
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
-    assert_equal(before[:updated_at], after[:updated_at], "Expected @#{resource_name}.updated_at to be unchanged") if resource.respond_to?(:updated_at)
+    assert_equal(before[:updated_at], after[:updated_at], "(updated_at) Expected @#{resource_name}.updated_at to be unchanged") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at))
 
     assert_flash(:danger) unless test_bot_skip?(:flash)
 
