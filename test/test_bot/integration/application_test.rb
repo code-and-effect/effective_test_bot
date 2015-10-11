@@ -40,7 +40,10 @@ module TestBot
             # If we're done accumulating CRUD actions, launch the crud_test with all seen actions
             if controller != next_controller || CRUD_ACTIONS.include?(next_action) == false
               begin
-                crud_test(controller, User.first, only: seen_actions.delete(controller))
+                only_tests = seen_actions.delete(controller)
+                only_tests << :tour if EffectiveTestBot.tour_mode?
+
+                crud_test(controller, User.first, only: only_tests)
               rescue => e
                 puts e.message # Sometimes there is an object that can't be instantiated, so we still want to continue the application test
               end

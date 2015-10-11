@@ -26,6 +26,8 @@ if Rails.env.test?
     # Take the tour!
     # Generate an animated gif for each test
     # Saved to an appropriate /test/tour/* directory
+    # Also enabled the crud_test #tour type tests
+    #
     # You can override this default by setting an ENV or calling
     # `rake test:bot TOUR=true`   or `rake test:bot TEST=posts TOUR=verbose`
     #

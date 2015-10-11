@@ -4,6 +4,10 @@
 module CrudTest
   protected
 
+  def test_bot_tour_test
+    puts "Test bot tour test!!"
+  end
+
   def test_bot_new_test
     sign_in(user) and visit(new_resource_path)
     save_test_bot_screenshot

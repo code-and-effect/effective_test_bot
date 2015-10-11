@@ -12,7 +12,7 @@ module TestBotable
   module CrudDsl
     extend ActiveSupport::Concern
 
-    CRUD_TESTS = [:new, :create_valid, :create_invalid, :edit, :update_valid, :update_invalid, :index, :show, :destroy]
+    CRUD_TESTS = [:new, :create_valid, :create_invalid, :edit, :update_valid, :update_invalid, :index, :show, :destroy, (:tour if EffectiveTestBot.tour_mode?)].compact
 
     module ClassMethods
 
