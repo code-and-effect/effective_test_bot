@@ -61,7 +61,12 @@ module EffectiveTestBotScreenshotsHelper
   protected
 
   def save_test_bot_gif(full_path)
-    images = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
+
+    png_image_ = @test_bot_screenshot_id.times.map do |x|
+      current_test_temp_path + '/' + format_screenshot_id(x+1) + '.png'
+    end
+
+    images = ImageList.new(*png_images)
 
     # Get max dimensions.
     dimensions = {width: 0, height: 0}
@@ -86,7 +91,7 @@ module EffectiveTestBotScreenshotsHelper
     animation = animation.optimize_layers(Magick::OptimizePlusLayer)
 
     # Write the final animated gif
-    animation.delay = 100  # 200 feels slow, 150 is probably right
+    animation.delay = 100 # 100 is the right setting
     animation.write(full_path)
   end
 
@@ -96,7 +101,7 @@ module EffectiveTestBotScreenshotsHelper
   # current_test_failure_path: destination for .gifs of failing tests
 
   def current_test_temp_path
-    File.join(Rails.root, 'tmp', 'test_bot', current_test)
+    @_current_test_temp_path ||= File.join(Rails.root, 'tmp', 'test_bot', current_test)
   end
 
   def current_test_failure_path
@@ -120,14 +125,14 @@ module EffectiveTestBotScreenshotsHelper
   private
 
   # Auto incrementing counter
+  # The very first screenshot will be 01.png (tmp/test_bot/posts#new/01.png)
   def current_test_screenshot_id
     @test_bot_screenshot_id = (@test_bot_screenshot_id || 0) + 1
+    format_screenshot_id(@test_bot_screenshot_id)
+  end
 
-    if @test_bot_screenshot_id < 10
-      "0#{@test_bot_screenshot_id}"
-    else
-      @test_bot_screenshot_id.to_s
-    end
+  def format_screenshot_id(number)
+    number < 10 ? "0#{number}" : number.to_s
   end
 
   def puts_yellow(text)
