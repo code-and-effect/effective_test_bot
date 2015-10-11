@@ -22,6 +22,10 @@ module EffectiveTestBotAssertions
     end
   end
 
+  def assert_submit_input(message = "(submit_input) Expected one or more input[type='submit'] to be present")
+    assert_selector 'input[type=submit]', message
+  end
+
   def assert_page_status(status = 200, message = '(page_status) Expected :status: HTTP status code')
     assert_equal status, page.status_code, message.sub(':status:', status.to_s)
   end

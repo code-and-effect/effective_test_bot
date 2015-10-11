@@ -13,10 +13,11 @@ module CrudTest
 
     # Make sure there's a form with a submit button
     form_selector = "form#new_#{resource_name}"
-
     assert_selector form_selector, "Expected form with selector #{form_selector}"
+
     within(form_selector) do
-      assert_selector 'input[type=submit]', 'Expected submit button to be present'
+      assert_submit_input unless test_bot_skip?(:submit_input)
+      assert_jquery_ujs_disable_with unless test_bot_skip?(:jquery_ujs_disable_with)
     end
 
   end
@@ -84,10 +85,11 @@ module CrudTest
 
     # Make sure there's a form with a submit button
     form_selector = "form#edit_#{resource_name}_#{resource.id}"
-
     assert_selector form_selector, "Expected form with selector #{form_selector}"
+
     within(form_selector) do
-      assert_selector 'input[type=submit]', 'Expected input[type=submit] to be present'
+      assert_submit_input unless test_bot_skip?(:submit_input)
+      assert_jquery_ujs_disable_with unless test_bot_skip?(:jquery_ujs_disable_with)
     end
   end
 
