@@ -80,18 +80,22 @@ module EffectiveTestBotScreenshotsHelper
 
     # Remove the PNG's alpha channel, 'cause .gifs dont support it
     # Extend the bottom/right of each image to extend upto dimension
+    delay = [(EffectiveTestBot.animated_gif_frame_delay.to_i rescue 0), 10].max
+    last_image = images.last
+
     images.each do |image|
       image.alpha Magick::DeactivateAlphaChannel
+      image.delay = (image == last_image) ? (delay * 3) : delay
+
       #image.background_color = 'white'
       animation << image.extent(dimensions[:width], dimensions[:height])
     end
 
     # Run it through optimize layers.
     # https://rmagick.github.io/ilist.html#optimize_layers
-    animation = animation.optimize_layers(Magick::OptimizePlusLayer)
+    animation = animation.optimize_layers(Magick::OptimizeLayer)
 
     # Write the final animated gif
-    animation.delay = 100 # 100 is the right setting
     animation.write(full_path)
   end
 

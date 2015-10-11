@@ -32,5 +32,9 @@ if Rails.env.test?
     # Valid values are true / false / :verbose
     config.tour_mode = false
 
+    # How long to delay in between frames
+    # The last frame is always applied a delay * 3
+    # 100 is "the right number", a bit on the slow side, but suitable for a demo
+    config.animated_gif_frame_delay = 100
   end
 end

@@ -116,6 +116,8 @@ module EffectiveTestBotFormFiller
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
         end
+      elsif classes.include?('email') || attribute.include?('email')
+        Faker::Internet.email
       elsif classes.include?('price') # effective_form_inputs price
         4.times.map { DIGITS.sample }.join('') + '.00'
       elsif classes.include?('numeric')
