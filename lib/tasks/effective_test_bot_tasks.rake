@@ -11,29 +11,28 @@ require 'rails/test_unit/sub_test_task'
 # rake test:bot:purge
 
 namespace :test do
-  desc 'Runs Effective Test Bot'
+  desc 'Runs the effective_test_bot'
   task :bot do
     if ENV['TEST'].present?
       ENV['TEST_BOT_TEST'] = ENV['TEST']
       ENV['TEST'] = nil
     end
 
-    Rake::Task["test:effective_test_bot"].invoke
+    Rake::Task['test:effective_test_bot'].invoke
   end
 
   namespace :bot do
-    desc 'Runs Effective Test Bot environment test'
+    desc 'Runs effective_test_bot environment test'
     task :environment do
-      Rake::Task["test:effective_test_bot_environment"].invoke
+      Rake::Task['test:effective_test_bot_environment'].invoke
     end
 
-    desc 'Deletes all temporary, failure and tour screenshots'
+    desc 'Deletes all effective_test_bot temporary, failure and tour screenshots'
     task :purge do
       FileUtils.rm_rf(Rails.root + 'test/tour')
       FileUtils.rm_rf(Rails.root + 'tmp/test_bot')
       puts "Successfully purged all effective_test_bot screenshots"
     end
-
   end
 
   Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|

@@ -7,6 +7,8 @@ module CrudTest
   def test_bot_new_test
     sign_in(user) and visit(new_resource_path)
 
+    save_test_bot_screenshot
+
     assert_page_normal
     assert_assigns(resource_name) # unskippable
 
@@ -17,10 +19,13 @@ module CrudTest
     within(form_selector) do
       assert_selector 'input[type=submit]', 'Expected submit button to be present'
     end
+
   end
 
   def test_bot_create_valid_test
     sign_in(user) and visit(new_resource_path)
+
+    save_test_bot_screenshot
 
     before = { count: resource_class.count, path: page.current_path }
 
@@ -28,6 +33,8 @@ module CrudTest
       fill_form(resource_attributes)
       submit_form
     end
+
+    save_test_bot_screenshot
 
     after = { count: resource_class.count, path: page.current_path }
 

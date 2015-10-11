@@ -31,6 +31,8 @@ module EffectiveTestBotFormFiller
       # changing the call to to fill_bootstrap_tabs_form for recursiveness should work
       # but it would be an extra all() lookup, and probably not worth it.
       tab.click()
+      save_test_bot_screenshot
+
       within("div#{tab['href']}") { fill_form_fields(fills) }
     end
 
@@ -44,7 +46,7 @@ module EffectiveTestBotFormFiller
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |field|
       next if skip_form_field?(field)
-      [1,2].sample.times { field.click(); save_test_bot_screenshot }
+      [1, 2].sample.times { field.click(); save_test_bot_screenshot }
     end
 
     all('input,select,textarea').each do |field|
@@ -52,8 +54,14 @@ module EffectiveTestBotFormFiller
 
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
+        field.click(); save_test_bot_screenshot
         field.set(value_for_field(field, fills))
       when 'select'
+        if field['class'].to_s.include?('select2') # effective_select
+          page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
+          save_test_bot_screenshot
+        end
+
         field.select(value_for_field(field, fills), match: :first)
       when 'input_file'
         if field['class'].to_s.include?('asset-box-uploader-fileinput')
@@ -180,12 +188,18 @@ module EffectiveTestBotFormFiller
     # Trigger the fake drop event
     page.execute_script("#{js} e = $.Event('drop'); e.originalEvent = {dataTransfer : { files : fileList } }; $('#s3_#{uid}').trigger(e);")
 
+    # Remove the file inputs we created
+    page.execute_script("$('input[id^=effectiveAssetsPlaceholder]').remove();")
+
     # Wait till the Uploader bar goes away
     begin
       Timeout.timeout(files.length * 5) do
         within("#asset-box-input-#{uid}") do
           within('.uploads') do
-            sleep(0.25) while (first('.upload').present? rescue false)
+            while (first('.upload').present? rescue false) do
+              save_test_bot_screenshot
+              sleep(0.5)
+            end
           end
         end
       end

@@ -6,14 +6,22 @@ module EffectiveTestBotScreenshotsHelper
   # Creates a screenshot based on the current test and the order in this test.
   def save_test_bot_screenshot
     return unless EffectiveTestBot.screenshots? && defined?(current_test)
-    page.save_screenshot(current_test_temp_path + '/' + "#{current_test_screenshot_id}.png")
+
+    full_path = current_test_temp_path + '/' + "#{current_test_screenshot_id}.png"
+    page.save_screenshot(full_path)
+
+    #i = Magick::Image.read(file).first
+    #i.resize_to_fill(100,100).write("#{file}-square-thumb.jpg")
+
   end
 
   # # This is run before every test
-  # def before_setup
-  #   super
-  #   return unless (EffectiveTestBot.screenshots? && defined?(current_test))
-  # end
+  def before_setup
+    super
+    return unless (EffectiveTestBot.screenshots? && defined?(current_test))
+
+    page.driver.resize_window(1024, 1200)
+  end
 
 
   # This gets called after every test.  Minitest hook for plugin developers
@@ -44,11 +52,35 @@ module EffectiveTestBotScreenshotsHelper
   def save_test_bot_tour_gif
     Dir.mkdir(current_test_tour_path) unless File.exists?(current_test_tour_path)
 
-    animation = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
-    animation.delay = 20 # delay 1/5 of a second between images.
-
     full_path = (current_test_tour_path + '/' + current_test_tour_filename)
-    animation.write (full_path)
+    images = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
+
+    # Get max dimensions.
+    dimensions = {width: 0, height: 0}
+    images.each do |image|
+      dimensions[:width] = [image.columns, dimensions[:width]].max
+      dimensions[:height] = [image.rows, dimensions[:height]].max
+    end
+
+    # Create a final ImageList
+    animation = ImageList.new()
+
+    # Remove the PNG's alpha channel, 'cause .gifs dont support it
+    # Extend the bottom/right of each image to extend upto dimension
+    images.each do |image|
+      image.alpha Magick::DeactivateAlphaChannel
+      #image.background_color = 'white'
+      animation << image.extent(dimensions[:width], dimensions[:height])
+    end
+
+    # Run it through optimize layers.
+    # https://rmagick.github.io/ilist.html#optimize_layers
+    animation = animation.optimize_layers(Magick::OptimizePlusLayer)
+
+    # Write the final animated gif
+    animation.delay = 100  # 200 feels slow, 150 is probably right
+    animation.write(full_path)
+
     puts_green("    Tour .gif: #{full_path}") if EffectiveTestBot.tour_mode_verbose?
   end
 

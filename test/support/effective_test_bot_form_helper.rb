@@ -38,11 +38,27 @@ module EffectiveTestBotFormHelper
   end
 
   def clear_form
-    all('input,select,textarea').each { |field| (field.set('') rescue false) }
+    all('input,select,textarea').each do |field|
+      begin
+        field.set('')
+        save_test_bot_screenshot
+      rescue => e; end
+    end
+
     true
   end
 
+  # So it turns out capybara-webkit has no way to just move the mouse to an element
+  # This kind of sucks, as we want to simulate mouse movements with the tour
+  # Instead we manually trigger submit buttons and use the data-disable-with to
+  # make the 'submit form' step look nice
   def click_submit(label)
+    if EffectiveTestBot.screenshots?
+      page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.disableFormElement($(this)); });"
+      save_test_bot_screenshot
+      page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
+    end
+
     label.present? ? click_on(label) : first(:css, "input[type='submit']").click
     synchronize!
   end
