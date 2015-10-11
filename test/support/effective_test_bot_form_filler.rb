@@ -19,7 +19,7 @@ module EffectiveTestBotFormFiller
     # clicking each one and filling any form fields found within
 
     active_tab = find("li.active > a[data-toggle='tab']")
-    tab_content = find("div#{active_tab['href']}").find(:xpath, '..')
+    tab_content = find('div' + active_tab['href']).find(:xpath, '..')
 
     excluding_fields_with_parent(tab_content) { fill_form_fields(fills) }
 
@@ -34,7 +34,7 @@ module EffectiveTestBotFormFiller
       synchronize!
       save_test_bot_screenshot
 
-      within("div#{tab['href']}") { fill_form_fields(fills) }
+      within('div' + tab['href']) { fill_form_fields(fills) }
     end
 
   end
@@ -87,6 +87,7 @@ module EffectiveTestBotFormFiller
   def value_for_field(field, fills = nil)
     field_name = [field.tag_name, field['type']].compact.join('_')
     attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
+    attribute = attributes.last.to_s
 
     fill_value = fill_value_for_field(fills, attributes)
 
@@ -102,13 +103,13 @@ module EffectiveTestBotFormFiller
       classes = field['class'].to_s.split(' ')
 
       if classes.include?('date') # Let's assume this is a date input.
-        if attributes.last.to_s.include?('end') # Make sure end dates are after start dates
+        if attribute.include?('end') # Make sure end dates are after start dates
           Faker::Date.forward(365).strftime('%Y-%m-%d')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d')
         end
       elsif classes.include?('datetime')
-        if attributes.last.to_s.include?('end')
+        if attribute.include?('end')
           Faker::Date.forward(365).strftime('%Y-%m-%d %H:%m')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
@@ -120,16 +121,26 @@ module EffectiveTestBotFormFiller
         max = (Float(field['max']) rescue 1000)
         number = Random.new.rand(min..max)
         number.kind_of?(Float) ? number.round(2) : number
-      elsif attributes.last.to_s.include?('first_name')
+      elsif attribute.include?('first_name')
         Faker::Name.first_name
-      elsif attributes.last.to_s.include?('last_name')
+      elsif attribute.include?('last_name')
         Faker::Name.last_name
-      elsif attributes.last.to_s.include?('name')
+      elsif attribute.include?('website')
+        Faker::Internet.url
+      elsif attribute.include?('city')
+        Faker::Address.city
+      elsif attribute.include?('address2')
+        Faker::Address.secondary_address
+      elsif attribute.include?('address')
+        Faker::Address.street_address
+      elsif attribute.include?('name')
         Faker::Name.name
-      elsif attributes.last.to_s.include?('postal') # Make a Canadian Postal Code
+      elsif attribute.include?('postal') # Make a Canadian postal code
         LETTERS.sample + DIGITS.sample + LETTERS.sample + ' ' + DIGITS.sample + LETTERS.sample + DIGITS.sample
+      elsif attribute.include?('zip') && attribute.include?('code') # Make a US zip code
+        DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample
       else
-        Faker::Lorem.word
+        Faker::Lorem.words
       end
 
     when 'select'
