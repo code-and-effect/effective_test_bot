@@ -31,6 +31,7 @@ module EffectiveTestBotFormFiller
       # changing the call to to fill_bootstrap_tabs_form for recursiveness should work
       # but it would be an extra all() lookup, and probably not worth it.
       tab.click()
+      synchronize!
       save_test_bot_screenshot
 
       within("div#{tab['href']}") { fill_form_fields(fills) }
@@ -46,7 +47,7 @@ module EffectiveTestBotFormFiller
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |field|
       next if skip_form_field?(field)
-      [1, 2].sample.times { field.click() }
+      2.times { field.click(); save_test_bot_screenshot }
     end
 
     all('input,select,textarea').each do |field|
