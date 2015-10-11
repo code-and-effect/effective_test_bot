@@ -91,11 +91,11 @@ module EffectiveTestBotAssertions
   # assert_no_assigns_errors :post
   def assert_no_assigns_errors(key = nil, message = nil)
     if key.present?
-      errors = (assigns[key.to_s] || {})['errors'] || []
+      errors = (assigns[key.to_s] || {})['errors']
       assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
     else
       assigns.each do |key, value|
-        errors = (value['errors'] || [])
+        errors = value['errors']
         assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
       end
     end
@@ -103,7 +103,8 @@ module EffectiveTestBotAssertions
 
   # assert_assigns_errors :post
   def assert_assigns_errors(key, message = nil)
-    refute_equal [], ((assigns[key.to_s] || {})['errors'] || []), message || "(assigns_errors) Expected @#{key}.errors to be present"
+    errors = (assigns[key.to_s] || {})['errors']
+    assert errors.present?, message || "(assigns_errors) Expected @#{key}.errors to be present"
   end
 
 end

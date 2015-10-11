@@ -62,11 +62,11 @@ module EffectiveTestBotScreenshotsHelper
 
   def save_test_bot_gif(full_path)
 
-    png_image_ = @test_bot_screenshot_id.times.map do |x|
+    png_images = @test_bot_screenshot_id.times.map do |x|
       current_test_temp_path + '/' + format_screenshot_id(x+1) + '.png'
     end
 
-    images = ImageList.new(*png_images)
+    images = Magick::ImageList.new(*png_images)
 
     # Get max dimensions.
     dimensions = {width: 0, height: 0}
@@ -76,7 +76,7 @@ module EffectiveTestBotScreenshotsHelper
     end
 
     # Create a final ImageList
-    animation = ImageList.new()
+    animation = Magick::ImageList.new()
 
     # Remove the PNG's alpha channel, 'cause .gifs dont support it
     # Extend the bottom/right of each image to extend upto dimension
