@@ -19,6 +19,7 @@ module EffectiveTestBotFormHelper
   # This submits the form, while checking for html5 form validation errors and unpermitted params
   def submit_form(label = nil)
     assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
+    assert_jquery_ujs_disable_with(label) unless test_bot_skip?(:jquery_ujs_disable_with)
 
     if test_bot_skip?(:no_unpermitted_params)
       click_submit(label)
@@ -62,7 +63,7 @@ module EffectiveTestBotFormHelper
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
     end
 
-    label.present? ? click_on(label) : first(:css, "input[type='submit']").click
+    label.present? ? find(:link_or_button, label).click : first(:css, "input[type='submit']").click
     synchronize!
   end
 
