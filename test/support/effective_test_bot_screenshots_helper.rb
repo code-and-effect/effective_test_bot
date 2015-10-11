@@ -12,15 +12,13 @@ module EffectiveTestBotScreenshotsHelper
 
     #i = Magick::Image.read(file).first
     #i.resize_to_fill(100,100).write("#{file}-square-thumb.jpg")
-
   end
 
-  # # This is run before every test
-  def before_setup
-    super
-    return unless (EffectiveTestBot.screenshots? && defined?(current_test))
-  end
-
+  # This is run before every test
+  # def before_setup
+  #   super
+  #   return unless (EffectiveTestBot.screenshots? && defined?(current_test))
+  # end
 
   # This gets called after every test.  Minitest hook for plugin developers
   def after_teardown
@@ -38,19 +36,21 @@ module EffectiveTestBotScreenshotsHelper
 
   def save_test_bot_failure_gif
     Dir.mkdir(current_test_failure_path) unless File.exists?(current_test_failure_path)
-
-    animation = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
-    animation.delay = 20 # delay 1/5 of a second between images.
-
     full_path = (current_test_failure_path + '/' + current_test_failure_filename)
-    animation.write(full_path)
+
+    save_test_bot_gif(full_path)
     puts_yellow("    Animated .gif: #{full_path}")
   end
 
   def save_test_bot_tour_gif
     Dir.mkdir(current_test_tour_path) unless File.exists?(current_test_tour_path)
-
     full_path = (current_test_tour_path + '/' + current_test_tour_filename)
+
+    save_test_bot_gif(full_path)
+    puts_green("    Tour .gif: #{full_path}") if EffectiveTestBot.tour_mode_verbose?
+  end
+
+  def save_test_bot_gif(full_path)
     images = ImageList.new(*Dir[current_test_temp_path + '/*.png'].first(@test_bot_screenshot_id))
 
     # Get max dimensions.
@@ -78,8 +78,6 @@ module EffectiveTestBotScreenshotsHelper
     # Write the final animated gif
     animation.delay = 100  # 200 feels slow, 150 is probably right
     animation.write(full_path)
-
-    puts_green("    Tour .gif: #{full_path}") if EffectiveTestBot.tour_mode_verbose?
   end
 
   protected

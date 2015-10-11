@@ -185,7 +185,6 @@ module CrudTest
     before = { count: resource_class.count, archived: (resource.archived rescue nil) }
 
     visit_delete(resource_path(resource), user)
-    save_test_bot_screenshot
 
     after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
 
