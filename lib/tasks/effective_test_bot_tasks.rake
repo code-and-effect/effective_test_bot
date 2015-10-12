@@ -41,9 +41,15 @@ namespace :test do
       puts "Successfully purged all effective_test_bot screenshots"
     end
 
-    desc 'Runs effective_test_bot environment test with tour mode (auto animated gifs) enabled'
+    desc 'Runs effective_test_bot environment test in tour mode'
     task :tour do
       ENV['TOUR'] ||= 'true'
+      Rake::Task['test:bot'].invoke
+    end
+
+    desc 'Runs effective_test_bot environment test in verbose tour mode'
+    task :tourv do
+      ENV['TOUR'] ||= 'verbose'
       Rake::Task['test:bot'].invoke
     end
 
