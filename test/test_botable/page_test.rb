@@ -14,8 +14,6 @@ module PageTest
     end
 
     assert_page_normal
-
-    #page.save_screenshot("#{page_path.to_s.parameterize}.png")
   end
 
 end

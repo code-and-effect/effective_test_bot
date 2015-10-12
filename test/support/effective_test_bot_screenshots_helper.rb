@@ -9,9 +9,6 @@ module EffectiveTestBotScreenshotsHelper
 
     full_path = current_test_temp_path + '/' + "#{current_test_screenshot_id}.png"
     page.save_screenshot(full_path)
-
-    #i = Magick::Image.read(file).first
-    #i.resize_to_fill(100,100).write("#{file}-square-thumb.jpg")
   end
 
   # This is run before every test

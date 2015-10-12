@@ -175,7 +175,7 @@ module EffectiveTestBotFormFiller
     when 'input_radio'
       [true, false].sample
     when 'input_file'
-      "#{File.dirname(__FILE__)}/effective_assets_upload_file._test"
+      "#{File.dirname(__FILE__)}/important_documents._test"
     else
       raise "fill_value unsupported field type: #{field['type']}"
     end
