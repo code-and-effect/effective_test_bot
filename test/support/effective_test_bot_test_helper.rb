@@ -13,12 +13,6 @@ module EffectiveTestBotTestHelper
     session.driver.submit :delete, path, {}
     session.document.find('html')
 
-    # Assign the Flash and Assigns
-    @flash = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Flash'])) rescue {})
-    @assigns = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Assigns'])) rescue {})
-    @unpermitted_params = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
-    @exceptions = (JSON.parse(Base64.decode64(session.driver.response_headers['Test-Bot-Exceptions'])) rescue [])
-
     @visit_delete_page = session
   end
 
@@ -38,19 +32,19 @@ module EffectiveTestBotTestHelper
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # These values are 'from the last page submit or refresh'
   def flash
-    @flash ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Flash'])) rescue {})
+    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Flash'])) rescue {})
   end
 
   def assigns
-    @assigns ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Assigns'])) rescue {})
+    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Assigns'])) rescue {})
   end
 
   def unpermitted_params
-    @unpermitted_params ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
+    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
 
   def exceptions
-    @exceptions ||= (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Exceptions'])) rescue [])
+    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Exceptions'])) rescue [])
   end
 
 end

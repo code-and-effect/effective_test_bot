@@ -104,7 +104,7 @@ module EffectiveTestBotScreenshotsHelper
   # current_test_failure_path: destination for .gifs of failing tests
 
   def current_test_temp_path
-    @_current_test_temp_path ||= File.join(Rails.root, 'tmp', 'test_bot', current_test)
+    @_current_test_temp_path ||= File.join(Rails.root, 'tmp', 'test_bot', current_test || 'none')
   end
 
   def current_test_failure_path

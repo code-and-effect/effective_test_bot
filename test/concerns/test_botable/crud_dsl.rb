@@ -12,7 +12,7 @@ module TestBotable
   module CrudDsl
     extend ActiveSupport::Concern
 
-    CRUD_TESTS = [:new, :create_valid, :create_invalid, :edit, :update_valid, :update_invalid, :index, :show, :destroy, (:tour if EffectiveTestBot.tour_mode?)].compact
+    CRUD_TESTS = [:index, :new, :create_invalid, :create_valid, :show, :edit, :update_invalid, :update_valid, :destroy, (:tour if EffectiveTestBot.tour_mode?)].compact
 
     module ClassMethods
 
@@ -29,14 +29,15 @@ module TestBotable
         label = options.delete(:label).presence
         only = options.delete(:only)
         except = options.delete(:except)
+        current_crud_tests = crud_tests_to_define(only, except)
 
         begin
-          normalize_test_bot_options!(options.merge!(user: user, resource: resource))
+          normalize_test_bot_options!(options.merge!(user: user, resource: resource, current_crud_tests: current_crud_tests))
         rescue => e
           raise "Error: #{e.message}.  Expected usage: crud_test(Post || Post.new, User.first, only: [:new, :create], skip: {create_invalid: [:path]})"
         end
 
-        crud_tests_to_define(only, except).each do |test|
+        current_crud_tests.each do |test|
           options_for_method = options.dup
 
           options_for_method[:skips] = Array(skips[test]) if skips[test]

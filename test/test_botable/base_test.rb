@@ -48,6 +48,19 @@ module BaseTest
     resource_class.last
   end
 
+  def find_or_create_rails_ujs_link_to_delete(resource)
+    selector = "a[href='#{resource_path(resource)}'][data-method='delete']"
+    link_to_delete = !page.has_no_selector?(selector) ? first(:css, selector) : nil
+
+    if link_to_delete.present? # Seriously ensure it's visible and clickable
+      page.execute_script("$('body').prepend($(\"#{selector}\").first().clone().removeProp('disabled').html('Delete'));")
+    else  # It's not present
+      page.execute_script("$('body').prepend($('<a>').attr({href: '#{resource_path(resource)}', 'data-method': 'delete', 'data-confirm': 'Are you sure?'}).html('Delete'));")
+    end
+
+    (first(:css, selector) rescue nil)
+  end
+
   def resources_path # index, create
     polymorphic_path([*controller_namespace, resource_class])
   end
