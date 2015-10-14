@@ -33,6 +33,7 @@ module EffectiveTestBotFormFiller
       tab.click()
       synchronize!
       save_test_bot_screenshot
+      @shared_max_fields = nil # Reset value_for_input_numeric_field() history
 
       within('div' + tab['href']) { fill_form_fields(fills) }
     end
