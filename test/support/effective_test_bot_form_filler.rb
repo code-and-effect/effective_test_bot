@@ -116,6 +116,8 @@ module EffectiveTestBotFormFiller
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
         end
+      elsif classes.include?('numeric')
+        value_for_input_numeric_field(field, "input.numeric[name$='[#{attribute}]']")
       elsif classes.include?('email') || attribute.include?('email')
         Faker::Internet.email
       elsif classes.include?('price') # effective_form_inputs price
@@ -156,10 +158,7 @@ module EffectiveTestBotFormFiller
 
       field.all('option:enabled').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
     when 'input_number'
-      min = (Float(field['min']) rescue 1)
-      max = (Float(field['max']) rescue 1000)
-      number = Random.new.rand(min..max)
-      number.kind_of?(Float) ? number.round(2) : number
+      value_for_input_numeric_field(field, "input[type='number'][name$='[#{attribute}]']")
     when 'input_email'
       Faker::Internet.email
     when 'input_password'
@@ -179,6 +178,35 @@ module EffectiveTestBotFormFiller
     else
       raise "fill_value unsupported field type: #{field['type']}"
     end
+  end
+
+  def value_for_input_numeric_field(field, selector)
+    min = (Float(field['min']) rescue 0)
+    max = (Float(field['max']) rescue 1000)
+    number = Random.new.rand(min..max)
+    number = (number.kind_of?(Float) ? number.round(2) : number)
+
+    return number if field['max'].blank?
+
+    shared_max_fields = all(selector)
+    return number if shared_max_fields.length <= 1
+
+    # So there's definitely 2+ fields that share the same max, named the same
+    # We want the total value of all these fields to add upto the max single max value
+    @shared_max_fields ||= {}
+    @shared_max_fields[selector] ||= max
+
+    available = @shared_max_fields[selector]
+
+    amount = if max.kind_of?(Float)
+      (((max * 1000.0) / shared_max_fields.length.to_f).ceil() / 1000.0).round(2)
+    else
+      (max / shared_max_fields.length.to_f).ceil
+    end
+    amount = [[amount, min].max, available].min
+
+    @shared_max_fields[selector] = (available - amount)
+    amount
   end
 
   # The field here is going to be the %input{:type => file}. Files can be one or more pathnames
