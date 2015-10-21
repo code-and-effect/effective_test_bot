@@ -7,7 +7,7 @@ module EffectiveTestBotScreenshotsHelper
   def save_test_bot_screenshot
     return unless EffectiveTestBot.screenshots? && defined?(current_test)
 
-    full_path = current_test_temp_path + '/' + "#{current_test_screenshot_id}.png"
+    full_path = current_test_temp_path + "/#{current_test_screenshot_id}.png"
     page.save_screenshot(full_path)
   end
 
@@ -101,11 +101,11 @@ module EffectiveTestBotScreenshotsHelper
   # current_test_failure_path: destination for .gifs of failing tests
 
   def current_test_temp_path
-    @_current_test_temp_path ||= File.join(Rails.root, 'tmp', 'test_bot', current_test || 'none')
+    @_current_test_temp_path ||= "#{Rails.root}/tmp/test_bot/#{current_test || 'none'}"
   end
 
   def current_test_failure_path
-    File.join(Rails.root, 'tmp', 'test_bot')
+    "#{Rails.root}/tmp/test_bot"
   end
 
   def current_test_failure_filename
@@ -115,11 +115,11 @@ module EffectiveTestBotScreenshotsHelper
 
   # Where the tour animated gif ends up
   def current_test_tour_path
-    File.join(Rails.root, 'test', 'tours')
+    "#{Rails.root}/test/tours"
   end
 
   def current_test_tour_filename
-    current_test + '.gif'
+    "#{current_test}.gif"
   end
 
   private
