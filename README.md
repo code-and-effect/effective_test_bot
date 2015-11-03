@@ -56,7 +56,7 @@ effective_test_bot requires that at least one user -- ideally a fully priviledge
 
 As per the `test/test_helper.rb` default file, when minitest and/or effective_test_bot starts, following tasks are run:
 
-```console
+```ruby
 # Rails default task, load fixtures from test/fixtures/*.yml (including users.yml if it exists)
 rake db:fixtures:load
 
@@ -140,6 +140,7 @@ And you can disable specific fields from being filled, by modifying the input ht
 
 ```ruby
 = f.input :too_complicated, 'data-test-bot-skip' => true
+```
 
 Sometimes you have the requirement that inputs add upto a certain number.  For example, having to provide percentages in 3-4 input fields that always add upto 100%.
 
