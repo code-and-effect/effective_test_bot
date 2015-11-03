@@ -45,10 +45,18 @@ module EffectiveTestBotFormFiller
   def fill_form_fields(fills = {})
     fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
 
+    save_test_bot_screenshot
+
     # Support for the cocoon gem
     all('a.add_fields[data-association-insertion-template]').each do |field|
       next if skip_form_field?(field)
-      2.times { field.click(); save_test_bot_screenshot }
+
+      if EffectiveTestBot.tour_mode_extreme?
+        2.times { field.click(); save_test_bot_screenshot }
+      else
+        2.times { field.click() }
+        save_test_bot_screenshot
+      end
     end
 
     all('input,select,textarea', visible: false).each do |field|
@@ -60,11 +68,19 @@ module EffectiveTestBotFormFiller
         field.set(value_for_field(field, fills))
       when 'select'
         if field['class'].to_s.include?('select2') # effective_select
-          page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
-          save_test_bot_screenshot
+          if EffectiveTestBot.tour_mode_extreme?
+            page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
+            save_test_bot_screenshot
+          end
         end
 
         field.select(value_for_field(field, fills), match: :first)
+
+        if field['class'].to_s.include?('select2') # effective_select
+          if EffectiveTestBot.tour_mode_extreme?
+            page.execute_script("try { $('select##{field['id']}').select2('close'); } catch(e) {};")
+          end
+        end
       when 'input_file'
         if field['class'].to_s.include?('asset-box-uploader-fileinput')
           upload_effective_asset(field, value_for_field(field, fills))
@@ -78,8 +94,13 @@ module EffectiveTestBotFormFiller
         raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
       end
 
-      save_test_bot_screenshot unless skip_field_screenshot
+      if EffectiveTestBot.tour_mode_extreme?
+        save_test_bot_screenshot unless skip_field_screenshot
+      end
     end
+
+    save_test_bot_screenshot
+
   end
 
   # Generates an appropriately pseudo-random value for the given field
@@ -241,7 +262,7 @@ module EffectiveTestBotFormFiller
         within("#asset-box-input-#{uid}") do
           within('.uploads') do
             while (first('.upload').present? rescue false) do
-              save_test_bot_screenshot
+              save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme?
               sleep(0.5)
             end
           end

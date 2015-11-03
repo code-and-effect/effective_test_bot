@@ -7,6 +7,7 @@ module EffectiveTestBot
   mattr_accessor :screenshots
   mattr_accessor :autosave_animated_gif_on_failure
   mattr_accessor :tour_mode
+  mattr_accessor :tour_mode_extreme
   mattr_accessor :animated_gif_delay
   mattr_accessor :animated_gif_background_color
 
@@ -60,11 +61,20 @@ module EffectiveTestBot
     end
   end
 
+  # form_filler will take a screenshot after every form field is filled
+  def self.tour_mode_extreme?
+    if ENV['TOUR'].present?
+      ['extreme', 'debug'].include?(ENV['TOUR'].to_s.downcase)
+    else
+      screenshots && ['extreme', 'debug'].include?(tour_mode.to_s)
+    end
+  end
+
   def self.tour_mode_verbose?
     if ENV['TOUR'].present?
-      ['verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
+      ['extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
-      screenshots && ['verbose', 'debug'].include?(tour_mode.to_s)
+      screenshots && ['extreme', 'verbose', 'debug'].include?(tour_mode.to_s)
     end
   end
 
