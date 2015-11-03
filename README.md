@@ -212,6 +212,8 @@ class PostsTest < ActionDispatch::IntegrationTest
 end
 ```
 
+### Skipping assertions and tests
+
 Each of these DSL test suite methods are designed to assert an expected standard rails behaviour.
 
 But sometimes a developer has a good reason for deviating from what is considered standard; therefore, each individual assertion is skippable.
@@ -241,6 +243,8 @@ EffectiveTestBot.setup do |config|
   ]
 end
 ```
+
+There is support for skipping individual assertions as well as entire tests.
 
 Please see the installed effective_test_bot.rb initializer file for a full description of all options.
 
