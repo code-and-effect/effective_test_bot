@@ -26,7 +26,21 @@ Makes sure everything actually works.
 
 ## Getting Started
 
-Make sure your site is using [devise](https://github.com/plataformatec/devise) and that your application javascript includes [jQuery](http://jquery.com/) and rails' [jquery_ujs](https://github.com/rails/jquery-ujs).
+First, make sure your site is using [devise](https://github.com/plataformatec/devise) and that your application javascript includes [jQuery](http://jquery.com/) and rails' [jquery_ujs](https://github.com/rails/jquery-ujs).
+
+```ruby
+gem 'devise'
+gem 'jquery-rails'
+```
+
+and in your application.js file:
+
+```ruby
+//= require jquery
+//= require jquery_ujs
+```
+
+Then you're ready to install `effective_test_bot`:
 
 ```ruby
 group :test do
