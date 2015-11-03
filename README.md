@@ -214,11 +214,18 @@ But sometimes a developer has a good reason for deviating from what is considere
 
 When an assertion fails, the minitest output will look something like:
 
-TODO users (current_path) example. zzz.
+```console
+crud_test: (users#update_invalid)                               FAIL (3.74s)
 
-The `(current_path)` is the name of the specific assertion that failed.
+Minitest::Assertion: (path) Expected current_path to match resource #update path.
+  Expected: "/users/562391275"
+  Actual: "/members/562391275"
+  /Users/matt/Sites/effective_test_bot/test/test_botable/crud_test.rb:155:in `test_bot_update_invalid_test'
+```
 
-The expectation is that submitting a form on `/users/edit/123` will take you to the update action which should be on `/users/123`, but in this case we redirect to `/members` instead.
+The `(path)` is the name of the specific assertion that failed.
+
+The expectation is that when submitting an invalid form at `/users/562391275/edit` we should be returned to the update action url `/users/562391275`, but in this totally reasonable but not-standard case we are redirected to `/members/562391275` instead.
 
 You can skip this specific assertion by adding it to the `app/config/initializers/effective_test_bot.rb` file:
 
@@ -235,221 +242,39 @@ Please see the installed effective_test_bot.rb initializer file for a full descr
 
 ### crud_test
 
+TODO
 
-
-####################################
-
-
-Test Bot DSL Methods
-  - one-liners that run entire test suites
-  - class level and instance level version of each
-  - appropriately runs all the assertions above and more
-  - every individual assertion is skippable. sometimes theres a good reason to deviate from rails default expectations
-
-  - crud_test
-    - tests all CRUD actions (7 actions in 9 tests)
-      - index, new, create_invalid, create_valid, show, edit, update_invalid, update_valid, delete
-    - or call the tour variant for better animated giffage
-      - just runs all these tests one after another
-      - generates an animated gif of an entire part/feature on your website. 1-liner.
-    - skip specific actions
-    - understands archived and delete
-  - devise_test
-    - sign_up_test
-    - sign_in_valid_test
-    - sign_ip_invalid_test
-  - page_test
-  - member_test
-  - redirect_test
-  - wizard_test
-
-Automated testing / Rake tasks
-  - just runs everything listed above all at once automatically on every route
-  - how the test keys and assertion keys work
-  - how to skip individual actions or assertions
-
-  - rake test:bot:environment # 1-time prove my environment is set up correctly
-  - rake test:bot
-  - rake test:bot TEST=documents#index
-  - rake test:bot:tour  # Run with tour mode enabled
-  - rake test:bot:tourv # verbose
-  - rake test:bot:tours # list existing tours
-  - rake test:bot:purge # Delete all screenshots
-  - rake load_fixture_seeds # Runs test/fixtures/seeds.rb 'cause screw yaml
-
-Screenshots and Animated Gifs
-  - autosave animated gif on failure
-  - tour mode
-    - automatically creates an animated gif for every workflow in your application
-
-
-First time set up Initial Environment Requirements
-  - One of the pains in the butt about unix philosophy is you gotta use so many gems to get everything you want
-  - So here I maintain a curated list of gems that I like to use for my minitest testing
-    - capybara_webkit
-    - shoulda
-    - capybara-screenshot
-    - slow_finder_errors
-    - devise and warden test helpers
-    - minitest_reporters
-    - probably add more in the future. guard.
-  - test_helper.rb
-  - seeds and fixtures
-  - test_bot_fixtures
-  - requires at least 1 user is seeded
-  - requires jquery and rails_ujs
-  - Kind of requires Devise
-  - Along with this, I have a script to test the minitest environment itself, ensuring
-  - databases, and capybara sessions are transactional and properly reset between tests.
-
-
-Testing Philosophy
-  - feature tests and black box testing
-  - minitest and capybara-webkit
-  - recordable, repeatable, automatable
-  - capybara limitations and how test_bot rails integrations improve on those
-    - assigns, assigns errors, flash, exceptions, permitted_params
-
-Licence
-
-Contributing
-
-
-
-Run `rake test:bot:environment` once to ensure your minitest environment is set up properly.
-
-Run `rake test:bot` to automatically check every route in your application for all kinds of errors.
-
-Run `rake test:bot:tour` to also record an animated gif for each controller action.
-
-Includes all kinds of extra minitest assertions
-
-Adds all kinds of extra assertions to minitest, and allows you to run entire test suites as a one-liner.
-
-
-Automatically checks every route in your application for all kinds of errors, including:
-
-Record animated gifs of your controller actions with only 1 or 2 lines of code.
-
-
-
-Test your controller actions with an entire test suite in only a few lines.
-
-
-
-
-Also provides a one-liner installation & configuration of minitest and capybara test environment.
-
-
-Rails 3.2.x and 4.x
-
-
-## Getting Started
-
-Add to your Gemfile:
-
-```ruby
-gem 'effective_test_bot'
-```
-
-Run the bundle command to install it:
-
-```console
-bundle install
-```
-
-Then run the generator:
-
-```ruby
-rails generate effective_test_bot:install
-```
-
-The above command will first invoke the default `minitest` installation tasks, if they haven't already been run.
-
-It will then copy the packaged `test_helper.rb` that matches this gem author's opinionated testing environment.
-
-Run the test suite with:
-
-```ruby
-bundle exec rake test:bot
-bundle exec rake test:bot:environment
-```
-
-You should now see multiple -- hopefully passing -- tests that you didn't write!
-
-## TODO
-
-Document this gem
-
-Minitest:
-
-rake test TEST=test/integration/clinic_assets_test.rb
-
-TestBot:
-
-rake test:bot TEST=posts
-rake test:bot TEST=posts#index
-rake test:bot TEST=
-
-Excepts will always work and be accounted for in test:bot
-Definign TEST= works with test names 'documents#new' or 'documents' or 'something_path' but not with 'flash' assertions
-
-
-    # config.except = [
-    #   'flash',
-    #   'users#show',
-    #   'users#create_invalid' => ['path', 'page_title'],
-    #   'users#create_invalid' => 'no_unpermitted_params',
-    #   'report_total_allocation_index_path'
-    #   'documents#destroy flash'
-    # ]
-
-
-require 'test_helper'
-
-class UsersTest < ActionDispatch::IntegrationTest
-  # The Create and Update action return to /members/12345 instead of /users/12345 when failing validation
-  # This is a side effect of working in the same namespace as devise
-  crud_test(User, User.find_by_email('admin@agilestyle.com'), except: :show, skip: {create_invalid: :path, update_invalid: :path})
-end
-
-require 'test_helper'
-
-class SettingTest < ActionDispatch::IntegrationTest
-  crud_test(Setting, User.first, only: [:new, :create])
-end
-
-require 'test_helper'
-
-class PhysiciansTest < ActionDispatch::IntegrationTest
-  page_test(:user_settings_path, User.first)
-  page_test(:user_settings_path, User.first)
-  page_test(:user_settings_path, User.first)
-  crud_test(Physician, User.first, except: :show)
-  crud_test('physicians', User.first, except: :show)
-
-  test 'another action' do
-    crud_action_test(:new, Physician, User.first)
-  end
-end
-
-
-, input_html: {'data-test-bot-skip': true}
-
-
-
-
-## Fixtures
+### devise_test
 
 TODO
 
-users.yml:
+### page_test
 
-```yaml
-normal:
-  email: 'normal@agilestyle.com'
-  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
-```
+TODO
+
+### member_test
+
+TODO
+
+### redirect_test
+
+TODO
+
+### wizard_test
+
+TODO
+
+## Automated Testing / Rake tasks
+
+TODO
+
+## Screenshots and Animated Gifs
+
+TODO
+
+### Tour mode
+
+TODO
 
 
 ## License
@@ -467,57 +292,3 @@ Code and Effect is the product arm of [AgileStyle](http://www.agilestyle.com/), 
 4. Push to the branch (`git push origin my-new-feature`)
 5. Bonus points for test coverage
 6. Create new Pull Request
-
-
-
-THIS IS A BLOG POST BASICALLY
-## Testing Philosophy
-
-
-
-
-
-
-
-So much of an average Ruby on Rails application is organized around CRUD, a lot of the tests
-
-
-It takes non-zero time, most of the tests are just boilerplate,
-and it's far too ownerous to consider every little
-
-The guiding principle behind effective_test_bot is that it takes too long to write tests.
-
-
-The guiding principle behind effective_test_bot is that writing tests sucks.
-
-(warning: incoming nerd rant)
-
-Unit tests are necessary.  You gotta test anything reasonably complex being done by your models.
-
-And yea, it's best to do those tests in isolation.
-
-Outside of that, full stack testing is the only worthwhile endeavour.
-
-Writing controller tests, view tests and the like is just a waste of time:
-  - They don't protect you against changes in your application
-  - They only test what you set them up to test.
-  - They overlook all kinds of simple human error like adding a form field to an existing form, but forgetting to add it to unpermitted params
-  - Your existing test doesn't pass that new value, so it still passes.  No problem right?
-  - They will render properly with your fixtured data, but what about a random faceroll of the keyboard?
-
-Ontop of that, no one writes tests that consistently check all the little things:
-  - Page titles, unpermitted params, flashes, data-disable-with, no javascript errors, no html5 validation errors, etc.
-
-
-
-  Do you update your tests everytime you add an extra
-
-They don't really protect you against changes in your application.
-
-They test what you set them up to test, which is usually quite different than a user actually clicking through your application.
-
-They overlook every day things like adding a form field to an existing form, but forgetting to add it to the unpermitted params.
-
-Your unchanged controller test still passes, no problem right?
-
-Your view may render properly with some fixtured data, but will it handle 5000 monkeys all throwing input at it?
