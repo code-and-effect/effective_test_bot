@@ -130,9 +130,11 @@ You can pass a Hash of 'fills' to specify specific input values:
 require 'test_helper'
 
 class PostTest < ActionDispatch::IntegrationTest
-  visit new_post_path
-  fill_form(:title => 'A Cool Post', 'author.last_name' => 'Smith')
-  submit_form
+  test 'creating a new post' do
+    visit new_post_path
+    fill_form(:title => 'A Cool Post', 'author.last_name' => 'Smith')
+    submit_form
+  end
 end
 ```
 
@@ -154,7 +156,7 @@ You can scope the fill_form to a particular area of the page by using the regula
 
 ### submit_form
 
-As well as just click on the input[type='submit'] button (or optional label), this helper also checks:
+As well as just click on the `input[type='submit']` button (or optional label), this helper also checks:
 - `assert_no_html5_form_validation_errors`
 - `assert_jquery_ujs_disable_with`
 - `assert_no_unpermitted_params`
@@ -208,6 +210,7 @@ class PostsTest < ActionDispatch::IntegrationTest
     page_action_test(:posts_path, User.first)
   end
 end
+```
 
 Each of these DSL test suite methods are designed to assert an expected standard rails behaviour.
 
