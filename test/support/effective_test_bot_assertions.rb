@@ -11,6 +11,26 @@ module EffectiveTestBotAssertions
     assert page.has_selector?('form#new_user'), message || '(signed_out) Expected new_user form to be present'
   end
 
+  def assert_capybara_can_execute_javascript(message = "Expected capybara-webkit page.evaluate_script() to be successful")
+    error = nil; result = nil;
+
+    begin
+      result = page.evaluate_script("var js = 'javascript'; js;")
+    rescue => e
+      error = e.message
+    end
+
+    assert (result == 'javascript'), "#{message}. Error was: #{error}"
+  end
+
+  def assert_jquery_present(message = "Expected jquery ($.fn.jquery) to be present")
+    assert((page.evaluate_script('$.fn.jquery') rescue '').length > 0, message)
+  end
+
+  def assert_jquery_ujs_present(message = "Expected rails' jquery_ujs ($.rails) to be present")
+    assert((page.evaluate_script('$.rails') rescue '').length > 0, message)
+  end
+
   def assert_page_title(title = :any, message = '(page_title) Expected page title to be present')
     return if was_download? # If this was a download, it correctly won't have a page title
 
