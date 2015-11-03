@@ -288,6 +288,13 @@ TODO
 
 ## Automated Testing / Rake tasks
 
+```ruby
+rake test:bot:environment
+rake test:bot
+rake test:bot TEST=posts
+rake test:bot TEST=posts#index
+```
+
 TODO
 
 ## Screenshots and Animated Gifs
@@ -295,6 +302,17 @@ TODO
 TODO
 
 ### Tour mode
+
+```ruby
+rake test:bot:tour
+rake test:bot:tour TEST=posts
+rake test:bot:tourv # verbose mode
+```
+
+```ruby
+rake test:bot:tours # Prints out file location of all tour animated .gifs
+rake test:bot:purge # Deletes all tour and failure animated .gifs
+```
 
 TODO
 
