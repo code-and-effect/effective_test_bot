@@ -22,9 +22,7 @@ module EffectiveTestBot
         puts "files with those packaged inside the effective_test_bot gem."
         puts ""
         puts "If you have very specific existing minitest configuration,"
-        puts "you may want to skip (press 'n') to the following overwrites"
-        puts "and refer to the GitHub documentation for this gem:"
-        puts "https://github.com/code-and-effect/effective_test_bot"
+        puts "you should ensure it's under version control so you can revert if needed"
         puts ""
         puts "Otherwise, press 'Y' to all the following prompts to automatically configure"
         puts "minitest-rails and capybara-webkit based effective_test_bot test coverage"
@@ -41,8 +39,9 @@ module EffectiveTestBot
 
       def thank_you
         puts "Thanks for using EffectiveTestBot"
-        puts "First make sure your test environment is correctly configured by running 'rake test:bot:environment'"
-        puts "Run tests with 'rake test:bot'"
+        puts "Make sure you create a user in your db/seeds.rb, test/fixtures/users.yml, or test/fixtures/seeds.rb"
+        puts "Run `rake test:bot:environment` once to ensure the testing environment is correctly configured"
+        puts "Test your app with 'rake test:bot'"
       end
     end
   end

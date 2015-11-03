@@ -39,7 +39,7 @@ if Rails.env.test?
     # 100 equals 1 second. (a bit on the slow side, but suitable for a demo)
     config.animated_gif_delay = 100
 
-    # Shorter than maximum height animaged gif frames have their
+    # Shorter than maximum height animated gif frames have their
     # bottom area filled by this color
     # For best appearance, have this match your site's background color
     config.animated_gif_background_color = 'white'
