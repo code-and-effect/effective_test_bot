@@ -55,10 +55,11 @@ module EffectiveTestBot
               assign_test_bot_unpermitted_params_header(exception)
             end
 
-            rescue_from StandardError do |exception|
-              assign_test_bot_exceptions_header(exception)
-              render status: 500, text: "<html><body><h1>Uncaught Exception</h1><p>#{exception.message}</p><p>#{exception.backtrace.first(20).join('<br>')}</p></body></html>"
-            end
+            # This isn't working properly. TODO: Fix this
+            # rescue_from StandardError do |exception|
+            #   assign_test_bot_exceptions_header(exception)
+            #   render status: 500, text: "<html><body><h1>Uncaught Exception</h1><p>#{exception.message}</p><p>#{exception.backtrace.first(20).join('<br>')}</p></body></html>"
+            # end
           end
 
         end
