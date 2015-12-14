@@ -5,7 +5,7 @@ module EffectiveTestBotFormFiller
   LETTERS = ('A'..'Z').to_a
 
   # Fill a boostrap tabs based form
-  def fill_bootstrap_tabs_form(fills = {}, boostrap_tab_elements = nil)
+  def fill_bootstrap_tabs_form(fills = HashWithIndifferentAccess.new, boostrap_tab_elements = nil)
     fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
 
     tabs = boostrap_tab_elements || all("a[data-toggle='tab']")
@@ -42,7 +42,7 @@ module EffectiveTestBotFormFiller
 
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
-  def fill_form_fields(fills = {})
+  def fill_form_fields(fills = HashWithIndifferentAccess.new)
     fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
 
     save_test_bot_screenshot

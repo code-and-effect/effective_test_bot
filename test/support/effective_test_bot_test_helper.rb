@@ -29,6 +29,10 @@ module EffectiveTestBotTestHelper
     end
   end
 
+  def click_first(label)
+    click_link(label, match: :first)
+  end
+
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # These values are 'from the last page submit or refresh'
   def flash
