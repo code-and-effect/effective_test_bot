@@ -9,6 +9,10 @@ module EffectiveTestBotLoginHelper
     user.kind_of?(String) ? login_as(User.find_by_email!(user)) : login_as(user)
   end
 
+  def sign_out
+    logout
+  end
+
   def sign_in_manually(user_or_email, password = nil)
     visit new_user_session_path
 
