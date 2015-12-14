@@ -191,10 +191,14 @@ module EffectiveTestBotFormFiller
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
     when 'textarea'
       Faker::Lorem.paragraph
-    when 'input_checkbox'
-      [true, false].sample
-    when 'input_radio'
-      [true, false].sample
+    when 'input_checkbox', 'input_radio'
+      if field['value'] == 'true'
+        true
+      elsif field['value'] == 'false'
+        false
+      else
+        [true, false].sample
+      end
     when 'input_file'
       "#{File.dirname(__FILE__)}/important_documents._test"
     else
