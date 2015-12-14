@@ -1,10 +1,12 @@
 # This DSL gives a class level and an instance level way of calling specific test suite
 #
 # class PostsTest < ActionDispatch::IntegrationTest
-#   member_test('admin/jobs', 'unarchive', User.first, Post.first)
+#   wizard_test('/fee_wizard/step1', '/fee_wizard/step5', User.first)
 #
 #   test 'a one-off action' do
-#     member_action_test('admin/jobs', 'unarchive', User.first)
+#     wizard_action_test('/fee_wizard/step1', '/fee_wizard/step5', User.first) do
+#       puts page.current_path
+#     end
 #   end
 # end
 
@@ -36,7 +38,7 @@ module TestBotable
         raise "Error: #{e.message}.  Expected usage: wizard_action_test('/fee_wizard/step1', '/fee_wizard/step5', User.first)"
       end
 
-      self.send(:test_bot_wizard_test)
+      block_given? ? test_bot_wizard_test { yield } : test_bot_wizard_test
     end
 
   end

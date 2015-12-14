@@ -4,17 +4,16 @@
 module WizardTest
   protected
 
-  def test_bot_wizard_test
+  def test_bot_wizard_test(&block)
     sign_in(user) and visit(from_path)
 
     0.upto(50) do |index|   # Can only test wizards 51 steps long
       assert_page_normal
 
+      yield if block_given?
+
       if defined?(within_form)
-        within(within_form) do
-          fill_form
-          submit_form
-        end
+        within(within_form) { fill_form; submit_form; }
       else
         fill_form
         submit_form
