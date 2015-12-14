@@ -80,8 +80,9 @@ module EffectiveTestBotAssertions
 
   # This must be run after submit_form()
   # It ensures there are no HTML5 validation errors that would prevent the form from being submit
+  # Browsers seem to only consider visible fields, so we will to
   def assert_no_html5_form_validation_errors(message = nil)
-    errors = all(':invalid', visible: false).map { |field| field['name'] }
+    errors = all(':invalid', visible: true).map { |field| field['name'] }
     assert errors.blank?, message || "(no_html5_form_validation_errors) Unable to submit form, unexpected HTML5 validation error present on the following fields:\n#{errors.join("\n")}"
   end
 
@@ -128,7 +129,7 @@ module EffectiveTestBotAssertions
       assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
     else
       assigns.each do |key, value|
-        errors = value['errors']
+        errors = value['errors'] if value.respond_to?(:[])
         assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
       end
     end
