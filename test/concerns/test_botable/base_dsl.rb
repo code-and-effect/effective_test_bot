@@ -119,7 +119,6 @@ module TestBotable
 
     # Instance Methods
 
-
     # Using reverse_merge! in the dsl action_tests makes sure that the
     # class level can assign a current_test variable
     # wheras the action level ones it's not present.
@@ -130,11 +129,17 @@ module TestBotable
         self.class.normalize_test_bot_options!(options)
       end
 
-      lets.each { |k, v| self.class.let(k) { v } } # Using the minitest spec let(:foo) { 'bar' } syntax
+      # Clear any previously defined memoized values
+      @_memoized = nil # This clears the minitest let! syntax memoized values
 
-      # test_bot may leak some lets from one test to the next, if they're not overridden
-      # I take special care to undefine just current test so far
-      self.class.let(:current_test) { nil } if options[:current_test].blank?
+      # Using the minitest spec let(:foo) { 'bar' } syntax
+      lets.each do |key, value|
+        if value.kind_of?(Hash) && !value.kind_of?(HashWithIndifferentAccess)
+          self.class.let(key) { HashWithIndifferentAccess.new(value) }
+        else
+          self.class.let(key) { value }
+        end
+      end
 
       lets
     end
