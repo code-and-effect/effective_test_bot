@@ -19,10 +19,17 @@ module WizardTest
         submit_form
       end
 
-      break if page.current_path == to_path
+      if to_path.present?
+        # Keep going till we hit a certain to_path
+        break if page.current_path == to_path
+      else
+        # Keep going till there's no more submit buttons
+        break if all("input[type='submit']").blank?
+      end
+
     end
 
-    assert_current_path to_path
+    assert_current_path(to_path) if to_path.present?
   end
 
 end
