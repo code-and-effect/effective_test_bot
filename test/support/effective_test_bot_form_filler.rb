@@ -33,7 +33,6 @@ module EffectiveTestBotFormFiller
       tab.click()
       synchronize!
       save_test_bot_screenshot
-      @shared_max_fields = nil # Reset value_for_input_numeric_field() history
 
       within('div' + tab['href']) { fill_form_fields(fills) }
     end
@@ -67,19 +66,15 @@ module EffectiveTestBotFormFiller
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
         field.set(value_for_field(field, fills))
       when 'select'
-        if field['class'].to_s.include?('select2') # effective_select
-          if EffectiveTestBot.tour_mode_extreme?
-            page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
-            save_test_bot_screenshot
-          end
+        if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
+          page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
+          save_test_bot_screenshot
         end
 
         field.select(value_for_field(field, fills), match: :first)
 
-        if field['class'].to_s.include?('select2') # effective_select
-          if EffectiveTestBot.tour_mode_extreme?
-            page.execute_script("try { $('select##{field['id']}').select2('close'); } catch(e) {};")
-          end
+        if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2')
+          page.execute_script("try { $('select##{field['id']}').select2('close'); } catch(e) {};")
         end
       when 'input_file'
         if field['class'].to_s.include?('asset-box-uploader-fileinput')
@@ -99,8 +94,12 @@ module EffectiveTestBotFormFiller
       end
     end
 
-    save_test_bot_screenshot
+    # Clear any value_for_field momoized values
+    @filled_numeric_fields = nil
+    @filled_password_fields = nil
+    @filled_radio_fields = nil
 
+    save_test_bot_screenshot
   end
 
   # Generates an appropriately pseudo-random value for the given field
@@ -115,10 +114,9 @@ module EffectiveTestBotFormFiller
 
     fill_value = fill_value_for_field(fills, attributes)
 
-    # If there is a predefined fill value for this field, return it here
-    # except for select fields which are treated differently, so we can match fill values on both the html text or value
-    # this edge case is implemented below
-    if fill_value.present? && !['select'].include?(field_name)
+    # If there is a predefined fill value for this field return it now
+    # except for select, checkbox and radio fields which we want to match by value or label
+    if fill_value.present? && !['select', 'input_checkbox', 'input_radio'].include?(field_name)
       return fill_value
     end
 
@@ -171,6 +169,25 @@ module EffectiveTestBotFormFiller
         Faker::Lorem.words(3).join(' ').capitalize
       end
 
+    when 'input_checkbox'
+      value_for_input_checkbox_field(field, fill_value)
+
+    when 'input_email'
+      Faker::Internet.email
+
+    when 'input_file'
+      "#{File.dirname(__FILE__)}/important_documents._test"
+
+    when 'input_number'
+      value_for_input_numeric_field(field, "input[type='number'][name$='[#{attribute}]']")
+
+    when 'input_password'
+      # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
+      @filled_password_fields ||= Faker::Internet.password
+
+    when 'input_radio'
+      value_for_input_radio_field(field, fill_value)
+
     when 'select'
       if fill_value.present? # accept a value or text
         field.all('option:enabled').each do |option|
@@ -179,30 +196,55 @@ module EffectiveTestBotFormFiller
       end
 
       field.all('option:enabled').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
-    when 'input_number'
-      value_for_input_numeric_field(field, "input[type='number'][name$='[#{attribute}]']")
-    when 'input_email'
-      Faker::Internet.email
-    when 'input_password'
-      # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
-      @test_bot_current_password ||= Faker::Internet.password
+
     when 'input_tel'
       d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
+
     when 'textarea'
       Faker::Lorem.paragraph
-    when 'input_checkbox', 'input_radio'
-      if field['value'] == 'true'
-        true
-      elsif field['value'] == 'false'
-        false
-      else
-        [true, false].sample
-      end
-    when 'input_file'
-      "#{File.dirname(__FILE__)}/important_documents._test"
+
     else
       raise "fill_value unsupported field type: #{field['type']}"
+    end
+  end
+
+  def value_for_input_checkbox_field(field, fill_value)
+    if fill_value.present?
+      fill_values = Array(fill_value)  # Allow an array of fill values to be passed
+      (fill_values.include?(field['value']) || fill_values.include?(field.find(:xpath, '..').text))
+    elsif field['value'] == 'true'
+      true
+    elsif field['value'] == 'false'
+      false
+    else
+      [true, false].sample
+    end
+  end
+
+  # The first time we run into a radio button, we definitely want to set it to TRUE so it's definitely selected
+  # Subsequent ones, we can randomly true/false
+  # Then if we run into something that has a fill_value, we definitely want to set that one to TRUE, and false the rest
+  def value_for_input_radio_field(field, fill_value)
+    @filled_radio_fields ||= {}
+
+    previous = @filled_radio_fields[field['name']]
+
+    retval =
+      if previous == true  # We've selected one of the options before
+        [true, false].sample
+      elsif previous.kind_of?(String)  # We selected a previous option with a specific fill_value
+        false
+      else # We've never seen this radio field before
+        true
+      end
+
+    if fill_value.present? && (fill_value == field['value'] || fill_value == field.find(:xpath, '..').text)
+      @filled_radio_fields[field['name']] = fill_value
+      true
+    else
+      @filled_radio_fields[field['name']] ||= true
+      retval
     end
   end
 
@@ -219,10 +261,10 @@ module EffectiveTestBotFormFiller
 
     # So there's definitely 2+ fields that share the same max, named the same
     # We want the total value of all these fields to add upto the max single max value
-    @shared_max_fields ||= {}
-    @shared_max_fields[selector] ||= max
+    @filled_numeric_fields ||= {}
+    @filled_numeric_fields[selector] ||= max
 
-    available = @shared_max_fields[selector]
+    available = @filled_numeric_fields[selector]
 
     amount = if max.kind_of?(Float)
       (((max * 1000.0) / shared_max_fields.length.to_f).ceil() / 1000.0).round(2)
@@ -231,7 +273,7 @@ module EffectiveTestBotFormFiller
     end
     amount = [[amount, min].max, available].min
 
-    @shared_max_fields[selector] = (available - amount)
+    @filled_numeric_fields[selector] = (available - amount)
     amount
   end
 
