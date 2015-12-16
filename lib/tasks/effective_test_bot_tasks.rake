@@ -5,7 +5,8 @@ require 'rails/test_unit/sub_test_task'
 # rake test:bot TEST=documents#new
 # rake test:bot TEST=documents#new,documents#show
 # rake test:bot TOUR=true
-# rake test:bot TOUR=verbose
+# rake test:bot TOUR=verbose   # Prints out the animated gif patch after test is run
+# rake test:bot TOUR=extreme   # Makes a whole bunch of extra screenshots
 
 # rake test:bot:tour
 # rake test:bot:tour TEST=documents#new
