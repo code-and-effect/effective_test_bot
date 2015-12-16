@@ -5,22 +5,18 @@ module EffectiveTestBotScreenshotsHelper
 
   # Creates a screenshot based on the current test and the order in this test.
   def save_test_bot_screenshot
-    return unless EffectiveTestBot.screenshots? && defined?(current_test)
-
-    full_path = current_test_temp_path + "/#{current_test_screenshot_id}.png"
-    page.save_screenshot(full_path)
+    return unless EffectiveTestBot.screenshots?
+    page.save_screenshot("#{current_test_temp_path}/#{current_test_screenshot_id}.png")
   end
 
   # This is run before every test
   # def before_setup
-  #   super
-  #   return unless (EffectiveTestBot.screenshots? && defined?(current_test))
   # end
 
   # This gets called after every test.  Minitest hook for plugin developers
   def after_teardown
     super
-    return unless EffectiveTestBot.screenshots? && defined?(current_test) && (@test_bot_screenshot_id || 0) > 0
+    return unless EffectiveTestBot.screenshots? && (@test_bot_screenshot_id || 0) > 0
 
     if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
       save_test_bot_failure_gif
@@ -101,7 +97,7 @@ module EffectiveTestBotScreenshotsHelper
   # current_test_failure_path: destination for .gifs of failing tests
 
   def current_test_temp_path
-    @_current_test_temp_path ||= "#{Rails.root}/tmp/test_bot/#{current_test || 'none'}"
+    @_current_test_temp_path ||= "#{Rails.root}/tmp/test_bot/#{current_test_name}"
   end
 
   def current_test_failure_path
@@ -110,7 +106,7 @@ module EffectiveTestBotScreenshotsHelper
 
   def current_test_failure_filename
     # Match Capybara-screenshots format-ish
-    "#{current_test}_failure_#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
+    "#{current_test_name}_failure_#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
   end
 
   # Where the tour animated gif ends up
@@ -119,7 +115,11 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def current_test_tour_filename
-    "#{current_test}.gif"
+    "#{current_test_name}.gif"
+  end
+
+  def current_test_name
+    defined?(curent_test) ? current_test : (@NAME.to_s.presence || 'none')
   end
 
   private
