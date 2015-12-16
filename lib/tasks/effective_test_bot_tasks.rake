@@ -16,9 +16,11 @@ require 'rails/test_unit/sub_test_task'
 # rake test:bot:tours
 # rake test:bot:tours TEST=documents
 
+# rake test:tour  # Not the bot, just regular minitest 'rake test'
+# rake test:tourv
 
 namespace :test do
-  desc 'Runs the effective_test_bot'
+  desc 'Runs the effective_test_bot automated test suite'
   task :bot do
     if ENV['TEST'].present?
       ENV['TEST_BOT_TEST'] = ENV['TEST']
@@ -26,6 +28,18 @@ namespace :test do
     end
 
     Rake::Task['test:effective_test_bot'].invoke
+  end
+
+  desc "Runs 'rake test' with effective_test_bot tour mode enabled"
+  task :tour do
+    ENV['TOUR'] ||= 'true'
+    Rake::Task['test'].invoke
+  end
+
+  desc "Runs 'rake test' with effective_test_bot verbose tour mode enabled"
+  task :tourv do
+    ENV['TOUR'] ||= 'verbose'
+    Rake::Task['test'].invoke
   end
 
   namespace :bot do
@@ -55,6 +69,7 @@ namespace :test do
 
     desc 'Prints all effective_test_bot animated gif tour file paths'
     task :tours do
+      present = false
       Dir['test/tours/*.gif'].each do |file|
         file = file.to_s
 
@@ -62,8 +77,11 @@ namespace :test do
           next unless file.include?(ENV['TEST'])
         end
 
+        present = true
         puts "\e[32m#{Rails.root + file}\e[0m" # 32 is green
       end
+
+      puts 'No effective_test_bot tours present.' unless present
     end
   end # /namespace bot
 
