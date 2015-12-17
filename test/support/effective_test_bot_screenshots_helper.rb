@@ -119,7 +119,15 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def current_test_name
-    defined?(curent_test) ? current_test : (@NAME.to_s.presence || 'none')
+    @_current_test_name ||= (
+      if defined?(current_test) # test_bot class level methods set this variable
+        current_test
+      elsif @NAME.present?  # minitest sets this variable
+        @NAME
+      else
+        Time.now.strftime('%Y-%m-%d-%H-%M-%S') # fallback
+      end.to_s.parameterize
+    )
   end
 
   private
