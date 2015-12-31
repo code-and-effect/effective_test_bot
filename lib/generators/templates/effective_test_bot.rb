@@ -5,13 +5,14 @@ if Rails.env.test?
 
     # Exclude the following tests or assertions from being run.
     # config.except = [
-    #   'widgets'
-    #   'posts#create_invalid'
-    #   'posts#index page_title'
+    #   'widgets',
+    #   'posts#create_invalid',
+    #   'posts#index page_title',
+    #   'posts#update_invalid' => ['page_title', 'current_path'],
     #   'no_unpermitted_params'
     # ]
 
-    # Run only the following tests.  Doesn't work with individual assertions>
+    # Run only the following tests.  Doesn't work with individual assertions
     # config.only = [
     #   'posts', 'events#index'
     # ]

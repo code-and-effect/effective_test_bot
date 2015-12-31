@@ -206,24 +206,143 @@ The following are refreshed on each page change, and are available to check anyw
 
 ## Test Bot DSL Methods
 
-All of the following DSL methods use the assertions and capybara extras to build an entire test suite that runs against a given page or controller action.
+All of the following DSL methods run an entire test suites against a given page or controller action.
 
-Right now the `crud_test` method is by far the most mature, with the other methods having had less development time.
+They are intended to be used both as standalone one-liners, like [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers), and as helper methods to aid in writing custom tests quickly.
 
-Each DSL method has a class level `x_test` and an instance level `x_action_test` version of each.
+Each method has a class-level/one-liner `x_test` and an instance level `x_action_test` version.
+
+### crud_test
+
+TODO
+
+### devise_test
+
+TODO
+
+### page_test
+
+This test signs in as the given user, visits the given page and simply checks `assert_page_normal`.
+
+Use it as a one-liner method:
 
 ```ruby
-require 'test_helper'
-
 class PostsTest < ActionDispatch::IntegrationTest
-  page_test(:posts_path, User.first)  # Runs the page_test test suite against posts_path (class level) as User.first
+  page_test(:posts_path, User.first)  # Runs the page_test test suite against posts_path as User.first
+end
+```
 
-  # Does the same thing.
-  # Runs the page_test suite against posts_path (instance level) as User.first
-  test 'my posts test' do
+Or as part of a regular test:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  test 'posts are displayed on the index page' do
+    Post.create(title: 'first post')
+
     page_action_test(:posts_path, User.first)
+
+    assert page.current_path, '/posts'
+    assert_content 'first post'
   end
 end
+```
+
+### member_test
+
+This test is intended for non-CRUD actions that operate on a specific instance of a resource.
+
+The action must be a `GET` with a required `id` value.  `member_test`-able actions will look like the following in `rake routes`:
+
+```ruby
+unarchive_post  GET  /posts/:id/unarchive(.:format)  posts#unarchive
+```
+
+This test signs in as the given user, visits the given controller/action/page and checks `assert_page_normal` and `assert_assigns`.
+
+Use it as a one-liner method:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  member_test('posts', 'unarchive', User.first, Post.find(1))  # Run the member_test specifically with Post.find(1)
+  member_test('posts', 'unarchive', User.first)                # Uses find_or_create_resource! to load a seeded resource or create a new one
+end
+```
+
+Or as part of a regular test:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  test 'posts can be unarchived' do
+    post = Post.create(title: 'first post', archived: true)
+
+    assert Post.where(archived: false).empty?
+    member_action_test('posts', 'unarchive', User.first, post)
+    assert Post.where(archived: false).present?
+  end
+end
+```
+
+### redirect_test
+
+This test signs in as the given user, visits the given page and checks `assert_redirect(from_path, to_path)` and `assert_page_normal`.
+
+Use it as a one-liner method:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  redirect_test('/blog', '/posts', User.first)  # Visits /blog and tests that it redirects to a working /posts page
+end
+```
+
+Or as part of a regular test:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  test 'visiting blog redirects to posts' do
+    Post.create(title: 'first post')
+    redirect_action_test('/blog', '/posts', User.first)
+    assert_content 'first post'
+  end
+end
+```
+
+### wizard_test
+
+This test signs in as the given user, visits the given initial page and continually runs `fill_form`, `submit_form` and `assert_page_normal` up until the given final page, or until no more `input[type=submit]`s exist.
+
+It tests any number of steps in a wizard, multi-step form, or inter-connected series of pages.
+
+As well, in the `wizard_action_test`, each page is yielded to the calling test.
+
+Use it as a one-liner method:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  wizard_test('/build_post/step1', '/build_post/step5', User.first)
+end
+```
+
+Or as part of a regular test:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  test 'building a post in 5 steps works' do
+    wizard_action_test('/build_post/step1', '/build_post/step5', User.first) do
+      if page.current_path.end_with?('step4')
+        assert_content 'your post is ready but must first be approved by an admin.'
+      end
+    end
+  end
+end
+```
+
+## Automated Testing / Rake tasks
+
+```ruby
+rake test:bot:environment
+rake test:bot
+rake test:bot TEST=posts
+rake test:bot TEST=posts#index
 ```
 
 ### Skipping assertions and tests
@@ -237,63 +356,31 @@ When an assertion fails, the minitest output will look something like:
 ```console
 crud_test: (users#update_invalid)                               FAIL (3.74s)
 
-Minitest::Assertion: (path) Expected current_path to match resource #update path.
+Minitest::Assertion: (current_path) Expected current_path to match resource #update path.
   Expected: "/users/562391275"
   Actual: "/members/562391275"
   /Users/matt/Sites/effective_test_bot/test/test_botable/crud_test.rb:155:in `test_bot_update_invalid_test'
 ```
 
-The `(path)` is the name of the specific assertion that failed.
+The `(current_path)` is the name of the specific assertion that failed.
 
 The expectation is that when submitting an invalid form at `/users/562391275/edit` we should be returned to the update action url `/users/562391275`, but in this totally reasonable but not-standard case we are redirected to `/members/562391275` instead.
 
-You can skip this specific assertion by adding it to the `app/config/initializers/effective_test_bot.rb` file:
+You can skip this assertion by adding it to the `app/config/initializers/effective_test_bot.rb` file:
 
 ```ruby
 EffectiveTestBot.setup do |config|
   config.except = [
-    'users#create_invalid path',  # Skips the path assertion for just the users#create_invalid test
-    'path'                        # Skips the path assertion entirely in all tests
+    'users#create_invalid current_path',  # Skips the current_path assertion for just the users#create_invalid test
+    'current_path',                       # Skips the current_path assertion entirely in all tests
+    'users#create_invalid'                # Skips the entire users#create_invalid test
   ]
 end
 ```
 
-There is support for skipping individual assertions as well as entire tests.
+There is support for skipping individual assertions, entire tests, or a combination of both.
 
 Please see the installed effective_test_bot.rb initializer file for a full description of all options.
-
-### crud_test
-
-TODO
-
-### devise_test
-
-TODO
-
-### page_test
-
-TODO
-
-### member_test
-
-TODO
-
-### redirect_test
-
-TODO
-
-### wizard_test
-
-TODO
-
-## Automated Testing / Rake tasks
-
-```ruby
-rake test:bot:environment
-rake test:bot
-rake test:bot TEST=posts
-rake test:bot TEST=posts#index
-```
 
 TODO
 
