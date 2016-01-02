@@ -56,9 +56,9 @@ Install the configuration file:
 rails generate effective_test_bot:install
 ```
 
-The generator will run `minitest:install` if not already present and create an initializer file which describes all configuration options.
+The generator will run `minitest:install` if not already present and create an initializer file which describes all config options.
 
-Fixture or seed one user. At least one user -- ideally a fully priviledged admin type user -- must be available in the testing environment.
+Fixture or seed one user. At least one user -- ideally a fully priviledged admin type user -- must be created.
 
 (there are future plans to make this better.  Right now `rake test:bot` just runs everything as one user.  There really isn't support for 'this user should not be able to' yet.)
 
