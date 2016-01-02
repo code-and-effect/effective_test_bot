@@ -46,13 +46,13 @@ end
 
 Run the bundle command to install it:
 
-```console
+```
 bundle install
 ```
 
 Install the configuration file:
 
-```console
+```
 rails generate effective_test_bot:install
 ```
 
@@ -221,9 +221,9 @@ Each test suite has a class-level one-liner `x_test` and and one or more instanc
 
 ### crud_test
 
-This test runs through the standard [CRUD](http://edgeguides.rubyonrails.org/getting_started.html) workflow of a given controller and checks that resource creation functions as expected -- that all the model, controller, views and database actually work -- and tries to enforce as many best practices as possible.
+This test runs through the standard [CRUD](http://edgeguides.rubyonrails.org/getting_started.html) workflow of a given controller and checks that resource creation functions as expected -- that all the model, controller, views and database actually work -- and tries to enforce best practices.
 
-There are 9 different `crud_action_test` test suites that may be individually run. The class level `crud_test` runs all of them.
+There are 9 different `crud_action_test` test suites that may be run individually. The one-liner `crud_test` runs all of them.
 
 The following instance level `crud_action_test` methods are available:
 
@@ -454,7 +454,7 @@ Minitest::Assertion: (current_path) Expected current_path to match resource #upd
   /Users/matt/Sites/effective_test_bot/test/test_botable/crud_test.rb:155:in `test_bot_update_invalid_test'
 ```
 
-Here, the `(current_path)` is the name of the specific assertion that failed.
+Here, the `(current_path)` is the name of the specific test bot assertion that failed.
 
 The expectation is that when submitting an invalid form at `/users/1/edit` we should be returned to the update action url `/users/1`, but in this totally reasonable but not-standard case we are redirected to `/members/1` instead.
 
