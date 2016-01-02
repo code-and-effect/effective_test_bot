@@ -83,7 +83,7 @@ Finally, to test that your testing environment is set up correctly run `rake tes
 
 You now have effective_test_bot configured and you're ready to go.
 
-# How to use this gem
+## How to use this gem
 
 Effective TestBot provides 4 areas of support in writing [minitest](https://github.com/seattlerb/minitest) [capybara](https://github.com/jnicklas/capybara) tests. As a developer, use this gem to:
 
