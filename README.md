@@ -91,7 +91,7 @@ Effective TestBot provides 4 different layers of support to a developer writing 
 
 1.) enjoy a whole bunch of individual minitest assertions and capybara quality of life helper functions.
 
-2.) call one-liner methods to run test suites (10-50+ assertions) against a page, or use these methods to write larger feature tests.
+2.) call one-liner methods to run test suites (10-50+ assertions) against a page, or use these methods to build larger tests.
 
 3.) produce animated .gifs of test runs. Enable auto-save on failure to help debug a tricky test, or run in tour mode and record walkthroughs of features.
 
