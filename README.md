@@ -8,19 +8,17 @@ Adds many additional minitest assertions and capybara quality of life helper fun
 
 Provides a curated set of minitest/capybara/rails testing gems and a well configured `test_helper.rb` minitest file.
 
-Includes a rake task to validate your testing environment.
-
-Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
+Run `rake test:bot:environment` to validate your testing environment.  Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
 
 Provides a DSL of class and instance level 1-liners that run entire test suites, checking many assertions all at once.
 
-Autosaves an animated gif for any failing test.
+Autosaves an animated .gif for any failing test.
 
 Run `rake test:bot` to automatically check every route in your application against an appropriate test suite, without writing any code.
 
 Automatically fills forms with appropriate pseudo-random input, and checks for all kinds of errors and omissions along the way.
 
-Turn on tour mode to automatically generate animated gifs of every part of your website.
+Turn on tour mode to programatically generate an animated .gif of every workflow in your website.
 
 Makes sure everything actually works.
 
@@ -107,8 +105,8 @@ The following assertions are added for use in any minitest & capybara integratio
 
 - `assert_signed_in` visits the devise `new_user_session_path` and checks for the `devise.failure.already_authenticated` content.
 - `assert_signed_out` visits the devise `new_user_session_path` and checks for absense of the `devise.failure.already_authenticated` content.
-- `assert_page_title` makes sure there is an html <title></title> present.
-- `assert_submit_input` makes sure there is an input[type='submit'] present.
+- `assert_page_title` makes sure there is an html `<title></title>` present.
+- `assert_submit_input` makes sure there is an `input[type='submit']` present.
 - `assert_page_status` checks for a given http status, default 200.
 - `assert_current_path(path)` asserts the current page path.
 - `assert_redirect(from_path)` optionally with to_path, makes sure the current page path is not from_path.
@@ -116,11 +114,15 @@ The following assertions are added for use in any minitest & capybara integratio
 - `assert_no_unpermitted_params` makes sure the last submitted form did not include any unpermitted params and prints out any unpermitted params that do exist.
 - `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was.
 - `assert_no_html_form_validation_errors` checks for frontend html5 errors.
-- `assert_jquery_ujs_disable_with` makes sure all input[type=submit] elements on the page have the data-disable-with property set.
-- `assert_flash` optionally with the desired :success, :error key and/or message, makes sure the flash is set.
+- `assert_jquery_ujs_disable_with` makes sure all `input[type=submit]` elements on the page have the `data-disable-with` property set.
+- `assert_flash`, optionally with the desired `:success`, `:error` key and/or message, makes sure the flash is set.
 - `assert_assigns` asserts a given rails view_assigns object is present.
-- `assert_no_assigns_errors` use after a form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
+- `assert_no_assigns_errors` should be used after any form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
 - `assert_assigns_errors` use after an intentionally invalid form submit to make sure your assigned rails object has errors, or a specific error.
+
+As well,
+
+- `assert_page_normal` checks for general errors on the current page.  Checks include  `assert_no_exceptions`, `assert_page_status`, `assert_no_js_errors`, and `assert_page_title`.
 
 ## Capybara Extras
 
@@ -191,26 +193,26 @@ As well as just click on the `input[type='submit']` button (or optional label), 
 
 ## Capybara Super Extras
 
-So the problem with running integration tests with capybara-webkit is that it's a real full black-box integration test.
+Running integration tests with capybara-webkit is truly a black-box integration testing experience.  This provides a lot of benefits, but also some severe limitations.
 
-Capybara runs in a totally separate process.  It knows nothing about your application.  You can't get access to any of the rails internal state. All you can test is html, javascript and urls. That really sucks.
+Capybara runs in a totally separate process.  It knows nothing about your application and it does not have access to any of the rails internal state. It only sees html, javascript, css and urls.
 
-effective_test_bot mixes in a rails controller include and does a bit of http header hackery to make available to capybara the internal rails state values that are just so handy.
+effective_test_bot extends this knowledge by adding a rails controller mixin and some http header hackery. In turn making available to capybara the internal rails state, which is just so handy.  This allows minitest to read back those values and take a peek inside the black box.
 
 The following are refreshed on each page change, and are available to check anywhere in your tests.
 
 - `flash` a Hash representation of the current page's flash
-- `assigns` a Hash representation of the current page's rails `view_assigns`. Serializes any ActiveRecord objects, as well as any TrueClass, FalseClass, NilClass, String, Symbol, Numeric objects.  Does not serialize anything else, but sets a symbol `assigns[key] == :present_but_not_serialized`.
+- `assigns` a Hash representation of the current page's rails `view_assigns`. Serializes any `ActiveRecord` objects, as well as any `TrueClass`, `FalseClass`, `NilClass`, `String`, `Symbol`, and `Numeric` objects.  Does not serialize anything else, but sets a symbol `assigns[key] == :present_but_not_serialized`.
 - `exceptions` an Array with the exception message and a stacktrace.
-- `unpermitted_params` an Array of any unpermitted paramaters that were encountered by the last request
+- `unpermitted_params` an Array of any unpermitted parameters that were encountered by the last request.
 
 - `save_test_bot_screenshot` saves a screenshot of the current page to be added to the current test's animated gif (see screenshots and tour mode below).
 
 ## Test Bot DSL Methods
 
-All of the following DSL methods run an entire test suites against a given page or controller action.
+Each of the following DSL methods run a test suite on a given page or controller action.
 
-They are intended to be used both as standalone one-liners, like [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers), and as helper methods to aid in writing custom tests quickly.
+These may be used as standalone one-liners, like [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and as helper methods to aid in writing custom tests quickly.
 
 Each method has a class-level/one-liner `x_test` and an instance level `x_action_test` version.
 
@@ -220,21 +222,21 @@ This test runs through the [CRUD](http://edgeguides.rubyonrails.org/getting_star
 
 There are 9 different `crud_action_test` test suites that can be run individually. The class level `crud_test` runs all of them at once.
 
-The following `crud_action_test`s are available:
+The following instance level `crud_action_test` methods are available:
 
-- `:index` - signs in as the given user, finds or creates a resource, visits `resources_path` and checks that a collection of resources has been assigned.
-- `:new` - signs in as the given user, visits `new_resource_path`, and checks for a properly named form appropriate to the resource.
-- `:create_invalid` - signs in as the given user, visits `new_resource_path` and submits an empty form. Checks that all errors are properly assigned and makes sure a new resource was not created.
-- `:create_valid` - signs in as the given user, visits `new_resource_path`, and submits a valid form.  Checks for any errors and makes sure a new resource was created.
-- `:show` - signs in as the given user, finds or creates a resource, visits `resource_path` and checks that the resource is shown.
-- `:edit` - signs in as the given user, finds or creates a resource, visits `edit_resource_path` and checks that an appropriate form exists for this resource.
-- `:update_invalid` - signs in as the given user, finds or creates a resource, visits `edit_resource_path` and submits an empty form.  Checks that the existing resource wasn't updated and that all errors are properly assigned and displayed.
-- `:update_valid` - signs in as the given user, finds or creates a resource, visits `edit_resource_path` and submits a valid form. Checks for any errors and makes sure the existing resource was updated.
-- `:destroy` - signs in as the given user, finds or creates a resource, visits `resources_path`.  It then finds or creates a link to destroy the resource and clicks the link.  Checks for any errors and makes sure the resource was deleted.  If the resource `respond_to?(:archived)` it will check for archive behavior instead of delete.
+- `crud_action_test(:index)` signs in as the given user, finds or creates a resource, visits `resources_path` and checks that a collection of resources has been assigned.
+- `crud_action_test(:new)` signs in as the given user, visits `new_resource_path`, and checks for a properly named form appropriate to the resource.
+- `crud_action_test(:create_invalid)` signs in as the given user, visits `new_resource_path` and submits an empty form. Checks that all errors are properly assigned and makes sure a new resource was not created.
+- `crud_action_test(:create_valid)` signs in as the given user, visits `new_resource_path`, and submits a valid form.  Checks for any errors and makes sure a new resource was created.
+- `crud_action_test(:show)` signs in as the given user, finds or creates a resource, visits `resource_path` and checks that the resource is shown.
+- `crud_action_test(:edit)` signs in as the given user, finds or creates a resource, visits `edit_resource_path` and checks that an appropriate form exists for this resource.
+- `crud_action_test(:update_invalid)` signs in as the given user, finds or creates a resource, visits `edit_resource_path` and submits an empty form.  Checks that the existing resource wasn't updated and that all errors are properly assigned and displayed.
+- `crud_action_test(:update_valid)` signs in as the given user, finds or creates a resource, visits `edit_resource_path` and submits a valid form. Checks for any errors and makes sure the existing resource was updated.
+- `crud_action_test(:destroy)` signs in as the given user, finds or creates a resource, visits `resources_path`.  It then finds or creates a link to destroy the resource and clicks the link.  Checks for any errors and makes sure the resource was deleted.  If the resource `respond_to?(:archived)` it will check for archive behavior instead of delete.
 
 Also,
 
-- `:tour` - signs in as a given user and runs all of the above `crud_action_test`s inside one test.  The animated .gif produced from this test suite records the entire process of creating, showing, editing and deleting a resource from start to finish.  It also makes all the same assertions as running the test suites individually.
+- `crud_action_test(:tour)` signs in as a given user and calls all the above `crud_action_test` methods from inside one test.  The animated .gif produced from this test suite records the entire process of creating, showing, editing and deleting a resource from start to finish.  It makes all the same assertions as running the test suites individually.
 
 
 A quick note on speed:  You can speed up these test suites by fixturing, seeding or first creating an instance of the resource being tested. Any tests that need to `find_or_create_resource` check for an existing resource first, otherwise visit `new_resource_path` and submit a form to create the resource.  Having a resource already created will speed up these test suites.
@@ -267,7 +269,7 @@ Or each individually in part of a regular test:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  test 'user is locked out after failing to update twice' do
+  test 'user is only allowed one edit' do
     crud_action_test(:create_valid, Post, User.first)
     assert_content 'successfully created post.  You can only edit it once.'
 
@@ -275,19 +277,19 @@ class PostsTest < ActionDispatch::IntegrationTest
     assert_content 'successfully updated post.'
 
     crud_action_test(:update_valid, Post.last, User.first, skip: [:no_assigns_errors, :updated_at])
-    assert_assigns_errors(:post, 'you can no longer update this post')
+    assert_assigns_errors(:post, 'you can no longer update this post.')
     assert_content 'you can no longer update this post.'
   end
 end
 ```
 
-If your resource controller passes a `crud_test` you can be certain that your application's end user will be able to do the same.
+If your resource controller passes a `crud_test` you can be certain that your user is able to correctly create, edit, display and delete a resource without encountering any application errors.
 
 ### devise_test
 
 This test runs through the the [devise](https://github.com/plataformatec/devise) sign up, sign in, and sign in invalid workflows.
 
-- `devise_action_test(:sign_up)` visits the devise `new_user_registration_path`, and `submit_form` and validates the `current_user`.
+- `devise_action_test(:sign_up)` visits the devise `new_user_registration_path`, submits the sign up form and validates the `current_user`.
 - `devise_action_test(:sign_in)` creates a new user and makes sure the sign in process works.
 - `devise_action_test(:sign_in_invalid)` makes sure an invalid password is correctly denied.
 
@@ -303,7 +305,6 @@ Or each individually in part of a regular test:
 
 ```ruby
 class MyApplicationTest < ActionDispatch::IntegrationTest
-
   test 'user receives 10 tokens after signing up' do
     devise_action_test(:sign_up)
     assert_content 'Tokens: 10'
@@ -356,8 +357,11 @@ Use it as a one-liner method:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  member_test('posts', 'unarchive', User.first, Post.find(1))  # Run the member_test specifically with Post.find(1)
-  member_test('posts', 'unarchive', User.first)                # Uses find_or_create_resource! to load a seeded resource or create a new one
+  # Uses find_or_create_resource! to load a seeded resource or create a new one
+  member_test('posts', 'unarchive', User.first)
+
+  # Run the member_test with a specific post
+  member_test('posts', 'unarchive', User.first, Post.find(1))
 end
 ```
 
@@ -383,7 +387,8 @@ Use it as a one-liner method:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  redirect_test('/blog', '/posts', User.first)  # Visits /blog and tests that it redirects to a working /posts page
+  # Visits /blog and tests that it redirects to a working /posts page
+  redirect_test('/blog', '/posts', User.first)
 end
 ```
 
@@ -419,7 +424,7 @@ Or as part of a regular test:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  test 'building a post in 5 steps works' do
+  test 'building a post in 5 steps' do
     wizard_action_test('/build_post/step1', '/build_post/step5', User.first) do
       if page.current_path.end_with?('step4')
         assert_content 'your post is ready but must first be approved by an admin.'
