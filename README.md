@@ -141,8 +141,6 @@ It clicks through bootstrap tabs and fill them nicely left-to-right, one tab at 
 You can pass a Hash of 'fills' to specify specific input values:
 
 ```ruby
-require 'test_helper'
-
 class PostTest < ActionDispatch::IntegrationTest
   test 'creating a new post' do
     visit new_post_path
@@ -170,10 +168,19 @@ You can scope the fill_form to a particular area of the page by using the regula
 
 ### submit_form
 
-As well as just click on the `input[type='submit']` button (or optional label), this helper also checks:
-- `assert_no_html5_form_validation_errors`
-- `assert_jquery_ujs_disable_with`
-- `assert_no_unpermitted_params`
+Clicks the first `input[type='submit']` field (or with the given label) and submits a form.
+
+Automatically checks for `assert_no_html5_form_validation_errors`, `assert_jquery_ujs_disable_with` and `assert_no_unpermitted_params`
+
+```ruby
+class PostTest < ActionDispatch::IntegrationTest
+  test 'creating a new post' do
+    visit new_post_path
+    fill_form
+    submit_form    # or submit_form('Save and Continue')
+  end
+end
+```
 
 ### other helpers
 
@@ -216,7 +223,7 @@ Each test suite has a class-level one-liner `x_test` and and one or more instanc
 
 This test runs through the standard [CRUD](http://edgeguides.rubyonrails.org/getting_started.html) workflow of a given controller and checks that resource creation functions as expected -- that all the model, controller, views and database actually work -- and tries to enforce as many best practices as possible.
 
-There are 9 different `crud_action_test` test suites that can be run individually. The class level `crud_test` runs all of them at once.
+There are 9 different `crud_action_test` test suites that may be individually run. The class level `crud_test` runs all of them.
 
 The following instance level `crud_action_test` methods are available:
 
@@ -261,7 +268,7 @@ class PostsTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Or each individually in part of a regular test:
+The individual test suites may also be used as part of a larger test:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
@@ -289,7 +296,7 @@ This test runs through the the [devise](https://github.com/plataformatec/devise)
 - `devise_action_test(:sign_in)` creates a new user and makes sure the sign in process works.
 - `devise_action_test(:sign_in_invalid)` makes sure an invalid password is correctly denied.
 
-Use as a one-liner method:
+Use as a one-liner:
 
 ```ruby
 class MyApplicationTest < ActionDispatch::IntegrationTest
@@ -314,7 +321,7 @@ end
 
 This test signs in as the given user, visits the given page and simply checks `assert_page_normal`.
 
-Use it as a one-liner method:
+Use it as a one-liner:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
@@ -343,13 +350,13 @@ This test is intended for non-CRUD actions that operate on a specific instance o
 
 The action must be a `GET` with a required `id` value.  `member_test`-able actions appear as follows from `rake routes`:
 
-```ruby
+```
 unarchive_post  GET  /posts/:id/unarchive(.:format)  posts#unarchive
 ```
 
 This test signs in as the given user, visits the given controller/action/page and checks `assert_page_normal` and `assert_assigns`.
 
-Use it as a one-liner method:
+Use it as a one-liner:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
@@ -377,9 +384,9 @@ end
 
 ### redirect_test
 
-This test signs in as the given user, visits the given page and checks `assert_redirect(from_path, to_path)` and `assert_page_normal`.
+This test signs in as the given user, visits the given page then checks `assert_redirect(from_path, to_path)` and `assert_page_normal`.
 
-Use it as a one-liner method:
+Use it as a one-liner:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
@@ -406,9 +413,9 @@ This test signs in as the given user, visits the given initial page and continua
 
 It tests any number of steps in a wizard, multi-step form, or inter-connected series of pages.
 
-As well, in the `wizard_action_test`, each page is yielded to the calling test.
+As well, in the `wizard_action_test`, each page is yielded to the calling method.
 
-Use it as a one-liner method:
+Use it as a one-liner:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
@@ -430,20 +437,11 @@ class PostsTest < ActionDispatch::IntegrationTest
 end
 ```
 
-## Automated Testing / Rake tasks
+## Skipping assertion in test suites
 
-```ruby
-rake test:bot:environment
-rake test:bot
-rake test:bot TEST=posts
-rake test:bot TEST=posts#index
-```
+Each of the test suites checks a page or pages for some expected behaviour.  Sometimes a developer has a good reason for deviating from what is expected and it's frustrating when just one assertion in a test suite fails.
 
-### Skipping assertions and tests
-
-Each of these DSL test suite methods are designed to assert an expected standard rails behaviour.
-
-But sometimes a developer has a good reason for deviating from what is considered standard; therefore, each individual assertion is skippable.
+So, almost every individual assertion made by these test suites is skippable.
 
 When an assertion fails, the minitest output will look something like:
 
@@ -451,14 +449,14 @@ When an assertion fails, the minitest output will look something like:
 crud_test: (users#update_invalid)                               FAIL (3.74s)
 
 Minitest::Assertion: (current_path) Expected current_path to match resource #update path.
-  Expected: "/users/562391275"
-  Actual: "/members/562391275"
+  Expected: "/users/1"
+  Actual: "/members/1"
   /Users/matt/Sites/effective_test_bot/test/test_botable/crud_test.rb:155:in `test_bot_update_invalid_test'
 ```
 
-The `(current_path)` is the name of the specific assertion that failed.
+Here, the `(current_path)` is the name of the specific assertion that failed.
 
-The expectation is that when submitting an invalid form at `/users/562391275/edit` we should be returned to the update action url `/users/562391275`, but in this totally reasonable but not-standard case we are redirected to `/members/562391275` instead.
+The expectation is that when submitting an invalid form at `/users/1/edit` we should be returned to the update action url `/users/1`, but in this totally reasonable but not-standard case we are redirected to `/members/1` instead.
 
 You can skip this assertion by adding it to the `app/config/initializers/effective_test_bot.rb` file:
 
@@ -474,9 +472,18 @@ end
 
 There is support for skipping individual assertions, entire tests, or a combination of both.
 
-Please see the installed effective_test_bot.rb initializer file for a full description of all options.
+Please see the installed `effective_test_bot.rb` initializer file for a full description of all options.
 
-TODO
+
+## Automated Testing / Rake tasks
+
+```ruby
+rake test:bot:environment
+rake test:bot
+rake test:bot TEST=posts
+rake test:bot TEST=posts#index
+```
+
 
 ## Screenshots and Animated Gifs
 
