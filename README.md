@@ -317,33 +317,6 @@ class MyApplicationTest < ActionDispatch::IntegrationTest
 end
 ```
 
-### page_test
-
-This test signs in as the given user, visits the given page and simply checks `assert_page_normal`.
-
-Use it as a one-liner:
-
-```ruby
-class PostsTest < ActionDispatch::IntegrationTest
-  page_test(:posts_path, User.first)  # Runs the page_test test suite against posts_path as User.first
-end
-```
-
-Or as part of a regular test:
-
-```ruby
-class PostsTest < ActionDispatch::IntegrationTest
-  test 'posts are displayed on the index page' do
-    Post.create(title: 'first post')
-
-    page_action_test(:posts_path, User.first)
-
-    assert page.current_path, '/posts'
-    assert_content 'first post'
-  end
-end
-```
-
 ### member_test
 
 This test is intended for non-CRUD actions that operate on a specific instance of a resource.
@@ -378,6 +351,33 @@ class PostsTest < ActionDispatch::IntegrationTest
     assert Post.where(archived: false).empty?
     member_action_test('posts', 'unarchive', User.first, post)
     assert Post.where(archived: false).present?
+  end
+end
+```
+
+### page_test
+
+This test signs in as the given user, visits the given page and simply checks `assert_page_normal`.
+
+Use it as a one-liner:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  page_test(:posts_path, User.first)  # Runs the page_test test suite against posts_path as User.first
+end
+```
+
+Or as part of a regular test:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  test 'posts are displayed on the index page' do
+    Post.create(title: 'first post')
+
+    page_action_test(:posts_path, User.first)
+
+    assert page.current_path, '/posts'
+    assert_content 'first post'
   end
 end
 ```
@@ -474,36 +474,102 @@ There is support for skipping individual assertions, entire tests, or a combinat
 
 Please see the installed `effective_test_bot.rb` initializer file for a full description of all options.
 
+## Testing the test environment
 
-## Automated Testing / Rake tasks
+Unfortunately, in the current day ruby on rails ecosystem simply getting a testing environment setup correctly is a non-trivial endeavor.
+
+There are a handful of gotchas and many things that can go wrong.  User sessions need to properly reset and database transactions must be correctly rolled back between tests.  Seeds and fixtures that were once valid may become invalid as the application changes.  Database migrations must also stay up to date.  Capybara needs to query your app with a single shared connection or weird things start happening.
+
+Included with this gem is the `rails generate effective_test_bot:install` that does its best to provide a known-good set of configuration files that initialize all required testing gems.  However, every developer's machine is different, and there are too many points of failure.  Everyone's `test/test_helper.rb` will be slightly different.
+
+Run `rake test:bot:environment` to check for capybara doing the right thing, that everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, that jquery, jquery-ujs are present.
+
+If all tests here pass, you will have a great experience with automated testing.
+
+## Automated full stack testing
+
+One of the main goals of `effective_test_bot` is to increase the speed at which tests can be written in any ruby on rails application.  Well, there's no faster way of writing tests than by not writing them at all.
+
+Run `rake test:bot` to scan every route defined in `routes.rb` and run an appropriate test suite.
+
+You can configure test bot to skip individual tests or assertions, tweak screenshot behaviour and toggle tour mode via the `config/initializers/effective_test_bot.rb` file.  As well, there are a few command line options available.
+
+These are some quick ways to customize test bot's behaviour:
 
 ```ruby
-rake test:bot:environment
+# Scan every route in the application as per config/initializers/effective_test_bot.rb
 rake test:bot
+
+# Test a specific controller (any routes matching posts)
 rake test:bot TEST=posts
+
+# Test a specific controller and action
 rake test:bot TEST=posts#index
 ```
 
-
 ## Screenshots and Animated Gifs
 
-TODO
+Call `save_test_bot_screenshot` from within your test to take a screenshot of the current page.  If an animated .gif is produced at the end of the test -- either from autosave_animated_gif_on_failure or tour mode -- this screenshot will be used as one of the frames in the animation.
+
+This method is already called by `fill_form` and `submit_form`.
+
+To disable taking screenshots entirely, change `config.screenshots = false` in the `config/initializers/effective_test_bot.rb` initializer file.
+
+### Autosave animated .gif on failure
+
+The `test/test_helper.rb` file that is installed by `effective_test_bot` enables [capybara-screenshot](https://github.com/mattheworiordan/capybara-screenshot)'s `autosave_on_failure` functionality.  So whenever a test fails, the current html will be written and a .png screenshot will be saved.  This is invaluable for troubleshooting why a test has failed.
+
+Building on this type of feature, `effective_test_bot` will also autosave an animated gif on failure.  This does slow down failing tests and can be disabled.
 
 ### Tour mode
 
+When running in tour mode, an animated .gif image file, a "tour", will be created for all successful tests.
+
+This feature is slow, increasing the runtime of each test by almost 30%, but it's also really cool.
+
+You can run test bot in tour mode by setting `config.tour_mode = true` in the `config/initializers/effective_test_bot.rb` file or by running any variation of the following rake tasks:
+
 ```ruby
+# Run test:bot in tour mode, saving an animated .gif for all successful tests
 rake test:bot:tour
+rake test:bot TOUR=true
+
+# Also prints the animated .gif file path to stdout
+rake test:bot:tourv
+rake test:bot TOUR=verbose
+
+# Makes a whole bunch of extra screenshots when filling out forms
+rake test:bot TOUR=extreme
+
+# Runs in tour mode and tests only a specific controller or action
 rake test:bot:tour TEST=posts
-rake test:bot:tourv # verbose mode
+rake test:bot:tour TEST=posts#index
 ```
+
+To print out the file location of all tour files, run the following:
 
 ```ruby
-rake test:bot:tours # Prints out file location of all tour animated .gifs
-rake test:bot:purge # Deletes all tour and failure animated .gifs
+# Prints out all animated .gif file locations
+rake test:bot:tours
+
+# Prints out any animated .gif files locations with a file name matching posts
+rake test:bot:tours TEST=posts
 ```
 
-TODO
+To delete all tour and autosave on failure animated .gifs, run the following:
 
+```ruby
+# Deletes all tour and failure animated .gifs
+rake test:bot:purge
+```
+
+As well, to enable tour mode when running the standard minitest `rake test`:
+
+```ruby
+# Runs all regular minitest tests with tour mode enabled
+rake test:tour
+rake test:tourv
+```
 
 ## License
 
