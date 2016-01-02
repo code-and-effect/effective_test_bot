@@ -81,7 +81,7 @@ Your initial user may be created by any of the above 3 tasks.
 
 
 
-Finally, to test that your testing environment is set up correctly run `rake test:bot:environment` and make sure all the tests pass.
+Finally, to test that your testing environment is set up correctly run `rake test:bot:environment` and have all tests pass.
 
 You now have effective_test_bot configured and you're ready to go.
 
@@ -89,13 +89,13 @@ You now have effective_test_bot configured and you're ready to go.
 
 Effective TestBot provides 4 different layers of support to a developer writing minitest capybara feature tests:
 
-1.) a whole bunch of individual minitest assertions and capybara quality of life helper functions.
+1.) enjoy a whole bunch of individual minitest assertions and capybara quality of life helper functions.
 
-2.) one-liner test suites -- run entire test suites (10-50+ assertions) against a page, or use these methods to aid in writing larger feature tests.
+2.) call one-liner methods to run test suites (10-50+ assertions) against a page, or use these methods to write larger feature tests.
 
-3.) record animated .gifs of test runs - enable auto-save on failure or run in tour mode to generate feature walkthroughs.
+3.) produce animated .gifs of test runs. Enable auto-save on failure to help debug a tricky test, or run in tour mode and record walkthroughs of features.
 
-4.) full application automated testing - run `rake test:bot` to scan every route in your application and choose an appropriate test suite to run.
+4.) apply full stack automated testing - run `rake test:bot` to scan every route in your application and check it with an appropriate test suite.
 
 ## Minitest Assertions
 
@@ -128,17 +128,15 @@ The following quality of life helpers are added for use in any minitest & capyba
 
 ### fill_form
 
-Finds all the input, select and textarea form fields on the current page and fills them with pseudo-random appropriate values.
+Finds all input, select and textarea form fields and fills them with pseudo-random but appropriate values.
 
-Detects names, addresses, start and end dates, telephone numbers, postal and zip codes, file, price, email, numeric, password and password confirmation fields. Probably more.
+Intelligently fills names, addresses, start and end dates, telephone numbers, postal and zip codes, file, price, email, numeric, password and password confirmation fields. Probably more.
 
 Will only fill visible fields that are currently visible and not disabled.
 
 If a selection made in one field changes the visibility/disabled of fields later in the form, those fields will be properly filled.
 
-It works with the [cocoon](https://github.com/nathanvda/cocoon), [select2](https://select2.github.io/) and [effective_assets](https://github.com/code-and-effect/effective_assets) gems.
-
-It will click through bootstrap tabs and fill them left-to-right one tab at a time.
+It clicks through bootstrap tabs and fill them nicely left-to-right, one tab at a time, and knows how to work with [cocoon](https://github.com/nathanvda/cocoon), [select2](https://select2.github.io/) and [effective_assets](https://github.com/code-and-effect/effective_assets) form fields.
 
 You can pass a Hash of 'fills' to specify specific input values:
 
@@ -179,7 +177,7 @@ As well as just click on the `input[type='submit']` button (or optional label), 
 
 ### other helpers
 
-- `submit_novalidate_form` will use javascript to disable all required fields, and submit a form without client side validation.
+- `submit_novalidate_form` submits the form without client side validation, ignoring any required field requirements.
 - `clear_form` clears all form fields, probably used before `submit_novalidate_form` to test invalid form submissions.
 - `sign_in(user)` optionally with user, signs in via `Warden::Test::Helpers` hacky login skipping method.
 - `sign_in_manually(user, password)` visits the devise `new_user_session_path` and signs in via the form.
@@ -197,9 +195,9 @@ Capybara runs in a totally separate process.  It knows nothing about your applic
 
 effective_test_bot extends this knowledge by adding a rails controller mixin and some http header hackery. In turn making available to capybara the internal rails state, which is just so handy.  This allows minitest to read back those values and take a peek inside the black box.
 
-The following are refreshed on each page change, and are available to check anywhere in your tests.
+The following are refreshed on each page change, and are available to check anywhere in your tests:
 
-- `flash` a Hash representation of the current page's flash
+- `flash` a Hash representation of the current page's flash.
 - `assigns` a Hash representation of the current page's rails `view_assigns`. Serializes any `ActiveRecord` objects, as well as any `TrueClass`, `FalseClass`, `NilClass`, `String`, `Symbol`, and `Numeric` objects.  Does not serialize anything else, but sets a symbol `assigns[key] == :present_but_not_serialized`.
 - `exceptions` an Array with the exception message and a stacktrace.
 - `unpermitted_params` an Array of any unpermitted parameters that were encountered by the last request.
@@ -208,15 +206,15 @@ The following are refreshed on each page change, and are available to check anyw
 
 ## Effective Test Suites
 
-Each of the following test suites run 10-50+ assertions on a given page or controller action.  The idea is to check for every possible error or omission accross all layers of the stack.
+Each of the following test suites make 10-50+ assertions on a given page or controller action.  The idea is to check for every possible error or omission accross all layers of the stack.
 
-These may be used as standalone one-liners, in the style of [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and as helper methods to quickly build advanced tests.
+These may be used as standalone one-liners, in the style of [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and as helper methods to quickly build up more advanced tests.
 
 Each test suite has a class-level one-liner `x_test` and and one or more instance level `x_action_test` versions.
 
 ### crud_test
 
-This test runs through the [CRUD](http://edgeguides.rubyonrails.org/getting_started.html) workflow of a given controller and checks that resource creation functions as expected -- that all the model, controller, views and database actually work -- and tries to enforce as many best practices as possible.
+This test runs through the standard [CRUD](http://edgeguides.rubyonrails.org/getting_started.html) workflow of a given controller and checks that resource creation functions as expected -- that all the model, controller, views and database actually work -- and tries to enforce as many best practices as possible.
 
 There are 9 different `crud_action_test` test suites that can be run individually. The class level `crud_test` runs all of them at once.
 
