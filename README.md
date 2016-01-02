@@ -2,11 +2,11 @@
 
 Stop testing and start test botting.
 
-A minitest library of capybara-webkit based feature tests that should pass in every Ruby on Rails application.
+A [minitest](https://github.com/seattlerb/minitest) library of [capybara](https://github.com/jnicklas/capybara) based feature tests that should pass in every Ruby on Rails application.
 
-Adds many additional minitest assertions and capybara quality of life helper functions.
+Adds many additional assertions and quality of life helper functions.
 
-Provides a curated set of minitest/capybara/rails testing gems and a well configured `test_helper.rb` minitest file.
+Provides a curated set of minitest, capybara, and rails testing gems and a well configured `test_helper.rb` file.
 
 Run `rake test:bot:environment` to validate your testing environment.  Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
 
@@ -85,9 +85,9 @@ You now have effective_test_bot configured and you're ready to go.
 
 # How to use this gem
 
-Effective TestBot provides 4 areas of support in writing minitest capybara tests. As a developer, use this gem to:
+Effective TestBot provides 4 areas of support in writing [minitest](https://github.com/seattlerb/minitest) [capybara](https://github.com/jnicklas/capybara) tests. As a developer, use this gem to:
 
-1.) Enjoy a whole bunch of individual minitest assertions and capybara quality of life helper functions.
+1.) Enjoy a whole bunch of individual assertions and quality of life helper functions.
 
 2.) Call one-liner methods to run test suites (10-50+ assertions) against a page, or use these methods to build larger tests.
 
@@ -97,7 +97,7 @@ Effective TestBot provides 4 areas of support in writing minitest capybara tests
 
 ## Minitest Assertions
 
-The following assertions are added for use in any minitest & capybara integration test:
+The following assertions are added for use in any integration test:
 
 - `assert_signed_in` visits the devise `new_user_session_path` and checks for the already signed in content.
 - `assert_signed_out` visits the devise `new_user_session_path` and checks for the sign in content.
@@ -122,7 +122,7 @@ As well,
 
 ## Capybara Extras
 
-The following quality of life helpers are added for use in any minitest & capybara integration test:
+The following quality of life helpers are added by this gem:
 
 ### fill_form
 
@@ -162,7 +162,7 @@ The `min` and `max` html properties are considered when filling in any numeric f
 
 If there are 2 or more numeric inputs that end with the same jquery selector, the fields will be filled so that their sum will match the html `max` value.
 
-You can scope the fill_form to a particular area of the page by using the regular capybara `within` `do..end` block
+You can scope the fill_form to a particular area of the page by using the regular `within` `do..end` block
 
 ### submit_form
 
@@ -187,19 +187,19 @@ end
 - `sign_in_manually(user, password)` visits the devise `new_user_session_path` and signs in via the form.
 - `sign_up` visits the devise `new_user_registration_path` and signs up as a new user.
 - `as_user(user) do .. end` yields a block between `sign_in`, and `logout`.
-- `synchronize!` should fix any timing issues waiting for capybara elements.
+- `synchronize!` should fix any timing issues waiting for page elements.
 - `was_redirect?` returns true/false if the last time we changed pages was a 304 redirect.
 - `was_download?` if clicking a link returned a file of any type rather than a page change.
 
 ## Capybara Super Extras
 
-Running integration tests with capybara-webkit is truly a black-box integration testing experience.  This provides a lot of benefits, but also some severe limitations.
+Running integration tests with [capybara-webkit](https://github.com/thoughtbot/capybara-webkit) is truly a black-box integration testing experience.  This provides a lot of benefits, but also some severe limitations.
 
-Capybara runs in a totally separate process.  It knows nothing about your application and it does not have access to any of the rails internal state. It only sees html, javascript, css and urls.
+The test web server runs in a totally separate process.  It knows nothing about your application and it does not have access to any of the rails internal state. It only sees html, javascript, css and urls.
 
-effective_test_bot extends this knowledge by adding a rails controller mixin and some http header hackery. In turn making available to capybara the internal rails state, which is just so handy.  This allows minitest to read back those values and take a peek inside the black box.
+effective_test_bot fills in this knowledge gap by serializing any interesting values within the http header.  This gives our tests a way to peek inside the black box.
 
-The following are refreshed on each page change, and are available to check anywhere in your tests:
+The following representations of the rails internal state are made available:
 
 - `assigns` a Hash representation of the current page's rails `view_assigns`. Serializes any `ActiveRecord` objects, as well as any `TrueClass`, `FalseClass`, `NilClass`, `String`, `Symbol`, and `Numeric` objects.  Does not serialize anything else, but sets a symbol `assigns[key] == :present_but_not_serialized`.
 - `exceptions` an Array with the exception message and a stacktrace.
