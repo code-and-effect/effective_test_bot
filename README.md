@@ -6,7 +6,7 @@ A [minitest](https://github.com/seattlerb/minitest) library of [capybara](https:
 
 Adds many additional assertions and quality of life helper functions.
 
-Provides a curated set of minitest, capybara, and rails testing gems and a well configured `test_helper.rb` file.
+Provides a curated set of minitest and capybara focused rails testing gems and a well configured `test_helper.rb` file.
 
 Run `rake test:bot:environment` to validate your testing environment.  Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
 
@@ -56,7 +56,7 @@ Install the configuration file:
 rails generate effective_test_bot:install
 ```
 
-The generator will run `minitest:install` if minitest is not already present and create an initializer file which describes all configuration options.
+The generator will run `minitest:install` if not already present and create an initializer file which describes all configuration options.
 
 Fixture or seed one user. At least one user -- ideally a fully priviledged admin type user -- must be available in the testing environment.
 
@@ -438,7 +438,7 @@ Each of the test suites checks a page or pages for some expected behaviour.  Som
 
 So, almost every individual assertion made by these test suites is skippable.
 
-When an assertion fails, the minitest output will look something like:
+When an assertion fails, the output will look something like:
 
 ```
 crud_test: (users#update_invalid)                               FAIL (3.74s)
@@ -558,7 +558,7 @@ To delete all tour and autosave on failure animated .gifs, run the following:
 rake test:bot:purge
 ```
 
-As well, to enable tour mode when running the standard minitest `rake test`:
+As well, to enable tour mode when running the standard `rake test`:
 
 ```
 # Runs all regular minitest tests with tour mode enabled
