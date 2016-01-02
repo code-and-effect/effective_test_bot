@@ -10,7 +10,7 @@ Provides a curated set of minitest/capybara/rails testing gems and a well config
 
 Run `rake test:bot:environment` to validate your testing environment.  Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
 
-Provides a DSL of class and instance level 1-liners that run entire test suites, checking many assertions all at once.
+Adds many class and instance level 1-liners to run entire test suites and check many assertions all at once.
 
 Autosaves an animated .gif for any failing test.
 
@@ -58,13 +58,13 @@ rails generate effective_test_bot:install
 
 The generator will run `minitest:install` if minitest is not already present and create an initializer file which describes all configuration options.
 
-Fixture or seed one user:
+Fixture or seed one user. At least one user -- ideally a fully priviledged admin type user -- must be available in the testing environment.
 
-effective_test_bot requires that at least one user -- ideally a fully priviledged admin type user -- be available in the testing environment.
+(there are future plans to make this better.  Right now `rake test:bot` just runs everything as one user.  There really isn't support for 'this user should not be able to' yet.)
 
-* There are future plans to make this better.  Right now `rake test:bot` just runs everything as one user.  There really isn't support for 'this user should not be able to'. yet.
+To create the initial user, please add it to either `test/fixtures/users.yml`, the `db/seeds.db` file or the effective_test_bot specific `test/fixtures/seeds.rb` file.
 
-As per the `test/test_helper.rb` default file, when minitest and/or effective_test_bot starts, following tasks are run:
+As per the included `test/test_helper.rb`, the following tasks run when minitest starts:
 
 ```ruby
 # Rails default task, load fixtures from test/fixtures/*.yml (including users.yml if it exists)
@@ -79,7 +79,8 @@ rake test:load_fixture_seeds
 
 Your initial user may be created by any of the above 3 tasks.
 
-Test that your testing environment is set up correctly:
+
+Finally, test that your testing environment is set up correctly:
 
 Run `rake test:bot:environment` and make sure all the tests pass.
 
