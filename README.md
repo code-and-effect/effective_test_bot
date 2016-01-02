@@ -16,7 +16,9 @@ Autosaves an animated .gif for any failing test.
 
 Run `rake test:bot` to automatically check every route in your application against an appropriate test suite, without writing any code.
 
-Automatically fills forms with appropriate pseudo-random input, and checks for all kinds of errors and omissions along the way.
+Intelligently fills forms with appropriate pseudo-random input.
+
+Checks for all kinds of errors and omissions.
 
 Turn on tour mode to programatically generate an animated .gif of every workflow in your website.
 
@@ -103,8 +105,8 @@ Effective TestBot provides 4 different layers of support to a developer writing 
 
 The following assertions are added for use in any minitest & capybara integration test:
 
-- `assert_signed_in` visits the devise `new_user_session_path` and checks for the `devise.failure.already_authenticated` content.
-- `assert_signed_out` visits the devise `new_user_session_path` and checks for absense of the `devise.failure.already_authenticated` content.
+- `assert_signed_in` visits the devise `new_user_session_path` and checks for the already signed in content.
+- `assert_signed_out` visits the devise `new_user_session_path` and checks for the sign in content.
 - `assert_page_title` makes sure there is an html `<title></title>` present.
 - `assert_submit_input` makes sure there is an `input[type='submit']` present.
 - `assert_page_status` checks for a given http status, default 200.
@@ -208,13 +210,13 @@ The following are refreshed on each page change, and are available to check anyw
 
 - `save_test_bot_screenshot` saves a screenshot of the current page to be added to the current test's animated gif (see screenshots and tour mode below).
 
-## Test Bot DSL Methods
+## Effective Test Suites
 
-Each of the following DSL methods run a test suite on a given page or controller action.
+Each of the following test suites run 10-50+ assertions on a given page or controller action.  The idea is to check for every possible error or omission accross all layers of the stack.
 
-These may be used as standalone one-liners, like [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and as helper methods to aid in writing custom tests quickly.
+These may be used as standalone one-liners, in the style of [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and as helper methods to quickly build advanced tests.
 
-Each method has a class-level/one-liner `x_test` and an instance level `x_action_test` version.
+Each test suite has a class-level one-liner `x_test` and and one or more instance level `x_action_test` versions.
 
 ### crud_test
 
@@ -239,7 +241,7 @@ Also,
 - `crud_action_test(:tour)` signs in as a given user and calls all the above `crud_action_test` methods from inside one test.  The animated .gif produced from this test suite records the entire process of creating, showing, editing and deleting a resource from start to finish.  It makes all the same assertions as running the test suites individually.
 
 
-A quick note on speed:  You can speed up these test suites by fixturing, seeding or first creating an instance of the resource being tested. Any tests that need to `find_or_create_resource` check for an existing resource first, otherwise visit `new_resource_path` and submit a form to create the resource.  Having a resource already created will speed up these test suites.
+A quick note on speed:  You can speed up these test suites by fixturing, seeding or first creating an instance of the resource being tested. Any tests that need to `find_or_create_resource` check for an existing resource first, otherwise visit `new_resource_path` and submit a form to create the resource.  Having a resource already created will speed things up.
 
 There are a few variations on the one-liner method:
 
@@ -269,16 +271,16 @@ Or each individually in part of a regular test:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  test 'user is only allowed one edit' do
+  test 'user may only update a post once' do
     crud_action_test(:create_valid, Post, User.first)
-    assert_content 'successfully created post.  You can only edit it once.'
+    assert_content 'successfully created post.  You may only update it once.'
 
     crud_action_test(:update_valid, Post.last, User.first)
     assert_content 'successfully updated post.'
 
     crud_action_test(:update_valid, Post.last, User.first, skip: [:no_assigns_errors, :updated_at])
-    assert_assigns_errors(:post, 'you can no longer update this post.')
-    assert_content 'you can no longer update this post.'
+    assert_assigns_errors(:post, 'you may no longer update this post.')
+    assert_content 'you may no longer update this post.'
   end
 end
 ```
@@ -345,7 +347,7 @@ end
 
 This test is intended for non-CRUD actions that operate on a specific instance of a resource.
 
-The action must be a `GET` with a required `id` value.  `member_test`-able actions will look like the following in `rake routes`:
+The action must be a `GET` with a required `id` value.  `member_test`-able actions appear as follows from `rake routes`:
 
 ```ruby
 unarchive_post  GET  /posts/:id/unarchive(.:format)  posts#unarchive
