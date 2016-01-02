@@ -87,15 +87,15 @@ You now have effective_test_bot configured and you're ready to go.
 
 # How to use this gem
 
-Effective TestBot provides 4 different layers of support to a developer writing minitest capybara feature tests:
+Effective TestBot provides 4 areas of support in writing minitest capybara tests. As a developer, use this gem to:
 
-1.) enjoy a whole bunch of individual minitest assertions and capybara quality of life helper functions.
+1.) Enjoy a whole bunch of individual minitest assertions and capybara quality of life helper functions.
 
-2.) call one-liner methods to run test suites (10-50+ assertions) against a page, or use these methods to build larger tests.
+2.) Call one-liner methods to run test suites (10-50+ assertions) against a page, or use these methods to build larger tests.
 
-3.) produce animated .gifs of test runs. Enable auto-save on failure to help debug a tricky test, or run in tour mode and record walkthroughs of features.
+3.) Produce animated .gifs of test runs. Enable autosave_animated_gif_on_failure to help debug a tricky test, or run in tour mode and record walkthroughs of features.
 
-4.) apply full stack automated testing - run `rake test:bot` to scan every route in your application and check it with an appropriate test suite.
+4.) Apply full stack automated testing. Just run `rake test:bot` to scan every route in your application and check that page with an appropriate test suite.
 
 ## Minitest Assertions
 
@@ -168,7 +168,7 @@ You can scope the fill_form to a particular area of the page by using the regula
 
 ### submit_form
 
-Clicks the first `input[type='submit']` field (or with the given label) and submits a form.
+Clicks the first `input[type='submit']` field (or first submit field with the given label) and submits the form.
 
 Automatically checks for `assert_no_html5_form_validation_errors`, `assert_jquery_ujs_disable_with` and `assert_no_unpermitted_params`
 
@@ -476,13 +476,13 @@ Please see the installed `effective_test_bot.rb` initializer file for a full des
 
 ## Testing the test environment
 
-Unfortunately, in the current day ruby on rails ecosystem simply getting a testing environment setup correctly is a non-trivial endeavor.
+Unfortunately, in the current day ruby on rails ecosystem getting a testing environment setup correctly is a non-trivial endeavor.
 
 There are a handful of gotchas and many things that can go wrong.  User sessions need to properly reset and database transactions must be correctly rolled back between tests.  Seeds and fixtures that were once valid may become invalid as the application changes.  Database migrations must also stay up to date.  Capybara needs to query your app with a single shared connection or weird things start happening.
 
 Included with this gem is the `rails generate effective_test_bot:install` that does its best to provide a known-good set of configuration files that initialize all required testing gems.  However, every developer's machine is different, and there are too many points of failure.  Everyone's `test/test_helper.rb` will be slightly different.
 
-Run `rake test:bot:environment` to check for capybara doing the right thing, that everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, that jquery, jquery-ujs are present.
+Run `rake test:bot:environment` to check that capybara is doing the right thing, everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, and rails' jquery-ujs is present.
 
 If all tests here pass, you will have a great experience with automated testing.
 
@@ -496,7 +496,7 @@ You can configure test bot to skip individual tests or assertions, tweak screens
 
 These are some quick ways to customize test bot's behaviour:
 
-```ruby
+```
 # Scan every route in the application as per config/initializers/effective_test_bot.rb
 rake test:bot
 
@@ -529,7 +529,7 @@ This feature is slow, increasing the runtime of each test by almost 30%, but it'
 
 You can run test bot in tour mode by setting `config.tour_mode = true` in the `config/initializers/effective_test_bot.rb` file or by running any variation of the following rake tasks:
 
-```ruby
+```
 # Run test:bot in tour mode, saving an animated .gif for all successful tests
 rake test:bot:tour
 rake test:bot TOUR=true
@@ -548,7 +548,7 @@ rake test:bot:tour TEST=posts#index
 
 To print out the file location of all tour files, run the following:
 
-```ruby
+```
 # Prints out all animated .gif file locations
 rake test:bot:tours
 
@@ -558,14 +558,14 @@ rake test:bot:tours TEST=posts
 
 To delete all tour and autosave on failure animated .gifs, run the following:
 
-```ruby
+```
 # Deletes all tour and failure animated .gifs
 rake test:bot:purge
 ```
 
 As well, to enable tour mode when running the standard minitest `rake test`:
 
-```ruby
+```
 # Runs all regular minitest tests with tour mode enabled
 rake test:tour
 rake test:tourv
