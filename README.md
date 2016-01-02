@@ -18,7 +18,7 @@ Run `rake test:bot` to automatically check every route in your application again
 
 Turn on tour mode to programatically generate an animated .gif of every workflow in your website.
 
-Makes sure everything actually works.
+Make sure everything actually works.
 
 ## Getting Started
 
@@ -66,7 +66,7 @@ To create the initial user, please add it to either `test/fixtures/users.yml`, t
 
 As per the included `test/test_helper.rb`, the following tasks run when minitest starts:
 
-```ruby
+```
 # Rails default task, load fixtures from test/fixtures/*.yml (including users.yml if it exists)
 rake db:fixtures:load
 
@@ -78,8 +78,6 @@ rake test:load_fixture_seeds
 ```
 
 Your initial user may be created by any of the above 3 tasks.
-
-
 
 Finally, to test that your testing environment is set up correctly run `rake test:bot:environment` and have all tests pass.
 
@@ -95,7 +93,7 @@ Effective TestBot provides 4 areas of support in writing minitest capybara tests
 
 3.) Produce animated .gifs of test runs. Enable autosave_animated_gif_on_failure to help debug a tricky test, or run in tour mode and record walkthroughs of features.
 
-4.) Apply full stack automated testing. Just run `rake test:bot` to scan every route in your application and check that page with an appropriate test suite.
+4.) Apply full stack automated testing. Just run `rake test:bot` to scan every route in your application and without writing any code check every controller action with an appropriate test suite.
 
 ## Minitest Assertions
 
@@ -175,8 +173,7 @@ Automatically checks for `assert_no_html5_form_validation_errors`, `assert_jquer
 ```ruby
 class PostTest < ActionDispatch::IntegrationTest
   test 'creating a new post' do
-    visit new_post_path
-    fill_form
+    visit(new_post_path) and fill_form
     submit_form    # or submit_form('Save and Continue')
   end
 end
@@ -204,12 +201,10 @@ effective_test_bot extends this knowledge by adding a rails controller mixin and
 
 The following are refreshed on each page change, and are available to check anywhere in your tests:
 
-- `flash` a Hash representation of the current page's flash.
 - `assigns` a Hash representation of the current page's rails `view_assigns`. Serializes any `ActiveRecord` objects, as well as any `TrueClass`, `FalseClass`, `NilClass`, `String`, `Symbol`, and `Numeric` objects.  Does not serialize anything else, but sets a symbol `assigns[key] == :present_but_not_serialized`.
 - `exceptions` an Array with the exception message and a stacktrace.
+- `flash` a Hash representation of the current page's flash.
 - `unpermitted_params` an Array of any unpermitted parameters that were encountered by the last request.
-
-- `save_test_bot_screenshot` saves a screenshot of the current page to be added to the current test's animated gif (see screenshots and tour mode below).
 
 ## Effective Test Suites
 
@@ -437,7 +432,7 @@ class PostsTest < ActionDispatch::IntegrationTest
 end
 ```
 
-## Skipping assertion in test suites
+## Skipping individual assertions or test suites
 
 Each of the test suites checks a page or pages for some expected behaviour.  Sometimes a developer has a good reason for deviating from what is expected and it's frustrating when just one assertion in a test suite fails.
 
@@ -445,7 +440,7 @@ So, almost every individual assertion made by these test suites is skippable.
 
 When an assertion fails, the minitest output will look something like:
 
-```console
+```
 crud_test: (users#update_invalid)                               FAIL (3.74s)
 
 Minitest::Assertion: (current_path) Expected current_path to match resource #update path.
@@ -476,15 +471,15 @@ Please see the installed `effective_test_bot.rb` initializer file for a full des
 
 ## Testing the test environment
 
-Unfortunately, in the current day ruby on rails ecosystem getting a testing environment setup correctly is a non-trivial endeavor.
+Unfortunately, with the current day ruby on rails ecosystem, simply getting a testing environment setup correctly is a non-trivial endeavor filled with gotchas and many things that can go wrong.
 
-There are a handful of gotchas and many things that can go wrong.  User sessions need to properly reset and database transactions must be correctly rolled back between tests.  Seeds and fixtures that were once valid may become invalid as the application changes.  Database migrations must also stay up to date.  Capybara needs to query your app with a single shared connection or weird things start happening.
+User sessions need to properly reset and database transactions must be correctly rolled back between tests.  Seeds and fixtures that were once valid may become invalid as the application changes.  Database migrations must stay up to date.  Capybara needs to query your app with a single shared connection or weird things start happening.
 
-Included with this gem is the `rails generate effective_test_bot:install` that does its best to provide a known-good set of configuration files that initialize all required testing gems.  However, every developer's machine is different, and there are too many points of failure.  Everyone's `test/test_helper.rb` will be slightly different.
+Included with this gem is the `rails generate effective_test_bot:install` that does its best to provide a known-good set of configuration files that initialize all required testing gems.  However, every developer's machine is different, and there are just too many points of failure.  Everyone's `test/test_helper.rb` will be slightly different.
 
-Run `rake test:bot:environment` to check that capybara is doing the right thing, everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, and rails' jquery-ujs is present.
+Run `rake test:bot:environment` to check that capybara is doing the right thing, everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, devise works and rails' jquery-ujs is present.
 
-If all tests here pass, you will have a great experience with automated testing.
+If all environment tests pass, you will have a great experience with automated testing.
 
 ## Automated full stack testing
 
@@ -507,15 +502,15 @@ rake test:bot TEST=posts
 rake test:bot TEST=posts#index
 ```
 
-## Screenshots and Animated Gifs
+## Animated gifs and screenshots
 
-Call `save_test_bot_screenshot` from within your test to take a screenshot of the current page.  If an animated .gif is produced at the end of the test -- either from autosave_animated_gif_on_failure or tour mode -- this screenshot will be used as one of the frames in the animation.
+Call `save_test_bot_screenshot` from within any test to take a screenshot of the current page.  If an animated .gif is produced at the end of the test -- either from autosave_animated_gif_on_failure or tour mode -- this screenshot will be used as one of the frames in the animation.
 
 This method is already called by `fill_form` and `submit_form`.
 
-To disable taking screenshots entirely, change `config.screenshots = false` in the `config/initializers/effective_test_bot.rb` initializer file.
+To disable taking screenshots entirely set `config.screenshots = false` in the `config/initializers/effective_test_bot.rb` initializer file.
 
-### Autosave animated .gif on failure
+### Autosave on failure
 
 The `test/test_helper.rb` file that is installed by `effective_test_bot` enables [capybara-screenshot](https://github.com/mattheworiordan/capybara-screenshot)'s `autosave_on_failure` functionality.  So whenever a test fails, the current html will be written and a .png screenshot will be saved.  This is invaluable for troubleshooting why a test has failed.
 
