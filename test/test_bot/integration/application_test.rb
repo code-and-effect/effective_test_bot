@@ -1,5 +1,8 @@
 require 'test_helper'
 
+# This gets run when we type `rake test:bot`
+# Scan through every route and run a test suite against it
+
 module TestBot
   class ApplicationTest < ActionDispatch::IntegrationTest
     CRUD_ACTIONS = %w(index create new edit show update destroy) # Same order as resources :object creates them in

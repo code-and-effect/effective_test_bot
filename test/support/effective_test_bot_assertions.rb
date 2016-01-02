@@ -110,7 +110,7 @@ module EffectiveTestBotAssertions
 
   # assert_assigns
   # assert_assigns :current_user
-  # assert_assigns :current_user, true
+  # assert_assigns :current_user, 'there should a current user'
   def assert_assigns(key = nil, value = nil, message = nil)
     if key.present? && value.present?
       assert_equal value, assigns[key.to_s], message || "(assigns) Expected assigns[#{key}] to equal #{value}. Instead, it was: #{value}"

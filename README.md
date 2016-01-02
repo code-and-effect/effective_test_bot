@@ -91,32 +91,34 @@ You now have effective_test_bot configured and you're ready to go.
 
 # How to use this gem
 
-Effective TestBot is a 3-layered cake of testing deliciousness.
+Effective TestBot provides 4 different layers of support to a developer writing minitest capybara feature tests:
 
-The bottom layer consists of advanced individual minitest assertions and capybara quality of life helper functions.
+1.) a whole bunch of individual minitest assertions and capybara quality of life helper functions.
 
-The middle layer is a meta testing DSL -- 1-liners for you to use in your regular minitest tests that run entire test suites (10-50+ assertions) against a page or controller.
+2.) one-liner test suites -- run entire test suites (10-50+ assertions) against a page, or use these methods to aid in writing larger feature tests.
 
-The final layer builds on the bottom two, run `rake test:bot` to scan every route in your application and choose an appropriate test suite to run.
+3.) record animated .gifs of test runs - enable auto-save on failure or run in tour mode to generate feature walkthroughs.
+
+4.) full application automated testing - run `rake test:bot` to scan every route in your application and choose an appropriate test suite to run.
 
 ## Minitest Assertions
 
 The following assertions are added for use in any minitest & capybara integration test:
 
-- `assert_signed_in` visits the devise `new_user_session_path` and checks for the `devise.failure.already_authenticated` content
-- `assert_signed_out` visits the devise `new_user_session_path` and checks for absense of the `devise.failure.already_authenticated` content
-- `assert_page_title` makes sure there is an html <title></title> present
-- `assert_submit_input` makes sure there is an input[type='submit'] present
+- `assert_signed_in` visits the devise `new_user_session_path` and checks for the `devise.failure.already_authenticated` content.
+- `assert_signed_out` visits the devise `new_user_session_path` and checks for absense of the `devise.failure.already_authenticated` content.
+- `assert_page_title` makes sure there is an html <title></title> present.
+- `assert_submit_input` makes sure there is an input[type='submit'] present.
 - `assert_page_status` checks for a given http status, default 200.
-- `assert_current_path(path)` asserts the current page path
-- `assert_redirect(from_path)` optionally with to_path, makes sure the current page path is not from_path
-- `assert_no_js_errors` - checks for any javascript errors on the page
+- `assert_current_path(path)` asserts the current page path.
+- `assert_redirect(from_path)` optionally with to_path, makes sure the current page path is not from_path.
+- `assert_no_js_errors` - checks for any javascript errors on the page.
 - `assert_no_unpermitted_params` makes sure the last submitted form did not include any unpermitted params and prints out any unpermitted params that do exist.
-- `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was
-- `assert_no_html_form_validation_errors` checks for frontend html5 errors
-- `assert_jquery_ujs_disable_with` makes sure all input[type=submit] elements on the page have the data-disable-with property set
-- `assert_flash` optionally with the desired :success, :error key and/or message, makes sure the flash is set
-- `assert_assigns` asserts a given rails view_assigns object is present
+- `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was.
+- `assert_no_html_form_validation_errors` checks for frontend html5 errors.
+- `assert_jquery_ujs_disable_with` makes sure all input[type=submit] elements on the page have the data-disable-with property set.
+- `assert_flash` optionally with the desired :success, :error key and/or message, makes sure the flash is set.
+- `assert_assigns` asserts a given rails view_assigns object is present.
 - `assert_no_assigns_errors` use after a form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
 - `assert_assigns_errors` use after an intentionally invalid form submit to make sure your assigned rails object has errors, or a specific error.
 
@@ -180,10 +182,10 @@ As well as just click on the `input[type='submit']` button (or optional label), 
 - `submit_novalidate_form` will use javascript to disable all required fields, and submit a form without client side validation.
 - `clear_form` clears all form fields, probably used before `submit_novalidate_form` to test invalid form submissions.
 - `sign_in(user)` optionally with user, signs in via `Warden::Test::Helpers` hacky login skipping method.
-- `sign_in_manually(user, password)` visits the devise `new_user_session_path` and signs in via the form
+- `sign_in_manually(user, password)` visits the devise `new_user_session_path` and signs in via the form.
 - `sign_up` visits the devise `new_user_registration_path` and signs up as a new user.
-- `as_user(user) do .. end` yields a block between `sign_in`, and `logout`
-- `synchronize!` should fix any timing issues waiting for capybara elements
+- `as_user(user) do .. end` yields a block between `sign_in`, and `logout`.
+- `synchronize!` should fix any timing issues waiting for capybara elements.
 - `was_redirect?` returns true/false if the last time we changed pages was a 304 redirect.
 - `was_download?` if clicking a link returned a file of any type rather than a page change.
 
@@ -191,7 +193,7 @@ As well as just click on the `input[type='submit']` button (or optional label), 
 
 So the problem with running integration tests with capybara-webkit is that it's a real full black-box integration test.
 
-Capybara runs in a totally separate process.  It knows nothing about your rails app.  You can't get access to any of the rails internal state. All you can test is html, javascript and urls. That really sucks.
+Capybara runs in a totally separate process.  It knows nothing about your application.  You can't get access to any of the rails internal state. All you can test is html, javascript and urls. That really sucks.
 
 effective_test_bot mixes in a rails controller include and does a bit of http header hackery to make available to capybara the internal rails state values that are just so handy.
 
@@ -214,11 +216,102 @@ Each method has a class-level/one-liner `x_test` and an instance level `x_action
 
 ### crud_test
 
-TODO
+This test runs through the [CRUD](http://edgeguides.rubyonrails.org/getting_started.html) workflow of a given controller and checks that resource creation functions as expected -- that all the model, controller, views and database actually work -- and tries to enforce as many best practices as possible.
+
+There are 9 different `crud_action_test` test suites that can be run individually. The class level `crud_test` runs all of them at once.
+
+The following `crud_action_test`s are available:
+
+- `:index` - signs in as the given user, finds or creates a resource, visits `resources_path` and checks that a collection of resources has been assigned.
+- `:new` - signs in as the given user, visits `new_resource_path`, and checks for a properly named form appropriate to the resource.
+- `:create_invalid` - signs in as the given user, visits `new_resource_path` and submits an empty form. Checks that all errors are properly assigned and makes sure a new resource was not created.
+- `:create_valid` - signs in as the given user, visits `new_resource_path`, and submits a valid form.  Checks for any errors and makes sure a new resource was created.
+- `:show` - signs in as the given user, finds or creates a resource, visits `resource_path` and checks that the resource is shown.
+- `:edit` - signs in as the given user, finds or creates a resource, visits `edit_resource_path` and checks that an appropriate form exists for this resource.
+- `:update_invalid` - signs in as the given user, finds or creates a resource, visits `edit_resource_path` and submits an empty form.  Checks that the existing resource wasn't updated and that all errors are properly assigned and displayed.
+- `:update_valid` - signs in as the given user, finds or creates a resource, visits `edit_resource_path` and submits a valid form. Checks for any errors and makes sure the existing resource was updated.
+- `:destroy` - signs in as the given user, finds or creates a resource, visits `resources_path`.  It then finds or creates a link to destroy the resource and clicks the link.  Checks for any errors and makes sure the resource was deleted.  If the resource `respond_to?(:archived)` it will check for archive behavior instead of delete.
+
+Also,
+
+- `:tour` - signs in as a given user and runs all of the above `crud_action_test`s inside one test.  The animated .gif produced from this test suite records the entire process of creating, showing, editing and deleting a resource from start to finish.  It also makes all the same assertions as running the test suites individually.
+
+
+A quick note on speed:  You can speed up these test suites by fixturing, seeding or first creating an instance of the resource being tested. Any tests that need to `find_or_create_resource` check for an existing resource first, otherwise visit `new_resource_path` and submit a form to create the resource.  Having a resource already created will speed up these test suites.
+
+There are a few variations on the one-liner method:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  # Runs all 9 crud_action tests against /posts
+  crud_test(Post, User.first)
+
+  # Runs all 9 crud_action tests against /posts and use this Post's attributes when calling fill_form.
+  crud_test(Post.new(title: 'my first post'), User.first)
+
+  # Runs all 9 crud_action tests against /admin/posts controller as a previously seeded or fixtured admin user
+  crud_test('admin/posts', User.where(admin: true).first)
+
+  # Run only some tests
+  crud_test(Post, User.first, only: [:new, :create_valid, :create_invalid, :show, :index])
+
+  # Run all except some tests
+  crud_test(Post, User.first, except: [:edit, :update_valid, :update_invalid])
+
+  # Skip individual assertions
+  crud_test(Post, User.first, skip: {create_valid: :path, update_invalid: [:path, :flash]})
+end
+```
+
+Or each individually in part of a regular test:
+
+```ruby
+class PostsTest < ActionDispatch::IntegrationTest
+  test 'user is locked out after failing to update twice' do
+    crud_action_test(:create_valid, Post, User.first)
+    assert_content 'successfully created post.  You can only edit it once.'
+
+    crud_action_test(:update_valid, Post.last, User.first)
+    assert_content 'successfully updated post.'
+
+    crud_action_test(:update_valid, Post.last, User.first, skip: [:no_assigns_errors, :updated_at])
+    assert_assigns_errors(:post, 'you can no longer update this post')
+    assert_content 'you can no longer update this post.'
+  end
+end
+```
+
+If your resource controller passes a `crud_test` you can be certain that your application's end user will be able to do the same.
 
 ### devise_test
 
-TODO
+This test runs through the the [devise](https://github.com/plataformatec/devise) sign up, sign in, and sign in invalid workflows.
+
+- `devise_action_test(:sign_up)` visits the devise `new_user_registration_path`, and `submit_form` and validates the `current_user`.
+- `devise_action_test(:sign_in)` creates a new user and makes sure the sign in process works.
+- `devise_action_test(:sign_in_invalid)` makes sure an invalid password is correctly denied.
+
+Use as a one-liner method:
+
+```ruby
+class MyApplicationTest < ActionDispatch::IntegrationTest
+  devise_test  # Runs all tests (sign_up, sign_in_valid, and sign_in_invalid)
+end
+```
+
+Or each individually in part of a regular test:
+
+```ruby
+class MyApplicationTest < ActionDispatch::IntegrationTest
+
+  test 'user receives 10 tokens after signing up' do
+    devise_action_test(:sign_up)
+    assert_content 'Tokens: 10'
+    assert_equals 10, User.last.tokens
+    assert_equals 10, assigns(:current_user).tokens
+  end
+end
+```
 
 ### page_test
 
@@ -308,7 +401,7 @@ end
 
 ### wizard_test
 
-This test signs in as the given user, visits the given initial page and continually runs `fill_form`, `submit_form` and `assert_page_normal` up until the given final page, or until no more `input[type=submit]`s exist.
+This test signs in as the given user, visits the given initial page and continually runs `fill_form`, `submit_form` and `assert_page_normal` up until the given final page, or until no more `input[type=submit]` are present.
 
 It tests any number of steps in a wizard, multi-step form, or inter-connected series of pages.
 
