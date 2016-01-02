@@ -14,11 +14,7 @@ Provides a DSL of class and instance level 1-liners that run entire test suites,
 
 Autosaves an animated .gif for any failing test.
 
-Run `rake test:bot` to automatically check every route in your application against an appropriate test suite, without writing any code.
-
-Intelligently fills forms with appropriate pseudo-random input.
-
-Checks for all kinds of errors and omissions.
+Run `rake test:bot` to automatically check every route in your application against an appropriate test suite, without writing any code.  Clicks through every page, intelligently fills forms with appropriate pseudo-random input and checks for all kinds of errors and omissions.
 
 Turn on tour mode to programatically generate an animated .gif of every workflow in your website.
 
