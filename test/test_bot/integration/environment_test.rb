@@ -60,7 +60,7 @@ module TestBot
 
     test '09: capybara can sign up a user' do
       user = sign_up()
-      assert user.kind_of?(User), "expected to create a new user after submitting sign up form at #{new_user_registration_path}"
+      assert user.kind_of?(User), "Expected to create a new user after submitting sign up form at #{new_user_registration_path}"
 
       assert_equal (original_users_count + 1), User.count
       assert_signed_in
@@ -72,8 +72,7 @@ module TestBot
     end
 
     test '11: capybara can login_as via warden test helper' do
-      create_user!
-      sign_in(email)
+      sign_in(User.first || create_user!)
       assert_signed_in
     end
 
@@ -83,8 +82,8 @@ module TestBot
     end
 
     test '13: capybara can sign in manually' do
-      create_user!
-      sign_in_manually(email, password)
+      user = create_user!
+      sign_in_manually(user, password)
       assert_signed_in
     end
 
@@ -109,6 +108,8 @@ module TestBot
       user.login = username if user.respond_to?('login=')
 
       user.valid? ? user.save : user.save(validate: false)
+
+      user
     end
 
   end

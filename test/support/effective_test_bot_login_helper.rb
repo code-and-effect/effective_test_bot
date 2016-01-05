@@ -17,9 +17,11 @@ module EffectiveTestBotLoginHelper
     visit new_user_session_path
 
     email = (user_or_email.respond_to?(:email) ? user_or_email.email : user_or_email)
+    username = (user_or_email.respond_to?(:username) ? user_or_email.username : user_or_email)
+    login = (user_or_email.respond_to?(:login) ? user_or_email.login : user_or_email)
 
     within('form#new_user') do
-      fill_form(email: email, password: password)
+      fill_form(email: email, password: password, username: username, login: login)
       submit_novalidate_form
     end
   end
