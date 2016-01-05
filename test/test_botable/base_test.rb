@@ -44,9 +44,9 @@ module BaseTest
 
       visit(new_resource_path)
 
-      assert_form "form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}"
+      assert_form("form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
 
-      within("form#new_#{resource_name}") do
+      within_if("form#new_#{resource_name}", !test_bot_skip?(:form)) do
         fill_form(resource_attributes)
 
         assert_submit_input "TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}"
