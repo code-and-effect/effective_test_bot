@@ -65,8 +65,18 @@ module EffectiveTestBotFormHelper
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
     end
 
-    label.present? ? find(:link_or_button, label).click : first(:css, "input[type='submit']").click
+    if label.present?
+      submit = find(:link_or_button, label)
+      assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
+      submit.click
+    else
+      submit = first(:css, "input[type='submit']")
+      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] on #{page.current_path}"
+      submit.click
+    end
+
     synchronize!
+    true
   end
 
   def with_raised_unpermitted_params_exceptions(&block)

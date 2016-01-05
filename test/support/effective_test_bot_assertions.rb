@@ -42,8 +42,12 @@ module EffectiveTestBotAssertions
     end
   end
 
-  def assert_submit_input(message = "(submit_input) Expected one or more input[type='submit'] to be present")
-    assert_selector 'input[type=submit]', message
+  def assert_form(selector, message = "(form) Expected visible form with selector :selector: to be present")
+    assert all(selector).present?, message.sub(':selector', selector)
+  end
+
+  def assert_submit_input(message = "(submit_input) Expected one or more visible input[type='submit'] to be present")
+    assert all('input[type=submit]').present?, message
   end
 
   def assert_page_status(status = 200, message = '(page_status) Expected :status: HTTP status code')

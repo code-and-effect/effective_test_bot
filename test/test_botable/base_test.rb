@@ -31,21 +31,33 @@ module BaseTest
     EffectiveTestBot.skip?((current_test if defined?(current_test)), assertion)
   end
 
+  # There are numerous points of failure here, so we want to be very helpful with the error messages
   def find_or_create_resource!
-    existing = resource_class.last
-    (existing.present? && !existing.kind_of?(User)) ? existing : create_resource!
-  end
+    obj = resource_class.last
+    return obj if obj.present? && !obj.kind_of?(User)
 
-  def create_resource!
+    hint = "Unable to find_or_create_resource!\nEither fixture/seed an instance of #{resource_class} or ensure that submitting form#new_#{resource_name} on #{(new_resource_path rescue nil) || 'the resource new page'} creates a new #{resource_name}"
+
+    # It doesn't exist, so lets go to the new page and submit a form to build one
     without_screenshots do
+      assert((new_resource_path rescue nil), "TestBotError: Generated polymorphic route new_#{[*controller_namespace, resource_name].compact.join('_')}_path is undefined. #{hint}")
+
       visit(new_resource_path)
 
+      assert_form "form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}"
+
       within("form#new_#{resource_name}") do
-        fill_form(resource_attributes) and submit_novalidate_form
+        fill_form(resource_attributes)
+
+        assert_submit_input "TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}"
+        submit_novalidate_form
       end
     end
 
-    resource_class.last
+    obj = resource_class.last
+    assert obj.present?, "TestBotError: Failed to create a resource after submitting form. #{hint}"
+
+    obj
   end
 
   # Try to find a link_to_delete already on this page
@@ -76,7 +88,7 @@ module BaseTest
   end
 
   def new_resource_path # new
-    new_polymorphic_path([*controller_namespace, resource])
+    path = new_polymorphic_path([*controller_namespace, resource])
   end
 
   def edit_resource_path(resource) # edit
