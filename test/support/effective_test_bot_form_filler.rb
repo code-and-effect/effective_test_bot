@@ -65,6 +65,7 @@ module EffectiveTestBotFormFiller
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
         field.set(value_for_field(field, fills))
+        close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
       when 'select'
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
           page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
@@ -165,6 +166,8 @@ module EffectiveTestBotFormFiller
         LETTERS.sample + DIGITS.sample + LETTERS.sample + ' ' + DIGITS.sample + LETTERS.sample + DIGITS.sample
       elsif attribute.include?('zip') && attribute.include?('code') # Make a US zip code
         DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample
+      elsif attribute.include?('slug')
+        Faker::Lorem.words(3).join(' ').parameterize
       else
         Faker::Lorem.words(3).join(' ').capitalize
       end
@@ -317,6 +320,10 @@ module EffectiveTestBotFormFiller
     rescue Timeout::Error
       puts "file upload timed out after #{files.length * 5}s"
     end
+  end
+
+  def close_effective_date_time_picker(field)
+    page.execute_script("try { $('input##{field['id']}').data('DateTimePicker').hide(); } catch(e) {};")
   end
 
   private

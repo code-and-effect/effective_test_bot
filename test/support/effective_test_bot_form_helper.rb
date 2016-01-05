@@ -47,6 +47,7 @@ module EffectiveTestBotFormHelper
 
       begin
         field.set('');
+        close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
         save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme?
       rescue => e; end
     end
