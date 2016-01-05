@@ -1,14 +1,16 @@
 module EffectiveTestBotAssertions
   def assert_signed_in(message = nil)
     visit new_user_session_path
-    assert_content I18n.t('devise.failure.already_authenticated') #, message || '(signed_in) Expected devise already_authenticated content to be present'
-    assert page.has_no_selector?('form#new_user'), message || '(signed_in) Expected new_user form to be blank'
+
+    assert all('form#new_user').blank?, message || 'Expected new_user form to be blank when signed in'
+    assert assigns['current_user'].present?, 'Expected @current_user to be present when signed in'
   end
 
   def assert_signed_out(message = nil)
     visit new_user_session_path
-    refute_content I18n.t('devise.failure.already_authenticated') #, message || '(signed_out) Expected devise already_authenticated content to be blank'
-    assert page.has_selector?('form#new_user'), message || '(signed_out) Expected new_user form to be present'
+
+    assert all('form#new_user').present?, message || 'Expected new_user form to be present when signed out'
+    assert assigns['current_user'].blank?, 'Expected @current_user to be blank when signed out'
   end
 
   def assert_capybara_can_execute_javascript(message = "Expected capybara-webkit page.evaluate_script() to be successful")
