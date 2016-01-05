@@ -57,7 +57,7 @@ module TestBot
             member_test(controller, action, User.first)
 
           # Page Test
-          elsif route.verb.to_s.include?('GET') && route.name.present?
+          elsif route.verb.to_s.include?('GET') && route.name.present? && Array(route.path.required_names).blank? # This could eventually be removed to supported nested routes
             page_test("#{route.name}_path".to_sym, User.first, route: route, label: "#{route.name}_path")
 
           else
