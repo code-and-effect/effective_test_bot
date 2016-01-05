@@ -181,15 +181,17 @@ end
 
 ### other helpers
 
-- `submit_novalidate_form` submits the form without client side validation, ignoring any required field requirements.
+- `as_user(user) do .. end` yields a block between `sign_in`, and `logout`.
 - `clear_form` clears all form fields, probably used before `submit_novalidate_form` to test invalid form submissions.
+- `click_first(label)` clicks the first link matching the given label
+- `submit_novalidate_form` submits the form without client side validation, ignoring any required field requirements.
 - `sign_in(user)` optionally with user, signs in via `Warden::Test::Helpers` hacky login skipping method.
 - `sign_in_manually(user, password)` visits the devise `new_user_session_path` and signs in via the form.
 - `sign_up` visits the devise `new_user_registration_path` and signs up as a new user.
-- `as_user(user) do .. end` yields a block between `sign_in`, and `logout`.
 - `synchronize!` should fix any timing issues waiting for page elements.
 - `was_redirect?` returns true/false if the last time we changed pages was a 304 redirect.
 - `was_download?` if clicking a link returned a file of any type rather than a page change.
+- `within_if(selector, boolean) do .. end` runs the block inside capybara's `within do .. end` if boolean is true, otherwise runs the same block skipping the `within`.
 
 ## Capybara Super Extras
 
