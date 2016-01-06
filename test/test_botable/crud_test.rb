@@ -143,7 +143,7 @@ module CrudTest
 
     save_test_bot_screenshot
 
-    resource = resource_class.find(resource.id)
+    resource = resource_class.where(id: resource.id).first
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
@@ -178,7 +178,7 @@ module CrudTest
 
     save_test_bot_screenshot
 
-    resource = resource_class.find(resource.id)
+    resource = resource_class.where(id: resource.id).first
 
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
@@ -226,7 +226,7 @@ module CrudTest
       assert((@visit_delete_page.find(:xpath, '//title', visible: false) rescue nil).present?, '(page_title) Expected page title to be present') unless test_bot_skip?(:page_title)
     end
 
-    after = { count: resource_class.count, archived: (resource_class.find(resource.id).archived rescue nil) }
+    after = { count: resource_class.count, archived: (resource_class.where(id: resource.id).first.try(:archived) rescue nil) }
 
     if resource.respond_to?(:archived)
       assert_equal(true, after[:archived], "Expected #{resource_class}.archived? to be true")
