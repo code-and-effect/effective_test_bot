@@ -35,6 +35,8 @@ module TestBotable
     def devise_action_test(test, options = {})
       options[:email] ||= "unique-#{Time.zone.now.to_i}@example.com"
       options[:password] ||= '!Password123'
+      options[:username] ||= 'unique-username'
+      options[:login] ||= 'unique-login'
       options[:user] ||= User.new
 
       begin
