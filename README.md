@@ -99,22 +99,24 @@ Effective TestBot provides 4 areas of support in writing [minitest](https://gith
 
 The following assertions are added for use in any integration test:
 
-- `assert_signed_in` checks that the assigned `@current_user` is present.
-- `assert_signed_out` checks that the assigned `@current_user` is blank.
-- `assert_page_title` makes sure there is an html `<title></title>` present.
-- `assert_submit_input` makes sure there is an `input[type='submit']` present.
-- `assert_page_status` checks for a given http status, default 200.
+- `assert_assigns` asserts a given rails view_assigns object is present.
+- `assert_assigns_errors` use after an intentionally invalid form submit to make sure your assigned rails object has errors, or a specific error.
+- `assert_no_assigns_errors` should be used after any form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
 - `assert_current_path(path)` asserts the current page path.
-- `assert_redirect(from_path)` optionally with to_path, makes sure the current page path is not from_path.
-- `assert_no_js_errors` - checks for any javascript errors on the page.
-- `assert_no_unpermitted_params` makes sure the last submitted form did not include any unpermitted params and prints out any unpermitted params that do exist.
+- `assert_flash`, optionally with the desired `:success`, `:error` key and/or message, makes sure the flash is set.
+- `assert_jquery_ujs_disable_with` makes sure all `input[type=submit]` elements on the page have the `data-disable-with` property set.
 - `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was.
 - `assert_no_html_form_validation_errors` checks for frontend html5 errors.
-- `assert_jquery_ujs_disable_with` makes sure all `input[type=submit]` elements on the page have the `data-disable-with` property set.
-- `assert_flash`, optionally with the desired `:success`, `:error` key and/or message, makes sure the flash is set.
-- `assert_assigns` asserts a given rails view_assigns object is present.
-- `assert_no_assigns_errors` should be used after any form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
-- `assert_assigns_errors` use after an intentionally invalid form submit to make sure your assigned rails object has errors, or a specific error.
+- `assert_no_js_errors` - checks for any javascript errors on the page.
+- `assert_no_unpermitted_params` makes sure the last submitted form did not include any unpermitted params and prints out any unpermitted params that do exist.
+- `assert_page_content(content)` checks that the given content is present without waiting the capybara default wait time.
+- `assert_no_page_content(content)` checks that the given content is blank without waiting the capybara default wait time.
+- `assert_page_status` checks for a given http status, default 200.
+- `assert_page_title` makes sure there is an html `<title></title>` present.
+- `assert_redirect(from_path)` optionally with to_path, makes sure the current page path is not from_path.
+- `assert_signed_in` checks that the assigned `@current_user` is present.
+- `assert_signed_out` checks that the assigned `@current_user` is blank.
+- `assert_submit_input` makes sure there is an `input[type='submit']` present.
 
 As well,
 
@@ -271,14 +273,14 @@ The individual test suites may also be used as part of a larger test:
 class PostsTest < ActionDispatch::IntegrationTest
   test 'user may only update a post once' do
     crud_action_test(:create_valid, Post, User.first)
-    assert_content 'successfully created post.  You may only update it once.'
+    assert_text 'successfully created post.  You may only update it once.'
 
     crud_action_test(:update_valid, Post.last, User.first)
-    assert_content 'successfully updated post.'
+    assert_text 'successfully updated post.'
 
     crud_action_test(:update_valid, Post.last, User.first, skip: [:no_assigns_errors, :updated_at])
     assert_assigns_errors(:post, 'you may no longer update this post.')
-    assert_content 'you may no longer update this post.'
+    assert_text 'you may no longer update this post.'
   end
 end
 ```
@@ -307,7 +309,7 @@ Or each individually in part of a regular test:
 class MyApplicationTest < ActionDispatch::IntegrationTest
   test 'user receives 10 tokens after signing up' do
     devise_action_test(:sign_up)
-    assert_content 'Tokens: 10'
+    assert_text 'Tokens: 10'
     assert_equals 10, User.last.tokens
     assert_equals 10, assigns(:current_user).tokens
   end
@@ -374,7 +376,7 @@ class PostsTest < ActionDispatch::IntegrationTest
     page_action_test(:posts_path, User.first)
 
     assert page.current_path, '/posts'
-    assert_content 'first post'
+    assert_text 'first post'
   end
 end
 ```
@@ -399,7 +401,7 @@ class PostsTest < ActionDispatch::IntegrationTest
   test 'visiting blog redirects to posts' do
     Post.create(title: 'first post')
     redirect_action_test('/blog', '/posts', User.first)
-    assert_content 'first post'
+    assert_text 'first post'
   end
 end
 ```
@@ -427,7 +429,7 @@ class PostsTest < ActionDispatch::IntegrationTest
   test 'building a post in 5 steps' do
     wizard_action_test('/build_post/step1', '/build_post/step5', User.first) do
       if page.current_path.end_with?('step4')
-        assert_content 'your post is ready but must first be approved by an admin.'
+        assert_text 'your post is ready but must first be approved by an admin.'
       end
     end
   end

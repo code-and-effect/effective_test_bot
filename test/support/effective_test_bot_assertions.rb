@@ -1,12 +1,20 @@
 module EffectiveTestBotAssertions
+  def assert_page_content(content, message = "(page_content) Expected page content :content: to be present")
+    assert page.has_text?(content, wait: 0), message.sub(':content:', content)
+  end
+
+  def assert_no_page_content(content, message = "(page_content) Expected page content :content: to be blank")
+    assert page.has_no_text?(content, wait: 0), message.sub(':content:', content)
+  end
+
   def assert_signed_in(message = nil)
     visit(root_path) if page.current_path.blank?
-    assert assigns['current_user'].present?, 'Expected @current_user to be present when signed in'
+    assert assigns['current_user'].present?, message || 'Expected @current_user to be present when signed in'
   end
 
   def assert_signed_out(message = nil)
     visit(root_path) if page.current_path.blank? || assigns['current_user'].present?
-    assert assigns['current_user'].blank?, 'Expected @current_user to be blank when signed out'
+    assert assigns['current_user'].blank?, message || 'Expected @current_user to be blank when signed out'
   end
 
   def assert_capybara_can_execute_javascript(message = "Expected capybara-webkit page.evaluate_script() to be successful")
