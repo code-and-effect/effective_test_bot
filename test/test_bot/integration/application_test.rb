@@ -71,10 +71,17 @@ module TestBot
 
       def is_crud_controller?(route)
         return false unless CRUD_ACTIONS.include?(route.defaults[:action])
-        return false unless route.defaults[:controller].present? && route.app.respond_to?(:controller)
+        return false unless route.defaults[:controller].present?
+
+        # Find the correct route.app that links to the controller
+        # If there is a routing constraint, we have to traverse the route.app linked list to find the route with a controller
+        route_app = route
+        route_app = route_app.app while route_app.respond_to?(:app)
+
+        return false unless route_app.respond_to?(:controller)
 
         begin
-          controller_klass = route.app.controller(route.defaults)
+          controller_klass = route_app.controller(route.defaults)
           controller_instance = controller_klass.new()
 
           # Is this a CRUD capable controller?
