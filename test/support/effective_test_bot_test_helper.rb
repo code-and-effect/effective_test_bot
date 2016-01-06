@@ -29,9 +29,9 @@ module EffectiveTestBotTestHelper
     end
   end
 
-  # Calls capybara within do .. end if selector is present
-  def within_if(selector, bool, &block)
-    bool ? within(selector) { yield } : yield
+  # Calls capybara within do .. end if selector is present and bool is true
+  def within_if(selector, bool = true, &block)
+    (selector.present? && bool) ? within(selector) { yield } : yield
   end
 
   def click_first(label)

@@ -99,8 +99,8 @@ Effective TestBot provides 4 areas of support in writing [minitest](https://gith
 
 The following assertions are added for use in any integration test:
 
-- `assert_signed_in` visits the devise `new_user_session_path` and checks that the sign in form is blank  and that `@current_user` is present.
-- `assert_signed_out` visits the devise `new_user_session_path` and checks for the sign in form is present and that `@current_user` is blank.
+- `assert_signed_in` checks that the assigned `@current_user` is present.
+- `assert_signed_out` checks that the assigned `@current_user` is blank.
 - `assert_page_title` makes sure there is an html `<title></title>` present.
 - `assert_submit_input` makes sure there is an `input[type='submit']` present.
 - `assert_page_status` checks for a given http status, default 200.

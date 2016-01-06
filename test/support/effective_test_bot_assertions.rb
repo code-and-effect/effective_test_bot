@@ -1,15 +1,11 @@
 module EffectiveTestBotAssertions
   def assert_signed_in(message = nil)
-    visit new_user_session_path
-
-    assert all('form#new_user').blank?, message || 'Expected new_user form to be blank when signed in'
+    visit(root_path) if page.current_path.blank?
     assert assigns['current_user'].present?, 'Expected @current_user to be present when signed in'
   end
 
   def assert_signed_out(message = nil)
-    visit new_user_session_path
-
-    assert all('form#new_user').present?, message || 'Expected new_user form to be present when signed out'
+    visit(root_path) if page.current_path.blank? || assigns['current_user'].present?
     assert assigns['current_user'].blank?, 'Expected @current_user to be blank when signed out'
   end
 
