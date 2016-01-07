@@ -26,8 +26,9 @@ module WizardTest
         # Keep going till there's no more submit buttons
         break if all("input[type='submit']").blank?
       end
-
     end
+
+    save_test_bot_screenshot
 
     assert_current_path(to_path) if to_path.present?
   end

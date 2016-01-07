@@ -52,14 +52,14 @@ module TestBot
               end
             end
 
-          # Member Test
-          elsif route.verb.to_s.include?('GET') && route.path.required_names == ['id']
-            member_test(controller, action, User.first)
-
           # Wizard Test
           elsif is_wicked_controller?(route)
             first_step_path = "/#{controller}/#{controller_instance(route).wizard_steps.first}"
             wizard_test(first_step_path, nil, User.first)
+
+          # Member Test
+          elsif route.verb.to_s.include?('GET') && route.path.required_names == ['id']
+            member_test(controller, action, User.first)
 
           # Page Test
           elsif route.verb.to_s.include?('GET') && route.name.present? && Array(route.path.required_names).blank? # This could eventually be removed to supported nested routes

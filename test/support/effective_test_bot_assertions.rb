@@ -62,7 +62,7 @@ module EffectiveTestBotAssertions
 
   def assert_current_path(path, message = '(current_path) Expected current_path to be :path:')
     path = public_send(path) if path.kind_of?(Symbol)
-    assert_equal path, page.current_path, message.sub(':path', path.to_s)
+    assert_equal path, page.current_path, message.sub(':path:', path.to_s)
   end
 
   # assert_redirect '/about'
@@ -84,8 +84,15 @@ module EffectiveTestBotAssertions
     assert_equal [], unpermitted_params, message
   end
 
-  def assert_no_exceptions(message = nil)
-    assert exceptions.blank?, message || "(no_exceptions) Unexpected exception:\n#{exceptions.join("\n")}\n========== End of rails server exception ==========\n"
+  def assert_no_exceptions(message = "(no_exceptions) Unexpected rails server exception:\n:exception:")
+    # this file is created by EffectiveTestBot::Middleware when an exception is encountered in the rails app
+    file = File.join(Dir.pwd, 'tmp', 'test_bot', 'exception.txt')
+    return unless File.exists?(file)
+
+    exception = File.read(file)
+    File.delete(file)
+
+    assert false, message.sub(':exception:', exception)
   end
 
   # This must be run after submit_form()

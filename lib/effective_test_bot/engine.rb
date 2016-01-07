@@ -13,32 +13,40 @@ module EffectiveTestBot
     end
 
     initializer 'effective_test_bot.test_suite' do |app|
-      Rails.application.config.to_prepare do
-        # test/support/
-        ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
-        ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
-        ActionDispatch::IntegrationTest.include EffectiveTestBotFormFiller
-        ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
-        ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
-        ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
+      if Rails.env.test?
+        Rails.application.config.to_prepare do
+          # test/support/
+          ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
+          ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
+          ActionDispatch::IntegrationTest.include EffectiveTestBotFormFiller
+          ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
+          ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
+          ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
 
-        # test/test_botable/
-        ActionDispatch::IntegrationTest.include BaseTest
-        ActionDispatch::IntegrationTest.include CrudTest
-        ActionDispatch::IntegrationTest.include DeviseTest
-        ActionDispatch::IntegrationTest.include MemberTest
-        ActionDispatch::IntegrationTest.include PageTest
-        ActionDispatch::IntegrationTest.include RedirectTest
-        ActionDispatch::IntegrationTest.include WizardTest
+          # test/test_botable/
+          ActionDispatch::IntegrationTest.include BaseTest
+          ActionDispatch::IntegrationTest.include CrudTest
+          ActionDispatch::IntegrationTest.include DeviseTest
+          ActionDispatch::IntegrationTest.include MemberTest
+          ActionDispatch::IntegrationTest.include PageTest
+          ActionDispatch::IntegrationTest.include RedirectTest
+          ActionDispatch::IntegrationTest.include WizardTest
 
-        # test/concerns/test_botable/
-        ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
-        ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
-        ActionDispatch::IntegrationTest.include TestBotable::DeviseDsl
-        ActionDispatch::IntegrationTest.include TestBotable::MemberDsl
-        ActionDispatch::IntegrationTest.include TestBotable::PageDsl
-        ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
-        ActionDispatch::IntegrationTest.include TestBotable::WizardDsl
+          # test/concerns/test_botable/
+          ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
+          ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
+          ActionDispatch::IntegrationTest.include TestBotable::DeviseDsl
+          ActionDispatch::IntegrationTest.include TestBotable::MemberDsl
+          ActionDispatch::IntegrationTest.include TestBotable::PageDsl
+          ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
+          ActionDispatch::IntegrationTest.include TestBotable::WizardDsl
+        end
+      end
+    end
+
+    initializer 'effective_test_bot.middleware' do |app|
+      if Rails.env.test?
+        Rails.application.config.middleware.use EffectiveTestBot::Middleware
       end
     end
 
@@ -54,14 +62,7 @@ module EffectiveTestBot
             rescue_from ActionController::UnpermittedParameters do |exception|
               assign_test_bot_unpermitted_params_header(exception)
             end
-
-            # This isn't working properly. TODO: Fix this
-            # rescue_from StandardError do |exception|
-            #   assign_test_bot_exceptions_header(exception)
-            #   render status: 500, text: "<html><body><h1>Uncaught Exception</h1><p>#{exception.message}</p><p>#{exception.backtrace.first(20).join('<br>')}</p></body></html>"
-            # end
           end
-
         end
       end
     end
