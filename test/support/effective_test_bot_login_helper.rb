@@ -2,13 +2,15 @@
 
 module EffectiveTestBotLoginHelper
   def as_user(user)
-    sign_in(user); yield; logout
+    sign_in(user); yield; sign_out
   end
 
-  def sign_in(user) # Warden::Test::Helpers
+  # This is currently hardcoded to use the warden login_as test helper
+  def sign_in(user)
     user.kind_of?(String) ? login_as(User.find_by_email!(user)) : login_as(user)
   end
 
+  # This is currently hardcoded to use the warden logout test helper
   def sign_out
     logout
   end
