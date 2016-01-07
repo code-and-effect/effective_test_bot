@@ -20,7 +20,12 @@ module TestBotable
     module ClassMethods
 
       def wizard_test(from_path, to_path, user, options = {})
-        options[:current_test] = options.delete(:label) || "#{from_path} to #{to_path}"
+        if to_path.present?
+          options[:current_test] = options.delete(:label) || "#{from_path} to #{to_path}"
+        else
+          options[:current_test] = options.delete(:label) || "#{from_path}"
+        end
+
         return if EffectiveTestBot.skip?(options[:current_test])
 
         method_name = test_bot_method_name('wizard_test', options[:current_test])

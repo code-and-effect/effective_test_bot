@@ -56,6 +56,11 @@ module TestBot
           elsif route.verb.to_s.include?('GET') && route.path.required_names == ['id']
             member_test(controller, action, User.first)
 
+          # Wizard Test
+          elsif is_wicked_controller?(route)
+            first_step_path = "/#{controller}/#{controller_instance(route).wizard_steps.first}"
+            wizard_test(first_step_path, nil, User.first)
+
           # Page Test
           elsif route.verb.to_s.include?('GET') && route.name.present? && Array(route.path.required_names).blank? # This could eventually be removed to supported nested routes
             page_test("#{route.name}_path".to_sym, User.first, route: route, label: "#{route.name}_path")
@@ -67,29 +72,47 @@ module TestBot
         end
       end
 
-      private
+      protected
 
       def is_crud_controller?(route)
         return false unless CRUD_ACTIONS.include?(route.defaults[:action])
-        return false unless route.defaults[:controller].present?
 
+        controller = controller_instance(route)
+        controller.respond_to?(:new) && controller.respond_to?(:create)
+      end
+
+      # https://github.com/schneems/wicked/
+      def is_wicked_controller?(route)
+        return false unless defined?(Wicked::Wizard)
+
+        controller = controller_instance(route)
+        return false unless controller.kind_of?(Wicked::Wizard)
+
+        # So this is a Wicked::Wizard controller, we have to trick it into running an action to make the steps available
+        controller.params = {}
+        (controller.run_callbacks(:process_action) rescue false)
+
+        controller.wizard_steps.present?
+      end
+
+      private
+
+      def controller_instance(route)
+        return :none unless route.defaults[:controller] && route.defaults[:action]
+
+        @_controller_instances ||= {}
+        @_controller_instances[route.defaults[:controller]] ||= build_controller_instance(route)
+      end
+
+      def build_controller_instance(route)
         # Find the correct route.app that links to the controller
         # If there is a routing constraint, we have to traverse the route.app linked list to find the route with a controller
         route_app = route
         route_app = route_app.app while route_app.respond_to?(:app)
 
-        return false unless route_app.respond_to?(:controller)
+        return :none unless route_app.respond_to?(:controller)
 
-        begin
-          controller_klass = route_app.controller(route.defaults)
-          controller_instance = controller_klass.new()
-
-          # Is this a CRUD capable controller?
-          controller_instance.respond_to?(:new) && controller_instance.respond_to?(:create)
-        rescue => e
-          false
-        end
-
+        (route_app.controller(route.defaults).new() rescue :none)
       end
 
     end
