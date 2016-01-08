@@ -108,7 +108,7 @@ module TestBot
         # Find the correct route.app that links to the controller
         # If there is a routing constraint, we have to traverse the route.app linked list to find the route with a controller
         route_app = route
-        route_app = route_app.app while route_app.respond_to?(:app)
+        route_app = route_app.app while (route_app.respond_to?(:app) && route_app != route_app.app)
 
         return :none unless route_app.respond_to?(:controller)
 

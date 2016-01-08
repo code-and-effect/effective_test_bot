@@ -30,7 +30,7 @@ class ActionDispatch::IntegrationTest
   # def setup # Called before every test
   # end
 
-  # def teardown # Called after every single test
+  # def teardown # Called after every test
   # end
 
   def after_teardown # I reset sessions here so capybara-screenshot can still make screenshots when tests fail
