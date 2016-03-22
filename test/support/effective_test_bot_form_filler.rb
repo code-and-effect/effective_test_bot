@@ -63,9 +63,11 @@ module EffectiveTestBotFormFiller
       skip_field_screenshot = false
 
       case [field.tag_name, field['type']].compact.join('_')
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'textarea'
+      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio'
         field.set(value_for_field(field, fills))
-        close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
+      when 'textarea'
+        value = value_for_field(field, fills)
+        field['class'].to_s.include?('ckeditor') ? fill_ckeditor_text_area(field, value) : field.set(value)
       when 'select'
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
           page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
@@ -220,6 +222,8 @@ module EffectiveTestBotFormFiller
       true
     elsif field['value'] == 'false'
       false
+    elsif field['required'].present?
+      true
     else
       [true, false].sample
     end
@@ -278,6 +282,11 @@ module EffectiveTestBotFormFiller
 
     @filled_numeric_fields[selector] = (available - amount)
     amount
+  end
+
+  def fill_ckeditor_text_area(field, value)
+    value = "<p>#{value.gsub("'", '')}</p>"
+    page.execute_script("try { CKEDITOR.instances['#{field['id']}'].setData('#{value}'); } catch(e) {};")
   end
 
   # The field here is going to be the %input{:type => file}. Files can be one or more pathnames
@@ -350,7 +359,9 @@ module EffectiveTestBotFormFiller
   def skip_form_field?(field)
     field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
 
-    field.visible? == false ||
+    ckeditor = (field.tag_name == 'textarea' && field['class'].to_s.include?('ckeditor'))
+
+    (field.visible? == false && !ckeditor) ||
     field.disabled? ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
