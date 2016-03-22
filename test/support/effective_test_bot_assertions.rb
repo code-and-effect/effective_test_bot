@@ -1,10 +1,10 @@
 module EffectiveTestBotAssertions
   def assert_page_content(content, message = "(page_content) Expected page content :content: to be present")
-    assert page.has_text?(content, wait: 0), message.sub(':content:', content)
+    assert page.has_text?(/#{Regexp.escape(content)}/i, wait: 0), message.sub(':content:', content)
   end
 
   def assert_no_page_content(content, message = "(page_content) Expected page content :content: to be blank")
-    assert page.has_no_text?(content, wait: 0), message.sub(':content:', content)
+    assert page.has_no_text?(/#{Regexp.escape(content)}/i, wait: 0), message.sub(':content:', content)
   end
 
   def assert_signed_in(message = nil)
