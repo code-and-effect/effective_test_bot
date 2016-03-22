@@ -34,7 +34,7 @@ module EffectiveTestBot
     end
 
     value = "#{test} #{assertion}".strip # This is the format config.excepts is flattened into
-    test_prefix = test.split('#')
+    test_prefix = test.split('#').first
 
     # Excepts are defined in the app's config/initializers/effective_test_bot.rb file
     return true if excepts.any? { |except| [test, test_prefix, assertion, value].include?(except) }
