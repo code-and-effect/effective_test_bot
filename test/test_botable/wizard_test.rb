@@ -19,6 +19,8 @@ module WizardTest
         submit_form
       end
 
+      assert_no_assigns_errors
+
       if to_path.present?
         # Keep going till we hit a certain to_path
         break if page.current_path == to_path
