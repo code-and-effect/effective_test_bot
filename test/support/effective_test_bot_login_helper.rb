@@ -2,7 +2,9 @@
 
 module EffectiveTestBotLoginHelper
   def as_user(user)
-    sign_in(user); yield; sign_out
+    sign_in(user); @test_bot_user = user
+    yield
+    sign_out; @test_bot_user = nil
   end
 
   # This is currently hardcoded to use the warden login_as test helper

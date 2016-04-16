@@ -15,7 +15,7 @@ module TestBotable
 
     module ClassMethods
 
-      def page_test(path:, user:, label: nil, **options)
+      def page_test(path:, user: _test_bot_user(), label: nil, **options)
         options[:current_test] = label || path.to_s
         return if EffectiveTestBot.skip?(options[:current_test])
 
@@ -27,7 +27,7 @@ module TestBotable
     end
 
     # Instance Methods - Call me from within a test
-    def page_action_test(path:, user:, **options)
+    def page_action_test(path:, user: _test_bot_user(), **options)
       begin
         assign_test_bot_lets!(options.reverse_merge!(user: user, page_path: path))
       rescue => e

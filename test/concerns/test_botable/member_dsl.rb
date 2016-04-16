@@ -16,7 +16,7 @@ module TestBotable
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def member_test(controller:, action:, user:, member: nil, label: nil, **options)
+      def member_test(controller:, action:, user: _test_bot_user(), member: nil, label: nil, **options)
         options[:current_test] = label || "#{controller}##{action}"
         return if EffectiveTestBot.skip?(options[:current_test])
 
@@ -28,7 +28,7 @@ module TestBotable
     end
 
     # Instance Methods - Call me from within a test
-    def member_action_test(controller:, action:, user:, member:, **options)
+    def member_action_test(controller:, action:, user: _test_bot_user(), member:, **options)
       begin
         assign_test_bot_lets!(options.reverse_merge!(resource: controller, action: action, user: user, member: member))
       rescue => e

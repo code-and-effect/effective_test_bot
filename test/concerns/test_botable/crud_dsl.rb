@@ -18,7 +18,7 @@ module TestBotable
 
       # All this does is define a 'test_bot' method for each required action on this class
       # So that MiniTest will see the test functions and run them
-      def crud_test(resource:, user:, label: nil, skip: {}, only: nil, except: nil, **options)
+      def crud_test(resource:, user: _test_bot_user(), label: nil, skip: {}, only: nil, except: nil, **options)
         # This skips paramaters is different than the initializer skips, which affect just the rake task
 
         # These are specificially for the DSL
@@ -78,7 +78,7 @@ module TestBotable
     #
     # If obj is a Hash {:resource => ...} just skip over parsing options
     # And assume it's already been done (by the ClassMethod crud_test)
-    def crud_action_test(test:, resource:, user:, **options)
+    def crud_action_test(test:, resource:, user: _test_bot_user(), **options)
       begin
         assign_test_bot_lets!(options.reverse_merge!(resource: resource, user: user))
       rescue => e

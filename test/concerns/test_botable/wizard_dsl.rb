@@ -19,7 +19,8 @@ module TestBotable
 
     module ClassMethods
 
-      def wizard_test(from:, to: nil, user:, label: nil, **options)
+      def wizard_test(from:, to: nil, user: _test_bot_user(), label: nil, **options)
+
         if to.present?
           options[:current_test] = label || "#{from} to #{to}"
         else
@@ -36,8 +37,7 @@ module TestBotable
     end
 
     # Instance Methods - Call me from within a test
-    def wizard_action_test(from:, to: nil, user:, **options)
-      binding.pry
+    def wizard_action_test(from:, to: nil, user: _test_bot_user(), **options)
       begin
         assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: user))
       rescue => e

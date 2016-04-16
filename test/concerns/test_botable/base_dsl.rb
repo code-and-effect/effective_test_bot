@@ -5,6 +5,10 @@ module TestBotable
     module ClassMethods
       TEST_BOT_TEST_PREFIXES = ['crud_test', 'devise_test', 'member_test', 'page_test', 'redirect_test', 'wizard_test']
 
+      def _test_bot_user
+        @test_bot_user
+      end
+
       # Parses and validates lots of options
       # This is a big manual merge wherein we translate some DSL methods into one consistent Hash here
       # The output is what gets sent to each test and defined as lets
@@ -118,6 +122,10 @@ module TestBotable
     end
 
     # Instance Methods
+
+    def _test_bot_user
+      @test_bot_user
+    end
 
     # Using reverse_merge! in the dsl action_tests makes sure that the
     # class level can assign a current_test variable

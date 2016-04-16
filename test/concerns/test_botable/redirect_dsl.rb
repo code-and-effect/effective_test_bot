@@ -14,7 +14,7 @@ module TestBotable
 
     module ClassMethods
 
-      def redirect_test(from:, to:, user:, label: nil, **options)
+      def redirect_test(from:, to:, user: _test_bot_user(), label: nil, **options)
         options[:current_test] = label || "#{from} to #{to}"
         return if EffectiveTestBot.skip?(options[:current_test])
 
@@ -25,7 +25,7 @@ module TestBotable
     end
 
     # Instance Methods - Call me from within a test
-    def redirect_action_test(from:, to:, user:, options: {})
+    def redirect_action_test(from:, to:, user: _test_bot_user(), options: {})
       begin
         assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: user))
       rescue => e
