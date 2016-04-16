@@ -9,7 +9,14 @@ module EffectiveTestBotLoginHelper
 
   # This is currently hardcoded to use the warden login_as test helper
   def sign_in(user)
-    user.kind_of?(String) ? login_as(User.find_by_email!(user)) : login_as(user)
+    if user.kind_of?(String)
+      login_as(User.find_by_email!(user))
+    elsif user.kind_of?(User)
+      raise 'user must be persisted' unless user.persisted?
+      login_as(user)
+    else
+      raise 'sign_in(user) expected a User or an email String'
+    end
   end
 
   # This is currently hardcoded to use the warden logout test helper
