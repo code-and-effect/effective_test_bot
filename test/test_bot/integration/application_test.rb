@@ -31,7 +31,7 @@ module TestBot
           elsif route.app.kind_of?(ActionDispatch::Routing::PathRedirect) && route.path.required_names.blank?
             path = route.path.spec.to_s
             route.path.optional_names.each { |name| path.sub!("(.:#{name})", '') } # Removes (.:format) from path
-            redirect_test(path, route.app.path([], nil), User.first)
+            redirect_test(from: path, to: route.app.path([], nil), user: User.first)
 
           # CRUD Test
           elsif is_crud_controller?(route)
@@ -46,7 +46,7 @@ module TestBot
                 only_tests = seen_actions.delete(controller)
                 only_tests << :tour if EffectiveTestBot.tour_mode?
 
-                crud_test(controller, User.first, only: only_tests)
+                crud_test(resource: controller, user: User.first, only: only_tests)
               rescue => e
                 puts e.message # Sometimes there is an object that can't be instantiated, so we still want to continue the application test
               end
@@ -55,15 +55,15 @@ module TestBot
           # Wizard Test
           elsif is_wicked_controller?(route)
             first_step_path = "/#{controller}/#{controller_instance(route).wizard_steps.first}"
-            wizard_test(first_step_path, nil, User.first)
+            wizard_test(from: first_step_path, user: User.first)
 
           # Member Test
           elsif route.verb.to_s.include?('GET') && route.path.required_names == ['id']
-            member_test(controller, action, User.first)
+            member_test(controller: controller, action: action, user: User.first)
 
           # Page Test
           elsif route.verb.to_s.include?('GET') && route.name.present? && Array(route.path.required_names).blank? # This could eventually be removed to supported nested routes
-            page_test("#{route.name}_path".to_sym, User.first, route: route, label: "#{route.name}_path")
+            page_test(path: "#{route.name}_path".to_sym, user: User.first, route: route, label: "#{route.name}_path")
 
           else
             puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"

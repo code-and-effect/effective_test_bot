@@ -1,10 +1,10 @@
 # This DSL gives a class level and an instance level way of calling specific test suite
 #
 # class PostsTest < ActionDispatch::IntegrationTest
-#   page_test(:posts_path, User.first)
+#   page_test(path: :posts_path, user: User.first)
 #
 #   test 'a one-off action' do
-#     page_action_test(:posts_path, User.first)
+#     page_action_test(path: :posts_path, user: User.first)
 #   end
 # end
 
@@ -15,23 +15,23 @@ module TestBotable
 
     module ClassMethods
 
-      def page_test(path, user, options = {})
-        options[:current_test] = options.delete(:label) || path.to_s
+      def page_test(path:, user:, label: nil, **options)
+        options[:current_test] = label || path.to_s
         return if EffectiveTestBot.skip?(options[:current_test])
 
         method_name = test_bot_method_name('page_test', options[:current_test])
 
-        define_method(method_name) { page_action_test(path, user, options) }
+        define_method(method_name) { page_action_test(path: path, user: user, options: options) }
       end
 
     end
 
     # Instance Methods - Call me from within a test
-    def page_action_test(path, user, options = {})
+    def page_action_test(path:, user:, **options)
       begin
         assign_test_bot_lets!(options.reverse_merge!(user: user, page_path: path))
       rescue => e
-        raise "Error: #{e.message}.  Expected usage: page_action_test(root_path, User.first)"
+        raise "Error: #{e.message}.  Expected usage: page_action_test(path: root_path, user: User.first)"
       end
 
       self.send(:test_bot_page_test)

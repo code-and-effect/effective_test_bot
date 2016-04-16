@@ -248,22 +248,22 @@ There are a few variations on the one-liner method:
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
   # Runs all 9 crud_action tests against /posts
-  crud_test(Post, User.first)
+  crud_test(resource: Post, user: User.first)
 
   # Runs all 9 crud_action tests against /posts and use this Post's attributes when calling fill_form.
-  crud_test(Post.new(title: 'my first post'), User.first)
+  crud_test(resource: Post.new(title: 'my first post'), user: User.first)
 
   # Runs all 9 crud_action tests against /admin/posts controller as a previously seeded or fixtured admin user
-  crud_test('admin/posts', User.where(admin: true).first)
+  crud_test(resource: 'admin/posts', user: User.where(admin: true).first)
 
   # Run only some tests
-  crud_test(Post, User.first, only: [:new, :create_valid, :create_invalid, :show, :index])
+  crud_test(resource: Post, user: User.first, only: [:new, :create_valid, :create_invalid, :show, :index])
 
   # Run all except some tests
-  crud_test(Post, User.first, except: [:edit, :update_valid, :update_invalid])
+  crud_test(resource: Post, user: User.first, except: [:edit, :update_valid, :update_invalid])
 
   # Skip individual assertions
-  crud_test(Post, User.first, skip: {create_valid: :path, update_invalid: [:path, :flash]})
+  crud_test(resource: Post, user: User.first, skip: {create_valid: :path, update_invalid: [:path, :flash]})
 end
 ```
 
@@ -272,13 +272,13 @@ The individual test suites may also be used as part of a larger test:
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
   test 'user may only update a post once' do
-    crud_action_test(:create_valid, Post, User.first)
+    crud_action_test(test: :create_valid, resource: Post, user: User.first)
     assert_text 'successfully created post.  You may only update it once.'
 
-    crud_action_test(:update_valid, Post.last, User.first)
+    crud_action_test(test: :update_valid, resource: Post.last, user: User.first)
     assert_text 'successfully updated post.'
 
-    crud_action_test(:update_valid, Post.last, User.first, skip: [:no_assigns_errors, :updated_at])
+    crud_action_test(test: :update_valid, resource: Post.last, user: User.first, skip: [:no_assigns_errors, :updated_at])
     assert_assigns_errors(:post, 'you may no longer update this post.')
     assert_text 'you may no longer update this post.'
   end
@@ -308,7 +308,7 @@ Or each individually in part of a regular test:
 ```ruby
 class MyApplicationTest < ActionDispatch::IntegrationTest
   test 'user receives 10 tokens after signing up' do
-    devise_action_test(:sign_up)
+    devise_action_test(test: :sign_up)
     assert_text 'Tokens: 10'
     assert_equals 10, User.last.tokens
     assert_equals 10, assigns(:current_user).tokens
@@ -333,10 +333,10 @@ Use it as a one-liner:
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
   # Uses find_or_create_resource! to load a seeded resource or create a new one
-  member_test('posts', 'unarchive', User.first)
+  member_test(controller: 'posts', action: 'unarchive', user: User.first)
 
   # Run the member_test with a specific post
-  member_test('posts', 'unarchive', User.first, Post.find(1))
+  member_test(controller: 'posts', action: 'unarchive', user: User.first, member: Post.find(1))
 end
 ```
 
@@ -348,7 +348,7 @@ class PostsTest < ActionDispatch::IntegrationTest
     post = Post.create(title: 'first post', archived: true)
 
     assert Post.where(archived: false).empty?
-    member_action_test('posts', 'unarchive', User.first, post)
+    member_action_test(controller: 'posts', action: 'unarchive', user: User.first, member: post)
     assert Post.where(archived: false).present?
   end
 end
@@ -362,7 +362,7 @@ Use it as a one-liner:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  page_test(:posts_path, User.first)  # Runs the page_test test suite against posts_path as User.first
+  page_test(path: :posts_path, user: User.first)  # Runs the page_test test suite against posts_path as User.first
 end
 ```
 
@@ -373,7 +373,7 @@ class PostsTest < ActionDispatch::IntegrationTest
   test 'posts are displayed on the index page' do
     Post.create(title: 'first post')
 
-    page_action_test(:posts_path, User.first)
+    page_action_test(path: :posts_path, user: User.first)
 
     assert page.current_path, '/posts'
     assert_text 'first post'
@@ -390,7 +390,7 @@ Use it as a one-liner:
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
   # Visits /blog and tests that it redirects to a working /posts page
-  redirect_test('/blog', '/posts', User.first)
+  redirect_test(from: '/blog', to: '/posts', user: User.first)
 end
 ```
 
@@ -400,7 +400,7 @@ Or as part of a regular test:
 class PostsTest < ActionDispatch::IntegrationTest
   test 'visiting blog redirects to posts' do
     Post.create(title: 'first post')
-    redirect_action_test('/blog', '/posts', User.first)
+    redirect_action_test(from: '/blog', to: '/posts', user: User.first)
     assert_text 'first post'
   end
 end
@@ -418,7 +418,7 @@ Use it as a one-liner:
 
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
-  wizard_test('/build_post/step1', '/build_post/step5', User.first)
+  wizard_test(from: '/build_post/step1', to: '/build_post/step5', user: User.first)
 end
 ```
 
@@ -427,7 +427,7 @@ Or as part of a regular test:
 ```ruby
 class PostsTest < ActionDispatch::IntegrationTest
   test 'building a post in 5 steps' do
-    wizard_action_test('/build_post/step1', '/build_post/step5', User.first) do
+    wizard_action_test(from: '/build_post/step1', to: '/build_post/step5', user: User.first) do
       if page.current_path.end_with?('step4')
         assert_text 'your post is ready but must first be approved by an admin.'
       end

@@ -5,7 +5,7 @@ module WizardTest
   protected
 
   def test_bot_wizard_test(&block)
-    sign_in(user) and visit(from_path)
+    sign_in(user) and visit(from)
 
     0.upto(50) do |index|   # Can only test wizards 51 steps long
       assert_page_normal
@@ -21,9 +21,9 @@ module WizardTest
 
       assert_no_assigns_errors
 
-      if to_path.present?
+      if to.present?
         # Keep going till we hit a certain to_path
-        break if page.current_path == to_path
+        break if page.current_path == to
       else
         # Keep going till there's no more submit buttons
         break if all("input[type='submit']").blank?
@@ -32,7 +32,7 @@ module WizardTest
 
     save_test_bot_screenshot
 
-    assert_current_path(to_path) if to_path.present?
+    assert_current_path(to) if to.present?
   end
 
 end

@@ -4,9 +4,9 @@
 #   devise_test()
 #
 #   test 'a one-off action' do
-#     devise_action_test(:sign_up)
-#     devise_action_test(:sign_in_valid)
-#     devise_action_test(:sign_in_invalid)
+#     devise_action_test(test: :sign_up)
+#     devise_action_test(test: :sign_in_valid)
+#     devise_action_test(test: :sign_in_invalid)
 #   end
 # end
 
@@ -16,23 +16,21 @@ module TestBotable
 
     module ClassMethods
 
-      def devise_test(options = {})
-        label = options.delete(:label).presence
-
+      def devise_test(label: nil, **options)
         [:sign_up, :sign_in_valid, :sign_in_invalid].each do |test|
           options[:current_test] = label || test
           next if EffectiveTestBot.skip?(options[:current_test])
 
           method_name = test_bot_method_name('devise_test', options[:current_test])
 
-          define_method(method_name) { devise_action_test(test, options) }
+          define_method(method_name) { devise_action_test(test: test, options: options) }
         end
       end
 
     end
 
     # Instance Methods - Call me from within a test
-    def devise_action_test(test, options = {})
+    def devise_action_test(test:, **options)
       options[:email] ||= "unique-#{Time.zone.now.to_i}@example.com"
       options[:password] ||= '!Password123'
       options[:username] ||= 'unique-username'
