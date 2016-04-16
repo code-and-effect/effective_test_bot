@@ -63,5 +63,12 @@ module TestBot
       assert_jquery_ujs_present
     end
 
+    test '11: action_mailer.default_url_options are present' do
+      assert(
+        (Rails.application.config.action_mailer.default_url_options[:host] rescue nil).present?,
+        "expected action_mailer.default_url_options[:host] to be present.\nAdd config.action_mailer.default_url_options = { host: 'example.com' } to config/environments/test.rb"
+      )
+
+    end
   end
 end
