@@ -37,6 +37,12 @@ module EffectiveTestBotFormFiller
       within('div' + tab['href']) { fill_form_fields(fills) }
     end
 
+    # If there is no visible submits, go back to the first tab
+    if all(:css, "input[type='submit']").length == 0
+      tabs.first.click()
+      synchronize!
+      save_test_bot_screenshot
+    end
   end
 
   # Only fills in visible fields
@@ -217,6 +223,15 @@ module EffectiveTestBotFormFiller
   def value_for_input_checkbox_field(field, fill_value)
     if fill_value.present?
       fill_values = Array(fill_value)  # Allow an array of fill values to be passed
+
+      if ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(fill_value)
+        fill_values = ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.to_a
+      end
+
+      if ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(fill_value)
+        fill_values = ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.to_a
+      end
+
       (fill_values.include?(field['value']) || fill_values.include?(field.find(:xpath, '..').text))
     elsif field['value'] == 'true'
       true
@@ -260,6 +275,10 @@ module EffectiveTestBotFormFiller
     max = (Float(field['max']) rescue 1000)
     number = Random.new.rand(min..max)
     number = (number.kind_of?(Float) ? number.round(2) : number)
+
+    if (field['step'] == '1' || field['class'].to_s.split(' ').include?('integer'))
+      number = number.to_i
+    end
 
     return number if field['max'].blank?
 

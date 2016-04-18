@@ -64,22 +64,21 @@ module EffectiveTestBotFormHelper
   # Instead we manually trigger submit buttons and use the data-disable-with to
   # make the 'submit form' step look nice
   def click_submit(label)
+    if label.present?
+      submit = find(:link_or_button, label)
+      assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
+    else
+      submit = first(:css, "input[type='submit']")
+      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] on #{page.current_path}"
+    end
+
     if EffectiveTestBot.screenshots?
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.disableFormElement($(this)); });"
       save_test_bot_screenshot
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
     end
 
-    if label.present?
-      submit = find(:link_or_button, label)
-      assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
-      submit.click
-    else
-      submit = first(:css, "input[type='submit']")
-      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] on #{page.current_path}"
-      submit.click
-    end
-
+    submit.click
     synchronize!
     true
   end
