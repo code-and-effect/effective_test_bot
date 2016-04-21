@@ -2,6 +2,19 @@ module EffectiveTestBotTestHelper
   # This makes sure capybara is done, and breaks out of any 'within' blocks
   def synchronize!
     page.document.find('html')
+    wait_for_ajax
+  end
+
+  # https://gist.github.com/josevalim/470808#gistcomment-1268491
+  def wait_for_ajax
+    Timeout.timeout(Capybara.default_max_wait_time) do
+      loop until finished_all_ajax_requests?
+    end
+  end
+
+  def finished_all_ajax_requests?
+    ajax_request_count = page.evaluate_script('jQuery.active')
+    ajax_request_count.present? && ajax_request_count.zero?
   end
 
   # Because capybara-webkit can't make delete requests, we need to use rack_test
