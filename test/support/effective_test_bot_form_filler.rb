@@ -221,24 +221,19 @@ module EffectiveTestBotFormFiller
   end
 
   def value_for_input_checkbox_field(field, fill_value)
-    if fill_value.present?
+    if ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(fill_value)
+      true
+    elsif ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(fill_value)
+      false
+    elsif fill_value.present?
       fill_values = Array(fill_value)  # Allow an array of fill values to be passed
-
-      if ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(fill_value)
-        fill_values = ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.to_a
-      end
-
-      if ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(fill_value)
-        fill_values = ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.to_a
-      end
-
       (fill_values.include?(field['value']) || fill_values.include?(field.find(:xpath, '..').text))
+    elsif field['required'].present?
+      true
     elsif field['value'] == 'true'
       true
     elsif field['value'] == 'false'
       false
-    elsif field['required'].present?
-      true
     else
       [true, false].sample
     end
@@ -346,7 +341,7 @@ module EffectiveTestBotFormFiller
       return fills[key].to_s if fills.key?(key)
     end
 
-    return fills[value].to_s if fills.key?(value)
+    return fills[value] if fills.key?(value)
 
     nil
   end
