@@ -121,7 +121,7 @@ module EffectiveTestBotFormFiller
     attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
     attribute = attributes.last.to_s
 
-    fill_value = fill_value_for_field(fills, attributes)
+    fill_value = fill_value_for_field(fills, attributes, field['value'])
 
     # If there is a predefined fill value for this field return it now
     # except for select, checkbox and radio fields which we want to match by value or label
@@ -337,14 +337,16 @@ module EffectiveTestBotFormFiller
 
   private
 
-  def fill_value_for_field(fills, attributes)
-    return if fills.blank? || attributes.blank?
+  def fill_value_for_field(fills, attributes, value)
+    return if fills.blank? || (attributes.blank? && value.blank?)
 
     key = nil
     attributes.reverse_each do |name|  # match last_name, then something_attributes.last_name, then user.something_attributes.last_name
       key = (key.present? ? "#{name}.#{key}" : name) # builds up the string as we go along
       return fills[key].to_s if fills.key?(key)
     end
+
+    return fills[value].to_s if fills.key?(value)
 
     nil
   end
