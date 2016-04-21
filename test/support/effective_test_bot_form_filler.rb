@@ -107,6 +107,7 @@ module EffectiveTestBotFormFiller
     @filled_numeric_fields = nil
     @filled_password_fields = nil
     @filled_radio_fields = nil
+    @filled_country_fields = nil
 
     save_test_bot_screenshot
   end
@@ -170,6 +171,12 @@ module EffectiveTestBotFormFiller
         Faker::Address.street_address
       elsif attribute.include?('name')
         Faker::Name.name
+      elsif attribute.include?('postal_code')
+        if @filled_country_fields == 'US'
+          DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample
+        else
+          LETTERS.sample + DIGITS.sample + LETTERS.sample + ' ' + DIGITS.sample + LETTERS.sample + DIGITS.sample
+        end
       elsif attribute.include?('postal') # Make a Canadian postal code
         LETTERS.sample + DIGITS.sample + LETTERS.sample + ' ' + DIGITS.sample + LETTERS.sample + DIGITS.sample
       elsif attribute.include?('zip') && attribute.include?('code') # Make a US zip code
@@ -202,12 +209,18 @@ module EffectiveTestBotFormFiller
     when 'select'
       if fill_value.present? # accept a value or text
         field.all('option:enabled').each do |option|
-          return option.text if (option.text == fill_value || option.value.to_s == fill_value)
+          if (option.text == fill_value || option.value.to_s == fill_value)
+            @filled_country_fields = option.value if attribute == 'country_code'
+            return option.text
+          end
         end
       end
 
-      field.all('option:enabled').select { |option| option.value.present? }.sample.try(:text) || '' # Don't select an empty option
+      option = field.all('option:enabled').select { |option| option.value.present? }.sample
 
+      @filled_country_fields = option.try(:value) if attribute == 'country_code' # So Postal Code can be set to a valid one
+
+      option.try(:text) || ''
     when 'input_tel'
       d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
