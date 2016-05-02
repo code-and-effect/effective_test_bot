@@ -5,6 +5,7 @@ require "effective_test_bot/version"
 module EffectiveTestBot
   mattr_accessor :except
   mattr_accessor :only
+  mattr_accessor :fail_fast
   mattr_accessor :screenshots
   mattr_accessor :autosave_animated_gif_on_failure
   mattr_accessor :tour_mode

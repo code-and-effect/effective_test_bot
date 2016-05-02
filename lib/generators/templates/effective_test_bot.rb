@@ -17,6 +17,9 @@ if Rails.env.test?
     #   'posts', 'events#index'
     # ]
 
+    # Exits immediately if there is a test failure
+    config.fail_fast = true
+
     # Should capybara generate a series of *.png screenshots as it goes through the test?
     # Disabling screenshots will also disable animated_gifs and touring
     config.screenshots = true

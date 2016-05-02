@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'minitest'
   s.add_dependency 'minitest-rails'
   s.add_dependency 'minitest-capybara'
+  s.add_dependency 'minitest-fail-fast'
   s.add_dependency 'minitest-rails-capybara'
   s.add_dependency 'minitest-reporters'
   s.add_dependency 'capybara'

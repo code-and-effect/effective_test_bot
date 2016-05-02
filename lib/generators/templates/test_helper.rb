@@ -16,7 +16,6 @@ require 'capybara/slow_finder_errors'
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
-  # Add more helper methods to be used by all tests here...
   use_transactional_fixtures = true
 end
 
@@ -26,18 +25,7 @@ class ActionDispatch::IntegrationTest
   include Capybara::Assertions
   include Capybara::Screenshot::MiniTestPlugin
   include Warden::Test::Helpers if defined?(Devise)
-
-  # def setup # Called before every test
-  # end
-
-  # def teardown # Called after every test
-  # end
-
-  def after_teardown # I reset sessions here so capybara-screenshot can still make screenshots when tests fail
-    super(); Capybara.reset_sessions!
-  end
 end
-
 
 Capybara.default_driver = :webkit
 Capybara.javascript_driver = :webkit
@@ -52,9 +40,7 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 Rails.backtrace_cleaner.remove_silencers!
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
 
-
-### So this is EffectiveTestBot 'code' here
-### That gets run just once before the whole test suite loads
+### Effective Test Bot specific stuff below ###
 
 # So the very first thing I do is set up a consistent database
 silence_stream(STDOUT) do
@@ -74,6 +60,10 @@ ActiveRecord::Migration.maintain_test_schema!
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke
 Rake::Task['test:load_fixture_seeds'].invoke # This is included by effective_test_bot.  It just runs the app's test/fixtures/seeds.rb if it exists
+
+if EffectiveTestBot.fail_fast
+  require 'minitest/fail_fast'
+end
 
 # Make all database transactions use the same thread, otherwise signing up in capybara won't get rolled back
 # This must be run after the Rake::Tasks above
