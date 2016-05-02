@@ -14,8 +14,7 @@ module EffectiveTestBotScreenshotsHelper
   # end
 
   # This gets called after every test.  Minitest hook for plugin developers
-  def after_teardown
-    super
+  def before_teardown
     return unless EffectiveTestBot.screenshots? && (@test_bot_screenshot_id || 0) > 0
 
     if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
