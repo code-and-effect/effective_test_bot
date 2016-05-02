@@ -79,7 +79,11 @@ rake test:load_fixture_seeds
 
 Your initial user may be created by any of the above 3 tasks.
 
-Finally, to test that your testing environment is set up correctly run `rake test:bot:environment` and have all tests pass.
+Finally, to test that your testing environment is set up correctly run and work through any issues with:
+
+```
+rake test:bot:environment
+```
 
 You now have effective_test_bot configured and you're ready to go.
 
