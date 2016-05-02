@@ -30,11 +30,11 @@ module EffectiveTestBotAssertions
   end
 
   def assert_jquery_present(message = "Expected jquery ($.fn.jquery) to be present")
-    assert((page.evaluate_script('$.fn.jquery') rescue '').length > 0, message)
+    assert((page.evaluate_script('$.fn.jquery') rescue nil).to_s.length > 0, message)
   end
 
   def assert_jquery_ujs_present(message = "Expected rails' jquery_ujs ($.rails) to be present")
-    assert((page.evaluate_script('$.rails') rescue '').length > 0, message)
+    assert((page.evaluate_script('$.rails') rescue nil).to_s.length > 0, message)
   end
 
   def assert_page_title(title = :any, message = '(page_title) Expected page title to be present')
