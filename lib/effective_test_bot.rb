@@ -14,6 +14,8 @@ module EffectiveTestBot
   mattr_accessor :animated_gif_delay
   mattr_accessor :animated_gif_background_color
 
+  mattr_accessor :passed_tests # This isn't a config variable.
+
   def self.setup
     yield self
   end
@@ -35,7 +37,7 @@ module EffectiveTestBot
       test = test[(left+1)..(right-1)]
     end
 
-    if failed_tests_only? && test.present? && EffectiveTestBotMinitestHelper.passed_tests[test]
+    if failed_tests_only? && test.present? && passed_tests[test]
       return true
     end
 
@@ -102,6 +104,24 @@ module EffectiveTestBot
     end
   end
 
+  def self.passed_tests
+    @@passed_tests ||= load_passed_tests
+  end
+
+  def self.load_passed_tests
+    {}.tap do |tests|
+      (File.readlines(passed_tests_filename).each { |line| tests[line.chomp] = true } rescue nil)
+    end
+  end
+
+  def self.save_passed_test(name)
+    EffectiveTestBot.passed_tests[name] = true
+
+    File.open(passed_tests_filename, 'w') do |file|
+      passed_tests.each { |test_name, _| file.puts(test_name) }
+    end
+  end
+
   private
 
   def self.onlies
@@ -145,6 +165,10 @@ module EffectiveTestBot
         skip
       end
     end.compact.sort
+  end
+
+  def self.passed_tests_filename
+    "#{Rails.root}/tmp/test_bot/passed_tests.txt"
   end
 
 end

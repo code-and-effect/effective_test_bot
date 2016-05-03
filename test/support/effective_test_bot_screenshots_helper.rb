@@ -74,6 +74,33 @@ module EffectiveTestBotScreenshotsHelper
 
   private
 
+  # There are 3 different paths we're working with
+  # current_test_temp_path: contains individually numbered .png screenshots produced by capybara
+  # current_test_tour_path: destination for .gifs of passing tests
+  # current_test_failure_path: destination for .gifs of failing tests
+
+  def current_test_temp_path
+    @_current_test_temp_path ||= "#{Rails.root}/tmp/test_bot/#{current_test_name.parameterize}"
+  end
+
+  def current_test_failure_path
+    "#{Rails.root}/tmp/test_bot"
+  end
+
+  def current_test_failure_filename
+    # Match Capybara-screenshots format-ish
+    "#{current_test_name.parameterize}_failure_#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
+  end
+
+  # Where the tour animated gif ends up
+  def current_test_tour_path
+    "#{Rails.root}/test/tours"
+  end
+
+  def current_test_tour_filename
+    "#{current_test_name.parameterize}.gif"
+  end
+
   # Auto incrementing counter
   # The very first screenshot will be 01.png (tmp/test_bot/posts#new/01.png)
   def current_test_screenshot_id
