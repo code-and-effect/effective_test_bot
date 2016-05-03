@@ -1,4 +1,5 @@
 require 'timeout'
+require 'faker'
 
 module EffectiveTestBotFormFiller
   DIGITS = ('1'..'9').to_a
@@ -69,7 +70,7 @@ module EffectiveTestBotFormFiller
       skip_field_screenshot = false
 
       case [field.tag_name, field['type']].compact.join('_')
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio'
+      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'input_url'
         field.set(value_for_field(field, fills))
       when 'textarea'
         value = value_for_field(field, fills)
@@ -91,7 +92,7 @@ module EffectiveTestBotFormFiller
         else
           field.set(value_for_field(field, fills))
         end
-      when 'input_submit', 'input_search'
+      when 'input_submit', 'input_search', 'input_button'
         skip_field_screenshot = true
         # Do nothing
       else
@@ -224,6 +225,9 @@ module EffectiveTestBotFormFiller
     when 'input_tel'
       d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
+
+    when 'input_url'
+      Faker::Internet.url
 
     when 'textarea'
       Faker::Lorem.paragraph
