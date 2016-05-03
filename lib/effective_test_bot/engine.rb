@@ -20,6 +20,7 @@ module EffectiveTestBot
           ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
           ActionDispatch::IntegrationTest.include EffectiveTestBotFormFiller
           ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
+          ActionDispatch::IntegrationTest.include EffectiveTestBotMinitestHelper
           ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
           ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
 
