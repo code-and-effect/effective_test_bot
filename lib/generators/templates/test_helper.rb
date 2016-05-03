@@ -61,7 +61,7 @@ Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds fir
 Rake::Task['db:seed'].invoke
 Rake::Task['test:load_fixture_seeds'].invoke # This is included by effective_test_bot.  It just runs the app's test/fixtures/seeds.rb if it exists
 
-if EffectiveTestBot.fail_fast
+if EffectiveTestBot.fail_fast?
   require 'minitest/fail_fast'
 end
 

@@ -56,6 +56,16 @@ module EffectiveTestBot
     screenshots && autosave_animated_gif_on_failure
   end
 
+  def self.fail_fast?
+    fails = ENV['FAIL_FAST'] || ENV['FAILFAST'] || ENV['FAIL']
+
+    if fails.present?
+      ['true', '1'].include?(fails).to_s.downcase)
+    else
+      fail_fast
+    end
+  end
+
   def self.tour_mode?
     if ENV['TOUR'].present?
       ['true', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
