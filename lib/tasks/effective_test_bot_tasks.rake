@@ -96,6 +96,13 @@ namespace :test do
       ENV['FAILS'] ||= 'true'
       Rake::Task['test:bot'].invoke
     end
+
+    desc 'Runs effective_test_bot while skipping all previously passed tests'
+    task :failed do
+      ENV['FAILS'] ||= 'true'
+      Rake::Task['test:bot'].invoke
+    end
+
   end # /namespace bot
 
   desc 'loads test/fixtures/seeds.rb'
