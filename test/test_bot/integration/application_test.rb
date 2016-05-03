@@ -11,8 +11,6 @@ module TestBot
 
       # Go through every route, and run an appropriate test suite on it
       def initialize_tests
-        puts 'test_bot scanning....'
-
         @test_bot_user = User.first
 
         routes = Rails.application.routes.routes.to_a

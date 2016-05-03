@@ -97,7 +97,7 @@ module TestBotable
         public_instance_methods.select do |name|
           name = name.to_s
           TEST_BOT_TEST_PREFIXES.any? { |prefix| name.starts_with?(prefix) }
-        end.map(&:to_s) + super
+        end.map { |name| name.to_s } + super
       end
 
       protected
