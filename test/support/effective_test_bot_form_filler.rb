@@ -74,7 +74,7 @@ module EffectiveTestBotFormFiller
         field.set(value_for_field(field, fills))
       when 'textarea'
         value = value_for_field(field, fills)
-        field['class'].to_s.include?('ckeditor') ? fill_ckeditor_text_area(field, value) : field.set(value)
+        ckeditor_text_area?(field) ? fill_ckeditor_text_area(field, value) : field.set(value)
       when 'select'
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
           page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
@@ -370,12 +370,15 @@ module EffectiveTestBotFormFiller
     @test_bot_excluded_fields_xpath = nil
   end
 
+  def ckeditor_text_area?(field)
+    return false unless field.tag_name == 'textarea'
+    (field['class'].to_s.include?('ckeditor') || all("span[id='cke_#{field['id']}']").present?)
+  end
+
   def skip_form_field?(field)
     field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
 
-    ckeditor = (field.tag_name == 'textarea' && field['class'].to_s.include?('ckeditor'))
-
-    (field.visible? == false && !ckeditor) ||
+    (field.visible? == false && !ckeditor_text_area?(field)) ||
     field.disabled? ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
