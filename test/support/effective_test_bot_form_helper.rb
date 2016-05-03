@@ -68,8 +68,8 @@ module EffectiveTestBotFormHelper
       submit = find(:link_or_button, label)
       assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
     else
-      submit = first(:css, "input[type='submit']")
-      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] on #{page.current_path}"
+      submit = first(:css, "input[type='submit'],button[type='submit']")
+      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] or button[type='submit'] on #{page.current_path}"
     end
 
     if EffectiveTestBot.screenshots?
