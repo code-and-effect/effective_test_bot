@@ -199,8 +199,11 @@ module EffectiveTestBotFormFiller
       Faker::Internet.email
 
     when 'input_file'
-      "#{File.dirname(__FILE__)}/documents._test"
-
+      if field['class'].to_s.include?('asset-box-uploader-fileinput')
+        "#{File.dirname(__FILE__)}/documents._test"
+      else
+        "#{File.dirname(__FILE__)}/logo.png"
+      end
     when 'input_number'
       value_for_input_numeric_field(field, "input[type='number'][name$='[#{attribute}]']")
 
