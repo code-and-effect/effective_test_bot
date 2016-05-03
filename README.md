@@ -574,6 +574,18 @@ rake test:tour
 rake test:tourv
 ```
 
+### Fail Fast
+
+Set `config.fail_fast = true` to exit immediately if there is a test failure.
+
+Or, override the config setting by running the following:
+
+```
+rake test:bot FAILFAST=true
+```
+
+This functionality is provided thanks to [minitest-fail-fast](https://github.com/teoljungberg/minitest-fail-fast/)
+
 ## License
 
 MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
