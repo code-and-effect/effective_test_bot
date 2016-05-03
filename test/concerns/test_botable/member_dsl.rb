@@ -22,7 +22,7 @@ module TestBotable
 
         method_name = test_bot_method_name('member_test', options[:current_test])
 
-        define_method(method_name) { member_action_test(controller: controller, action: action, user: user, member: member, options: options) }
+        define_method(method_name) { member_action_test(controller: controller, action: action, user: user, member: member, **options) }
       end
 
     end

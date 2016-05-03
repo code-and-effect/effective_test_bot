@@ -23,7 +23,7 @@ module TestBotable
 
           method_name = test_bot_method_name('devise_test', options[:current_test])
 
-          define_method(method_name) { devise_action_test(test: test, options: options) }
+          define_method(method_name) { devise_action_test(test: test, **options) }
         end
       end
 

@@ -21,7 +21,7 @@ module TestBotable
 
         method_name = test_bot_method_name('page_test', options[:current_test])
 
-        define_method(method_name) { page_action_test(path: path, user: user, options: options) }
+        define_method(method_name) { page_action_test(path: path, user: user, **options) }
       end
 
     end

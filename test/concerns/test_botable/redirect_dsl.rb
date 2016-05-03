@@ -20,7 +20,7 @@ module TestBotable
 
         method_name = test_bot_method_name('redirect_test', options[:current_test])
 
-        define_method(method_name) { redirect_action_test(from: from, to: to, user: user, options: options) }
+        define_method(method_name) { redirect_action_test(from: from, to: to, user: user, **options) }
       end
     end
 
