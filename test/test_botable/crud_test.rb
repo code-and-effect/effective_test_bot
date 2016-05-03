@@ -118,9 +118,9 @@ module CrudTest
 
     assert_page_normal
     assert_assigns(resource_name) # unskippable
-    assert_form("form#edit_#{resource_name}_#{resource.id}") unless test_bot_skip?(:form)
+    assert_form("form[id^='edit_#{resource_name}']") unless test_bot_skip?(:form)
 
-    within_if("form#edit_#{resource_name}_#{resource.id}", !test_bot_skip?(:form)) do
+    within_if("form[id^='edit_#{resource_name}']", !test_bot_skip?(:form)) do
       assert_submit_input unless test_bot_skip?(:submit_input)
       assert_jquery_ujs_disable_with unless test_bot_skip?(:jquery_ujs_disable_with)
     end
@@ -134,9 +134,7 @@ module CrudTest
 
     before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_form("form#edit_#{resource_name}_#{resource.id}") unless test_bot_skip?(:form)
-
-    within_if("form#edit_#{resource_name}_#{resource.id}", !test_bot_skip?(:form)) do
+    within_if("form[id^='edit_#{resource_name}']", !test_bot_skip?(:form)) do
       clear_form
       submit_novalidate_form
     end
@@ -169,9 +167,7 @@ module CrudTest
 
     before = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
-    assert_form("form#edit_#{resource_name}_#{resource.id}") unless test_bot_skip?(:form)
-
-    within_if("form#edit_#{resource_name}_#{resource.id}", !test_bot_skip?(:form)) do
+    within_if("form[id^='edit_#{resource_name}']", !test_bot_skip?(:form)) do
       fill_form(resource_attributes)
       submit_form
     end
