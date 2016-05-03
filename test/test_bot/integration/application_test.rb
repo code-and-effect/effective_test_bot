@@ -68,7 +68,7 @@ module TestBot
             page_test(path: "#{route.name}_path".to_sym, route: route, label: "#{route.name}_path")
 
           else
-            puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
+            #puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
 
           end # / Routes
         end
