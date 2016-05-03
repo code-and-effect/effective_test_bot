@@ -138,12 +138,16 @@ module EffectiveTestBotFormFiller
       if classes.include?('date') # Let's assume this is a date input.
         if attribute.include?('end') # Make sure end dates are after start dates
           Faker::Date.forward(365).strftime('%Y-%m-%d')
+        elsif attribute.include?('closing')
+          Faker::Date.forward(30).strftime('%Y-%m-%d')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d')
         end
       elsif classes.include?('datetime')
         if attribute.include?('end')
           Faker::Date.forward(365).strftime('%Y-%m-%d %H:%m')
+        elsif attribute.include?('closing')
+          Faker::Date.forward(30).strftime('%Y-%m-%d %H:%m')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
         end
@@ -195,7 +199,7 @@ module EffectiveTestBotFormFiller
       Faker::Internet.email
 
     when 'input_file'
-      "#{File.dirname(__FILE__)}/important_documents._test"
+      "#{File.dirname(__FILE__)}/documents._test"
 
     when 'input_number'
       value_for_input_numeric_field(field, "input[type='number'][name$='[#{attribute}]']")
