@@ -59,11 +59,10 @@ module BaseTest
         assert_submit_input "TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}"
         submit_novalidate_form
       end
+
+      obj = resource_class.last
+      assert obj.present?, "TestBotError: Failed to create a resource after submitting form. Errors: #{(assigns[resource_name] || {})['errors']}\n#{hint}."
     end
-
-    obj = resource_class.last
-
-    assert obj.present?, "TestBotError: Failed to create a resource after submitting form. Errors: #{(assigns[resource_name] || {})['errors']}\n#{hint}."
 
     obj
   end

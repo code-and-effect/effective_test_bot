@@ -54,7 +54,7 @@ module EffectiveTestBotFormFiller
     save_test_bot_screenshot
 
     # Support for the cocoon gem
-    all('a.add_fields[data-association-insertion-template]').each do |field|
+    all('a.add_fields[data-association-insertion-template],a.has_many_add').each do |field|
       next if skip_form_field?(field)
 
       if EffectiveTestBot.tour_mode_extreme?
