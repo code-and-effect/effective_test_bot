@@ -50,8 +50,8 @@ module EffectiveTestBotAssertions
     assert all(selector).present?, message.sub(':selector:', selector)
   end
 
-  def assert_submit_input(message = "(submit_input) Expected one or more visible input[type='submit'] to be present")
-    assert all('input[type=submit]').present?, message
+  def assert_submit_input(message = "(submit_input) Expected one or more visible input[type='submit'] or button[type='submit'] to be present")
+    assert all("input[type='submit'],button[type='submit']").present?, message
   end
 
   def assert_page_status(status = 200, message = '(page_status) Expected :status: HTTP status code')
@@ -71,6 +71,11 @@ module EffectiveTestBotAssertions
     else
       refute_equal from_path, page.current_path, message || "(redirect) Expected redirect away from #{from_path}"
     end
+  end
+
+  def assert_no_ajax_requests(message = "(no_ajax_requests) :count: Unexpected AJAX requests present")
+    active = page.evaluate_script('jQuery.active')
+    assert (active.blank? || active.zero?), message.sub(':count:', active.to_s)
   end
 
   def assert_no_js_errors(message = nil)
