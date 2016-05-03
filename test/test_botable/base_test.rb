@@ -36,13 +36,20 @@ module BaseTest
     obj = resource_class.last
     return obj if obj.present? && !obj.kind_of?(User)
 
-    hint = "Unable to find_or_create_resource!\nEither fixture/seed an instance of #{resource_class} or ensure that submitting form#new_#{resource_name} on #{(new_resource_path rescue nil) || 'the resource new page'} creates a new #{resource_name}"
-
     # It doesn't exist, so lets go to the new page and submit a form to build one
     without_screenshots do
-      assert((new_resource_path rescue nil), "TestBotError: Generated polymorphic route new_#{[*controller_namespace, resource_name].compact.join('_')}_path is undefined. #{hint}")
+      new_resource_paths = [  # TODO: enumerate all controller namespaces instead of just admin
+        (new_resource_path rescue nil),
+        (new_polymorphic_path(resource) rescue nil),
+        (new_polymorphic_path([:admin, resource]) rescue nil),
+        (new_polymorphic_path([:members, resource]) rescue nil)
+      ].compact
 
-      visit(new_resource_path)
+      hint = "Unable to find_or_create_resource!\nEither fixture/seed an instance of #{resource_class} or ensure that submitting form#new_#{resource_name} on #{(new_resource_paths.first rescue nil) || 'the resource new page'} creates a new #{resource_name}"
+
+      assert(new_resource_paths.present?, "TestBotError: Generated polymorphic route new_#{[*controller_namespace, resource_name].compact.join('_')}_path is undefined. #{hint}")
+
+      visit(new_resource_paths.first)
 
       assert_form("form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
 
@@ -55,7 +62,8 @@ module BaseTest
     end
 
     obj = resource_class.last
-    assert obj.present?, "TestBotError: Failed to create a resource after submitting form. #{hint}"
+
+    assert obj.present?, "TestBotError: Failed to create a resource after submitting form. Errors: #{(assigns[resource_name] || {})['errors']}\n#{hint}."
 
     obj
   end
