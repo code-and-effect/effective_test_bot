@@ -20,6 +20,11 @@ if Rails.env.test?
     # Exits immediately if there is a test failure
     config.fail_fast = true
 
+    # Fill form fields with these values
+    # Based on the input name
+    # :email => 'somethign@soneone.com', 'user.last_name' => 'hlwerewr'
+    config.form_fills = {}
+
     # Should capybara generate a series of *.png screenshots as it goes through the test?
     # Disabling screenshots will also disable animated_gifs and touring
     config.screenshots = true
@@ -33,7 +38,7 @@ if Rails.env.test?
     # Also enabled the crud_test #tour type tests
     #
     # You can override this default by setting an ENV or calling
-    # `rake test:bot TOUR=true`   or `rake test:bot TEST=posts TOUR=verbose`
+    # `rake test:bot TOUR=true` or `rake test:bot TEST=posts TOUR=verbose`
     #
     # Valid values are true / false / :verbose
     config.tour_mode = false

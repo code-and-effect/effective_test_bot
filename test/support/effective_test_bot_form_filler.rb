@@ -6,9 +6,7 @@ module EffectiveTestBotFormFiller
   LETTERS = ('A'..'Z').to_a
 
   # Fill a boostrap tabs based form
-  def fill_bootstrap_tabs_form(fills = HashWithIndifferentAccess.new, boostrap_tab_elements = nil)
-    fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
-
+  def fill_bootstrap_tabs_form(fills = {}, boostrap_tab_elements = nil)
     tabs = boostrap_tab_elements || all("a[data-toggle='tab']")
 
     # If there's only 1 tab, just fill it out
@@ -48,8 +46,7 @@ module EffectiveTestBotFormFiller
 
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
-  def fill_form_fields(fills = HashWithIndifferentAccess.new)
-    fills = HashWithIndifferentAccess.new(fills) unless fills.kind_of?(HashWithIndifferentAccess)
+  def fill_form_fields(fills = {})
 
     save_test_bot_screenshot
 
@@ -118,7 +115,7 @@ module EffectiveTestBotFormFiller
   #
   # Operates on just string keys, no symbols here
 
-  def value_for_field(field, fills = nil)
+  def value_for_field(field, fills = {})
     field_name = [field.tag_name, field['type']].compact.join('_')
     attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
     attribute = attributes.last.to_s
@@ -138,16 +135,12 @@ module EffectiveTestBotFormFiller
       if classes.include?('date') # Let's assume this is a date input.
         if attribute.include?('end') # Make sure end dates are after start dates
           Faker::Date.forward(365).strftime('%Y-%m-%d')
-        elsif attribute.include?('closing')
-          Faker::Date.forward(30).strftime('%Y-%m-%d')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d')
         end
       elsif classes.include?('datetime')
         if attribute.include?('end')
           Faker::Date.forward(365).strftime('%Y-%m-%d %H:%m')
-        elsif attribute.include?('closing')
-          Faker::Date.forward(30).strftime('%Y-%m-%d %H:%m')
         else
           Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
         end

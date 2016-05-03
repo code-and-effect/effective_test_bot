@@ -3,16 +3,15 @@ require 'timeout'
 module EffectiveTestBotFormHelper
   # Intelligently fills a form with Faker based randomish input
   # Delegates the form fill logic to effective_test_bot_form_filler
-  def fill_form(local_fills = {})
-    # The fills here are from a let!(:fills) { 'Something' } as defined in an _action test
-    fill_values = ((fills if defined?(fills)) || HashWithIndifferentAccess.new).merge(local_fills)
-
+  def fill_form(fills = {})
     bootstrap_tabs = all("a[data-toggle='tab']")
 
+    form_fills = HashWithIndifferentAccess.new((EffectiveTestBot.form_fills || {}).merge(fills || {}))
+
     if bootstrap_tabs.length > 1
-      fill_bootstrap_tabs_form(fill_values, bootstrap_tabs)
+      fill_bootstrap_tabs_form(form_fills, bootstrap_tabs)
     else
-      fill_form_fields(fill_values)
+      fill_form_fields(form_fills)
     end
     true
   end

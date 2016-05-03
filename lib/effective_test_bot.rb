@@ -6,6 +6,7 @@ module EffectiveTestBot
   mattr_accessor :except
   mattr_accessor :only
   mattr_accessor :fail_fast
+  mattr_accessor :form_fills
   mattr_accessor :screenshots
   mattr_accessor :autosave_animated_gif_on_failure
   mattr_accessor :tour_mode
@@ -53,16 +54,16 @@ module EffectiveTestBot
   end
 
   def self.autosave_animated_gif_on_failure?
-    screenshots && autosave_animated_gif_on_failure
+    screenshots? && autosave_animated_gif_on_failure
   end
 
   def self.fail_fast?
-    fails = ENV['FAIL_FAST'] || ENV['FAILFAST'] || ENV['FAIL']
+    fails = (ENV['FAIL_FAST'] || ENV['FAILFAST'] || ENV['FAIL'])
 
     if fails.present?
       ['true', '1'].include?(fails.to_s.downcase)
     else
-      fail_fast
+      fail_fast == true
     end
   end
 
@@ -70,7 +71,7 @@ module EffectiveTestBot
     if ENV['TOUR'].present?
       ['true', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
-      screenshots && (tour_mode != false)
+      screenshots? && (tour_mode != false)
     end
   end
 
@@ -79,7 +80,7 @@ module EffectiveTestBot
     if ENV['TOUR'].present?
       ['extreme', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
-      screenshots && ['extreme', 'debug'].include?(tour_mode.to_s)
+      screenshots? && ['extreme', 'debug'].include?(tour_mode.to_s)
     end
   end
 
@@ -87,7 +88,7 @@ module EffectiveTestBot
     if ENV['TOUR'].present?
       ['extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
-      screenshots && ['extreme', 'verbose', 'debug'].include?(tour_mode.to_s)
+      screenshots? && ['extreme', 'verbose', 'debug'].include?(tour_mode.to_s)
     end
   end
 
