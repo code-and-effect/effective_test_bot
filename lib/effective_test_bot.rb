@@ -35,6 +35,10 @@ module EffectiveTestBot
       test = test[(left+1)..(right-1)]
     end
 
+    if failed_tests_only? && test.present? && EffectiveTestBotMinitestHelper.passed_tests[test]
+      return true
+    end
+
     value = "#{test} #{assertion}".strip # This is the format config.excepts is flattened into
     test_prefix = test.split('#').first
 
@@ -58,12 +62,18 @@ module EffectiveTestBot
   end
 
   def self.fail_fast?
-    fails = (ENV['FAIL_FAST'] || ENV['FAILFAST'] || ENV['FAIL'])
-
-    if fails.present?
-      ['true', '1'].include?(fails.to_s.downcase)
+    if (ENV['FAIL_FAST'] || ENV['FAILFAST']).present?
+      ['true', '1'].include?((ENV['FAIL_FAST'] || ENV['FAILFAST']).to_s.downcase)
     else
       fail_fast == true
+    end
+  end
+
+  def self.failed_tests_only?
+    if (ENV['FAILS'] || ENV['FAIL']).present?
+      ['true', '1'].include?((ENV['FAILS'] || ENV['FAIL']).to_s.downcase)
+    else
+      false
     end
   end
 
