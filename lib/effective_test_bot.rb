@@ -60,7 +60,7 @@ module EffectiveTestBot
     fails = ENV['FAIL_FAST'] || ENV['FAILFAST'] || ENV['FAIL']
 
     if fails.present?
-      ['true', '1'].include?(fails).to_s.downcase)
+      ['true', '1'].include?(fails.to_s.downcase)
     else
       fail_fast
     end
