@@ -117,6 +117,8 @@ module EffectiveTestBot
   def self.save_passed_test(name)
     EffectiveTestBot.passed_tests[name] = true
 
+    Dir.mkdir(passed_tests_path) unless File.exists?(passed_tests_path)
+
     File.open(passed_tests_filename, 'w') do |file|
       passed_tests.each { |test_name, _| file.puts(test_name) }
     end
@@ -167,8 +169,12 @@ module EffectiveTestBot
     end.compact.sort
   end
 
+  def self.passed_tests_path
+    "#{Rails.root}/tmp/test_bot"
+  end
+
   def self.passed_tests_filename
-    "#{Rails.root}/tmp/test_bot/passed_tests.txt"
+    "#{passed_tests_path}/passed_tests.txt"
   end
 
 end
