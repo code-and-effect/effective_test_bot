@@ -18,12 +18,13 @@ module TestBotable
 
       def devise_test(label: nil, **options)
         [:sign_up, :sign_in_valid, :sign_in_invalid].each do |test|
-          options[:current_test] = label || test
-          next if EffectiveTestBot.skip?(options[:current_test])
+          options_for_method = options.dup
+          options_for_method[:current_test] = label || test
+          next if EffectiveTestBot.skip?(options_for_method[:current_test])
 
-          method_name = test_bot_method_name('devise_test', options[:current_test])
+          method_name = test_bot_method_name('devise_test', options_for_method[:current_test])
 
-          define_method(method_name) { devise_action_test(test: test, **options) }
+          define_method(method_name) { devise_action_test(test: test, **options_for_method) }
         end
       end
 
