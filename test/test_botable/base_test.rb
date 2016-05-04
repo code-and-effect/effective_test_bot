@@ -38,26 +38,32 @@ module BaseTest
 
     # It doesn't exist, so lets go to the new page and submit a form to build one
     without_screenshots do
-      new_resource_paths = [  # TODO: enumerate all controller namespaces instead of just admin
-        (new_resource_path rescue nil),
-        (new_polymorphic_path(resource) rescue nil),
-        (new_polymorphic_path([:admin, resource]) rescue nil),
-        (new_polymorphic_path([:members, resource]) rescue nil)
-      ].compact
+      # TODO: enumerate all controller namespaces instead of just admin and members
+      new_path = (new_resource_path rescue nil)
+      new_path ||= (new_polymorphic_path(resource) rescue nil)
+      new_path ||= (new_polymorphic_path([:admin, resource]) rescue nil)
+      new_path ||= (new_polymorphic_path([:members, resource]) rescue nil)
 
-      hint = "Unable to find_or_create_resource!\nEither fixture/seed an instance of #{resource_class} or ensure that submitting form#new_#{resource_name} on #{(new_resource_paths.first rescue nil) || 'the resource new page'} creates a new #{resource_name}"
+      hint = "Unable to find_or_create_resource!\n"
+      hint += "Either fixture/seed an instance of #{resource_class} or ensure that submitting form#new_#{resource_name} "
+      hint += "on #{(new_path rescue nil) || 'the resource new page'} creates a new #{resource_name}"
 
-      assert(new_resource_paths.present?, "TestBotError: Generated polymorphic route new_#{[*controller_namespace, resource_name].compact.join('_')}_path is undefined. #{hint}")
+      assert(new_path.present?, "TestBotError: Generated polymorphic route new_#{[*controller_namespace, resource_name].compact.join('_')}_path is undefined. #{hint}")
 
-      visit(new_resource_paths.first)
+      visit(new_path)
+      assert_no_exceptions
+      assert_page_status
 
       assert_form("form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
 
       within_if("form#new_#{resource_name}", !test_bot_skip?(:form)) do
-        fill_form(resource_attributes)
+        assert_submit_input("TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}")
 
-        assert_submit_input "TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}"
+        fill_form(resource_attributes)
         submit_novalidate_form
+
+        assert_no_exceptions
+        assert_page_status
       end
 
       obj = resource_class.last
