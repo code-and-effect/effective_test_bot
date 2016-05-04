@@ -18,11 +18,11 @@ if Rails.env.test?
     # ]
 
     # Exits immediately if there is a test failure
-    config.fail_fast = true
+    config.fail_fast = false
 
     # Fill form fields with these values
     # Based on the input name
-    # :email => 'somethign@soneone.com', 'user.last_name' => 'hlwerewr'
+    # :email => 'j.smith@example.com', 'user.last_name' => 'Smith'
     config.form_fills = {}
 
     # Should capybara generate a series of *.png screenshots as it goes through the test?
