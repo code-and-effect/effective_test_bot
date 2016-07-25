@@ -91,9 +91,10 @@ namespace :test do
       Rake::Task['test:bot'].invoke
     end
 
-    desc 'Runs effective_test_bot while skipping all previously passed tests'
+    desc 'Runs effective_test_bot while skipping all previously passed tests upto the first failure'
     task :fail do
       ENV['FAILS'] ||= 'true'
+      ENV['FAIL_FAST'] ||= 'true'
       Rake::Task['test:bot'].invoke
     end
 

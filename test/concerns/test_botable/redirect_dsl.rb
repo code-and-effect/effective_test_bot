@@ -25,7 +25,7 @@ module TestBotable
     end
 
     # Instance Methods - Call me from within a test
-    def redirect_action_test(from:, to:, user: _test_bot_user(), options: {})
+    def redirect_action_test(from:, to:, user: _test_bot_user(), **options)
       begin
         assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: user))
       rescue => e

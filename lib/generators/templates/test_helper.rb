@@ -25,6 +25,10 @@ class ActionDispatch::IntegrationTest
   include Capybara::Assertions
   include Capybara::Screenshot::MiniTestPlugin
   include Warden::Test::Helpers if defined?(Devise)
+
+  def after_teardown # Some apps seem to need this to correctly reset the test_06:_capybara_can_sign_in
+    super(); Capybara.reset_sessions!
+  end
 end
 
 Capybara.default_driver = :webkit

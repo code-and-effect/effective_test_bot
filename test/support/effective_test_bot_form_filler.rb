@@ -17,8 +17,11 @@ module EffectiveTestBotFormFiller
     # Then we start at the first, and go left-to-right through all the tabs
     # clicking each one and filling any form fields found within
 
-    active_tab = find("li.active > a[data-toggle='tab']")
-    tab_content = find('div' + active_tab['href']).find(:xpath, '..')
+    active_tab = all("li.active > a[data-toggle='tab']").first
+
+    tab_content = if active_tab
+      find('div' + active_tab['href']).find(:xpath, '..')
+    end
 
     excluding_fields_with_parent(tab_content) { fill_form_fields(fills) }
 
@@ -365,7 +368,7 @@ module EffectiveTestBotFormFiller
 
   # Takes a capybara element
   def excluding_fields_with_parent(element, &block)
-    @test_bot_excluded_fields_xpath = element.path
+    @test_bot_excluded_fields_xpath = element.try(:path)
     yield
     @test_bot_excluded_fields_xpath = nil
   end

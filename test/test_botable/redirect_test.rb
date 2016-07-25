@@ -5,12 +5,12 @@ module RedirectTest
   protected
 
   def test_bot_redirect_test
-    sign_in(user) and visit(from_path)
+    sign_in(user) and visit(from)
 
-    assert_redirect(from_path, to_path)
+    assert_redirect(from, to)
     assert_page_normal
 
-    #page.save_screenshot("#{from_path.parameterize}.png")
+    #page.save_screenshot("#{from.parameterize}.png")
   end
 
 end
