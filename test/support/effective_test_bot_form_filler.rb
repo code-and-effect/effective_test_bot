@@ -3,7 +3,7 @@ require 'faker'
 
 module EffectiveTestBotFormFiller
   DIGITS = ('1'..'9').to_a
-  LETTERS = ('A'..'Z').to_a
+  LETTERS = %w(A B C E G H J K L M N P R S T V X Y)
 
   # Fill a boostrap tabs based form
   def fill_bootstrap_tabs_form(fills = {}, boostrap_tab_elements = nil)
@@ -327,7 +327,13 @@ module EffectiveTestBotFormFiller
   # http://stackoverflow.com/questions/5188240/using-selenium-to-imitate-dragging-a-file-onto-an-upload-element/11203629#11203629
   def upload_effective_asset(field, file)
     uid = field['id']
-    field.set(file)
+
+    begin
+      field.set(file)
+    rescue Capybara::Webkit::ClickFailed
+      puts "file upload failed to click #{uid}"
+      return
+    end
 
     # Wait till the Uploader bar goes away
     begin
