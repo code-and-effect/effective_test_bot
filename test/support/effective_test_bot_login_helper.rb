@@ -14,6 +14,8 @@ module EffectiveTestBotLoginHelper
     elsif user.kind_of?(User)
       raise 'user must be persisted' unless user.persisted?
       login_as(user)
+    elsif user == false
+      true # Do nothing
     else
       raise 'sign_in(user) expected a User or an email String'
     end

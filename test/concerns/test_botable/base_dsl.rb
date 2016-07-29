@@ -28,7 +28,7 @@ module TestBotable
 
       def normalize_test_bot_options!(options)
         raise 'expected options to be a Hash' unless options.kind_of?(Hash)
-        raise 'expected key :user to be a User' unless options[:user].kind_of?(User)
+        raise 'expected key :user to be a User' unless (options[:user].kind_of?(User) || options[:user] == false)
         #raise 'expected key :current_test to be a String' unless options[:current_test].kind_of?(String)
 
         # Controller stuff
