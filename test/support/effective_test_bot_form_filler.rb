@@ -70,7 +70,7 @@ module EffectiveTestBotFormFiller
       skip_field_screenshot = false
 
       case [field.tag_name, field['type']].compact.join('_')
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'input_url'
+      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'input_url', 'input_color'
         field.set(value_for_field(field, fills))
       when 'textarea'
         value = value_for_field(field, fills)
@@ -191,6 +191,9 @@ module EffectiveTestBotFormFiller
     when 'input_checkbox'
       value_for_input_checkbox_field(field, fill_value)
 
+    when 'input_color'
+      Faker::Color.hex_color
+
     when 'input_email'
       Faker::Internet.email
 
@@ -200,6 +203,7 @@ module EffectiveTestBotFormFiller
       else
         "#{File.dirname(__FILE__)}/../fixtures/logo.png"
       end
+
     when 'input_number'
       value_for_input_numeric_field(field, "input[type='number'][name$='[#{attribute}]']")
 
@@ -225,6 +229,7 @@ module EffectiveTestBotFormFiller
       @filled_country_fields = option.try(:value) if attribute == 'country_code' # So Postal Code can be set to a valid one
 
       option.try(:text) || ''
+
     when 'input_tel'
       d = 10.times.map { DIGITS.sample }
       d[0] + d[1] + d[2] + '-' + d[3] + d[4] + d[5] + '-' + d[6] + d[7] + d[8] + d[9]
