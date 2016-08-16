@@ -101,7 +101,7 @@ module BaseTest
   end
 
   def new_resource_path # new
-    path = new_polymorphic_path([*controller_namespace, resource])
+    new_polymorphic_path([*controller_namespace, resource_class])
   end
 
   def edit_resource_path(resource) # edit
