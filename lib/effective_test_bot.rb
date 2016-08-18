@@ -13,6 +13,7 @@ module EffectiveTestBot
   mattr_accessor :tour_mode_extreme
   mattr_accessor :animated_gif_delay
   mattr_accessor :animated_gif_background_color
+  mattr_accessor :backtrace_lines
 
   mattr_accessor :passed_tests # This isn't a config variable.
 

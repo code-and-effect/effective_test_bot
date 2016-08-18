@@ -20,6 +20,9 @@ if Rails.env.test?
     # Exits immediately if there is a test failure
     config.fail_fast = false
 
+    # Display x number of lines of a backtrace
+    config.backtrace_lines = 12
+
     # Fill form fields with these values
     # Based on the input name
     # :email => 'j.smith@example.com', 'user.last_name' => 'Smith'
@@ -52,5 +55,6 @@ if Rails.env.test?
     # bottom area filled by this color
     # For best appearance, have this match your site's background color
     config.animated_gif_background_color = 'white'
+
   end
 end
