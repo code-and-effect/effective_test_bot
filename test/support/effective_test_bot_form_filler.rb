@@ -246,9 +246,9 @@ module EffectiveTestBotFormFiller
   end
 
   def value_for_input_checkbox_field(field, fill_value)
-    if ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(fill_value)
+    if truthy?(fill_value)
       true
-    elsif ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(fill_value)
+    elsif falsey?(fill_value)
       false
     elsif fill_value.present?
       fill_values = Array(fill_value)  # Allow an array of fill values to be passed
@@ -396,6 +396,22 @@ module EffectiveTestBotFormFiller
     field.disabled? ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
+  end
+
+  def truthy?(value)
+    if defined?(::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES)  # Rails 5
+      ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(value)
+    else
+      ActiveRecord::Type::Boolean.new.cast(value)
+    end
+  end
+
+  def falsey?(value)
+    if defined?(::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES)  # Rails 5
+      ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(value)
+    else
+      ::ActiveRecord::Type::Boolean.new.cast(value) == false
+    end
   end
 
 end
