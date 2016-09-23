@@ -17,6 +17,9 @@ if Rails.env.test?
     #   'posts', 'events#index'
     # ]
 
+    # Silence skipped routes
+    config.silence_skipped_routes = false
+
     # Exits immediately if there is a test failure
     config.fail_fast = false
 
