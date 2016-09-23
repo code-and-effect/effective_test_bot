@@ -93,18 +93,22 @@ module BaseTest
   end
 
   def resources_path # index, create
-    polymorphic_path([*controller_namespace, resource_class])
+    path = polymorphic_path([*controller_namespace, resource_class]) rescue nil
+    path || polymorphic_path([*controller_namespace.try(:singularize), resource_class])
   end
 
   def resource_path(resource) # show, update, destroy
-    polymorphic_path([*controller_namespace, resource])
+    path = polymorphic_path([*controller_namespace, resource]) rescue nil
+    path || polymorphic_path([*controller_namespace.try(:singularize), resource])
   end
 
   def new_resource_path # new
-    new_polymorphic_path([*controller_namespace, resource_class])
+    path = new_polymorphic_path([*controller_namespace, resource_class]) rescue nil
+    path || new_polymorphic_path([*controller_namespace.try(:singularize), resource_class])
   end
 
   def edit_resource_path(resource) # edit
-    edit_polymorphic_path([*controller_namespace, resource])
+    path = edit_polymorphic_path([*controller_namespace, resource]) rescue nil
+    path || edit_polymorphic_path([*controller_namespace.try(:singularize), resource])
   end
 end
