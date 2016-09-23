@@ -5,7 +5,13 @@ module WizardTest
   protected
 
   def test_bot_wizard_test(&block)
-    sign_in(user) and visit(from)
+    sign_in(user)
+
+    if from.kind_of?(Symbol) && defined?(step)
+      visit(public_send(from, id: step))
+    else
+      visit(from)
+    end
 
     0.upto(50) do |index|   # Can only test wizards 51 steps long
       assert_page_normal

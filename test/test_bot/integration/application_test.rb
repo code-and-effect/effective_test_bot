@@ -21,14 +21,14 @@ module TestBot
           action = route.defaults[:action]
 
           # Devise Test
-          if (controller || '').include?('devise')
+          if is_devise_controller?(route)
             next if seen_actions['devise'].present?
             seen_actions['devise'] = true # So we don't repeat it
 
             devise_test()
 
           # Redirect Test
-          elsif route.app.kind_of?(ActionDispatch::Routing::PathRedirect) && route.path.required_names.blank?
+          elsif is_redirect?(route)
             path = route.path.spec.to_s
             route.path.optional_names.each { |name| path.sub!("(.:#{name})", '') } # Removes (.:format) from path
             redirect_test(from: path, to: route.app.path([], nil))
@@ -54,25 +54,40 @@ module TestBot
 
           # Wizard Test
           elsif is_wicked_controller?(route)
-            first_step_path = "/#{controller}/#{controller_instance(route).wizard_steps.first}"
-            wizard_test(from: first_step_path)
+            next if seen_actions[controller].present?
+            seen_actions[controller] = true # So we don't repeat it
+
+            wizard_test(from: "#{route.name}_path".to_sym, step: controller_instance(route).wizard_steps.first)
 
           # Member Test
-          elsif route.verb.to_s.include?('GET') && route.path.required_names == ['id']
+          elsif is_member?(route)
             member_test(controller: controller, action: action)
 
           # Page Test
-          elsif route.verb.to_s.include?('GET') && route.name.present? && Array(route.path.required_names).blank? # This could eventually be removed to supported nested routes
+          elsif is_page?(route)
             page_test(path: "#{route.name}_path".to_sym, route: route, label: "#{route.name}_path")
 
           else
-            #puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
+            unless EffectiveTestBot.silence_skipped_routes
+              puts "skipping #{route.name}_path | #{route.path.spec} | #{route.verb} | #{route.defaults[:controller]} | #{route.defaults[:action]}"
+            end
 
           end # / Routes
         end
       end
 
       protected
+
+      def is_devise_controller?(route)
+        return true if (route.defaults[:controller] || '').include?('devise')
+
+        controller = controller_instance(route)
+        controller.respond_to?(:devise_controller?) && controller.devise_controller?
+      end
+
+      def is_redirect?(route)
+        route.app.kind_of?(ActionDispatch::Routing::PathRedirect) && route.path.required_names.blank?
+      end
 
       def is_crud_controller?(route)
         return false unless CRUD_ACTIONS.include?(route.defaults[:action])
@@ -85,6 +100,9 @@ module TestBot
       def is_wicked_controller?(route)
         return false unless defined?(Wicked::Wizard)
 
+        # This might be a wickeds controller, but it's a nested one, so we can't handle it anyway
+        return false unless route.path.required_names == ['id']
+
         controller = controller_instance(route)
         return false unless controller.kind_of?(Wicked::Wizard)
 
@@ -93,6 +111,14 @@ module TestBot
         (controller.run_callbacks(:process_action) rescue false)
 
         controller.wizard_steps.present?
+      end
+
+      def is_member?(route)
+        route.verb.to_s.include?('GET') && route.path.required_names == ['id']
+      end
+
+      def is_page?(route)
+        route.verb.to_s.include?('GET') && route.name.present? && Array(route.path.required_names).blank? # This could eventually be removed to supported nested routes
       end
 
       private
