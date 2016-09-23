@@ -1,5 +1,5 @@
 ENV['RAILS_ENV'] = 'test'
-require File.expand_path("../../config/environment", __FILE__)
+require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require 'minitest/rails'
 require 'minitest/rails/capybara'
@@ -12,6 +12,8 @@ require 'shoulda'
 require 'capybara/webkit'
 require 'capybara-screenshot/minitest'
 require 'capybara/slow_finder_errors'
+
+require 'database_cleaner'
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
@@ -26,8 +28,15 @@ class ActionDispatch::IntegrationTest
   include Capybara::Screenshot::MiniTestPlugin
   include Warden::Test::Helpers if defined?(Devise)
 
-  def after_teardown # Some apps seem to need this to correctly reset the test_06:_capybara_can_sign_in
-    super(); Capybara.reset_sessions!
+  def after_setup
+    super()
+    DatabaseCleaner.start
+  end
+
+  def after_teardown
+    super()
+    DatabaseCleaner.clean
+    Capybara.reset_sessions!  # Some apps seem to need this to correctly reset the test_06:_capybara_can_sign_in
   end
 end
 
@@ -44,16 +53,19 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 Rails.backtrace_cleaner.remove_silencers!
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
 
+###############################################
 ### Effective Test Bot specific stuff below ###
+###############################################
 
-# So the very first thing I do is set up a consistent database
-silence_stream(STDOUT) do
-  Rake::Task['db:schema:load'].invoke
-end
+# So the very first thing we do is consistently reset the database.
+# This can be done with Snippet 1 or Snippet 2.
+# Snippet 1 is faster, and will usually work.  Snippet 2 should always work.
 
+# Snippet 1:
+silence_stream(STDOUT) { Rake::Task['db:schema:load'].invoke }
 ActiveRecord::Migration.maintain_test_schema!
 
-# or the following 3:
+# Snippet 2:
 
 # silence_stream(STDOUT) do
 #   Rake::Task['db:drop'].invoke
@@ -61,6 +73,7 @@ ActiveRecord::Migration.maintain_test_schema!
 #   Rake::Task['db:migrate'].invoke
 # end
 
+# Now we populate our test data:
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke
 Rake::Task['test:load_fixture_seeds'].invoke # This is included by effective_test_bot.  It just runs the app's test/fixtures/seeds.rb if it exists
@@ -69,14 +82,23 @@ if EffectiveTestBot.fail_fast?
   require 'minitest/fail_fast'
 end
 
-# Make all database transactions use the same thread, otherwise signing up in capybara won't get rolled back
-# This must be run after the Rake::Tasks above
-class ActiveRecord::Base
-  mattr_accessor :shared_connection
-  @@shared_connection = nil
+# "Connection not rolling back" snippets
+# These are some snippets that the internet has collected to fix test threading issues.
+# They are unneeded with effective_test_bot.  On my machine. But I leave them here as a reference.
+# Try one or both if you are having issues passing rake test:bot:environment
 
-  def self.connection
-    @@shared_connection || retrieve_connection
-  end
-end
-ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
+# class ActiveRecord::Base
+#   mattr_accessor :shared_connection
+#   @@shared_connection = nil
+
+#   def self.connection
+#     @@shared_connection || retrieve_connection
+#   end
+# end
+# ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
+
+# ActiveRecord::ConnectionAdapters::ConnectionPool.class_eval do
+#   def current_connection_id
+#     Thread.main.object_id
+#   end
+# end

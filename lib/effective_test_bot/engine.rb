@@ -56,8 +56,13 @@ module EffectiveTestBot
         if Rails.env.test?
           ActionController::Base.send :include, ::EffectiveTestBotControllerHelper
 
-          ActionController::Base.send :before_filter, :expires_now # Prevent 304 Not Modified caching
-          ActionController::Base.send :after_filter, :assign_test_bot_http_headers
+          if ActionController::Base.respond_to?(:before_action)
+            ActionController::Base.send :before_action, :expires_now # Prevent 304 Not Modified caching
+            ActionController::Base.send :after_action, :assign_test_bot_http_headers
+          else
+            ActionController::Base.send :before_filter, :expires_now # Prevent 304 Not Modified caching
+            ActionController::Base.send :after_filter, :assign_test_bot_http_headers
+          end
 
           ApplicationController.instance_exec do
             rescue_from ActionController::UnpermittedParameters do |exception|
