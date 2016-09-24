@@ -49,9 +49,10 @@ Capybara::Webkit.configure { |config| config.allow_unknown_urls }
 
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
-# These two lines are needed as of minitest-reporters 1.1.2
+# These three lines are needed as of minitest-reporters 1.1.2
 Rails.backtrace_cleaner.remove_silencers!
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
+Rails.backtrace_cleaner.add_silencer { |line| line =~ /effective_test_bot/ }
 
 ###############################################
 ### Effective Test Bot specific stuff below ###
