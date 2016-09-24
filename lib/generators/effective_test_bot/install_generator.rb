@@ -13,22 +13,6 @@ module EffectiveTestBot
         run 'bundle exec rails generate minitest:install'
       end
 
-      def explain_overwrite
-        puts '[effective_test_bot] Successfully installed/detected: minitest'
-        puts ""
-        puts 'Starting effective_test_bot specific installation tasks:'
-        puts ""
-        puts "You will be prompted to overwrite the default minitest configuration"
-        puts "files with those packaged inside the effective_test_bot gem."
-        puts ""
-        puts "If you have very specific existing minitest configuration,"
-        puts "you should ensure it's under version control so you can revert if needed"
-        puts ""
-        puts "Otherwise, press 'Y' to all the following prompts to automatically configure"
-        puts "minitest-rails and capybara-webkit based effective_test_bot test coverage"
-        puts ""
-      end
-
       def copy_initializer
         template "effective_test_bot.rb", "config/initializers/effective_test_bot.rb"
       end
