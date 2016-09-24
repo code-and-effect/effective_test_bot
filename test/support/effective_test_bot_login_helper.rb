@@ -39,11 +39,11 @@ module EffectiveTestBotLoginHelper
     end
   end
 
-  def sign_up(email = Faker::Internet.email, password = Faker::Internet.password)
+  def sign_up(email: Faker::Internet.email, password: Faker::Internet.password, **options)
     visit new_user_registration_path
 
     within('form#new_user') do
-      fill_form(email: email, password: password, password_confirmation: password)
+      fill_form({email: email, password: password, password_confirmation: password}.merge(options))
       submit_novalidate_form
     end
 
