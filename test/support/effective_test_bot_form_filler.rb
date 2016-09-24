@@ -253,7 +253,7 @@ module EffectiveTestBotFormFiller
     elsif fill_value.present?
       fill_values = Array(fill_value)  # Allow an array of fill values to be passed
       (fill_values.include?(field['value']) || fill_values.include?(field.find(:xpath, '..').text))
-    elsif field['required'].present?
+    elsif field['required'].nil? == false
       true
     elsif field['value'] == 'true'
       true
