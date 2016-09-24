@@ -333,11 +333,30 @@ module EffectiveTestBotFormFiller
   def upload_effective_asset(field, file)
     uid = field['id']
 
-    begin
-      field.set(file)
-    rescue Capybara::Webkit::ClickFailed
-      puts "file upload failed to click #{uid}"
-      return
+    # In some apps, capybara can field.set(file) and it will will just work
+    # Sometimes we need to fallback to javascript to get a file uploaded
+    unless ((field.set(file) || true) rescue false)
+      files = Array(file)
+      uid = field['id']
+
+      js = "fileList = Array();"
+
+      files.each_with_index do |file, i|
+        # Generate a fake input selector
+        page.execute_script("if($('#effectiveAssetsPlaceholder#{i}').length == 0) {effectiveAssetsPlaceholder#{i} = window.$('<input/>').attr({id: 'effectiveAssetsPlaceholder#{i}', type: 'file'}).appendTo('body'); }")
+
+        # Attach file to the fake input selector through Capybara
+        page.document.attach_file("effectiveAssetsPlaceholder#{i}", files[i])
+
+        # Build up the fake js event
+        js = "#{js} fileList.push(effectiveAssetsPlaceholder#{i}.get(0).files[0]);"
+      end
+
+      # Trigger the fake drop event
+      page.execute_script("#{js} e = $.Event('drop'); e.originalEvent = {dataTransfer : { files : fileList } }; $('#s3_#{uid}').trigger(e);")
+
+      # Remove the file inputs we created
+      page.execute_script("$('input[id^=effectiveAssetsPlaceholder]').remove();")
     end
 
     # Wait till the Uploader bar goes away
