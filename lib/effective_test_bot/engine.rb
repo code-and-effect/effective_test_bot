@@ -51,9 +51,23 @@ module EffectiveTestBot
       end
     end
 
+    initializer 'effective_test_bot.email_logger' do |app|
+      if Rails.env.test?
+        ActiveSupport.on_load :action_mailer do
+          ActionMailer::Base.send :include, ::EffectiveTestBotMailerHelper
+
+          if ActionMailer::Base.respond_to?(:after_action)
+            ActionMailer::Base.send :after_action, :assign_test_bot_mailer_info
+          else
+            ActionMailer::Base.send :after_filter, :assign_test_bot_mailer_info
+          end
+        end
+      end
+    end
+
     initializer 'effective_test_bot.assign_assign_headers' do
-      ActiveSupport.on_load :action_controller do
-        if Rails.env.test?
+      if Rails.env.test?
+        ActiveSupport.on_load :action_controller do
           ActionController::Base.send :include, ::EffectiveTestBotControllerHelper
 
           if ActionController::Base.respond_to?(:before_action)

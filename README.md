@@ -107,6 +107,7 @@ The following assertions are added for use in any integration test:
 - `assert_assigns_errors` use after an intentionally invalid form submit to make sure your assigned rails object has errors, or a specific error.
 - `assert_no_assigns_errors` should be used after any form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
 - `assert_current_path(path)` asserts the current page path.
+- `assert_email(action)` asserts an email with the given action name was sent. Also supports `assert_email(to: email)` type syntax with to, from, subject, body.
 - `assert_flash`, optionally with the desired `:success`, `:error` key and/or message, makes sure the flash is set.
 - `assert_jquery_ujs_disable_with` makes sure all `input[type=submit]` elements on the page have the `data-disable-with` property set.
 - `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was.
