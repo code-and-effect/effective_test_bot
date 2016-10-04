@@ -246,13 +246,15 @@ module EffectiveTestBotFormFiller
   end
 
   def value_for_input_checkbox_field(field, fill_value)
-    if truthy?(fill_value)
-      true
-    elsif falsey?(fill_value)
-      false
-    elsif fill_value.present?
-      fill_values = Array(fill_value)  # Allow an array of fill values to be passed
-      (fill_values.include?(field['value']) || fill_values.include?(field.find(:xpath, '..').text))
+    if !fill_value.nil?
+      if truthy?(fill_value)
+        true
+      elsif falsey?(fill_value)
+        false
+      else
+        fill_values = Array(fill_value)  # Allow an array of fill values to be passed
+        (fill_values.include?(field['value']) || fill_values.include?(field.find(:xpath, '..').text))
+      end
     elsif field['required'].nil? == false
       true
     elsif field['value'] == 'true'
