@@ -3,7 +3,7 @@ require 'faker'
 
 module EffectiveTestBotFormFiller
   DIGITS = ('1'..'9').to_a
-  LETTERS = %w(A B C E G H J K L M N P R S T V X Y)
+  LETTERS = %w(A B C E G H J K L M N P R S T V X Y) # valid letters of a canadian postal code, eh?
 
   # Fill a boostrap tabs based form
   def fill_bootstrap_tabs_form(fills = {}, boostrap_tab_elements = nil)
@@ -182,6 +182,8 @@ module EffectiveTestBotFormFiller
         LETTERS.sample + DIGITS.sample + LETTERS.sample + ' ' + DIGITS.sample + LETTERS.sample + DIGITS.sample
       elsif attribute.include?('zip') && attribute.include?('code') # Make a US zip code
         DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample + DIGITS.sample
+      elsif attribute.include?('social_insurance_number') || attributes.include?('sin_number')
+        "#{DIGITS.sample(3).join} #{DIGITS.sample(3).join} #{DIGITS.sample(3).join}"
       elsif attribute.include?('slug')
         Faker::Lorem.words(3).join(' ').parameterize
       else

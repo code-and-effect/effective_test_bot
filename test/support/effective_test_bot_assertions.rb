@@ -83,8 +83,12 @@ module EffectiveTestBotAssertions
     assert errors.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{errors.first.to_s}"
   end
 
-  def assert_no_unpermitted_params(message = "(no_unpermitted_params) Encountered unpermitted params:\n:unpermitted_params:")
+  def assert_no_unpermitted_params(message = "(no_unpermitted_params) Unexpected unpermitted params:\n:unpermitted_params:")
     assert unpermitted_params.blank?, message.sub(':unpermitted_params:', unpermitted_params.to_s)
+  end
+
+  def assert_no_flash_errors(message = "(no_flash_errors) Unexpected flash error:\n:flash_errors:")
+    assert (!flash.key?('error') && !flash.key?('danger')), message.sub(':flash_errors:', flash.to_s)
   end
 
   def assert_no_exceptions(message = "(no_exceptions) Unexpected rails server exception:\n:exception:")

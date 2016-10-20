@@ -10,6 +10,7 @@ module BaseTest
     assert_no_exceptions unless test_bot_skip?(:exceptions)
     assert_page_status unless test_bot_skip?(:page_status)
     assert_no_js_errors unless test_bot_skip?(:no_js_errors)
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
     assert_page_title unless (test_bot_skip?(:page_title) || all('head').blank? || was_download?)
   end
 
