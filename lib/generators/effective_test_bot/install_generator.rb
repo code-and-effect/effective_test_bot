@@ -5,7 +5,7 @@ module EffectiveTestBot
 
       desc "Creates an EffectiveTestBot initializer in your application."
 
-      source_root File.expand_path("../../templates", __FILE__)
+      source_root File.expand_path('../../templates', __FILE__)
 
       def install_minitest
         return if File.exists?('test/test_helper.rb')
@@ -14,7 +14,7 @@ module EffectiveTestBot
       end
 
       def copy_initializer
-        template "effective_test_bot.rb", "config/initializers/effective_test_bot.rb"
+        template ('../' * 3) +  'config/effective_test_bot.rb', 'config/initializers/effective_test_bot.rb'
       end
 
       def overwrite_minitest

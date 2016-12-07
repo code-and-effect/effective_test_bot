@@ -1,5 +1,3 @@
-# EffectiveTestBot Rails Engine
-
 if Rails.env.test?
   EffectiveTestBot.setup do |config|
 
@@ -58,6 +56,5 @@ if Rails.env.test?
     # bottom area filled by this color
     # For best appearance, have this match your site's background color
     config.animated_gif_background_color = 'white'
-
   end
 end
