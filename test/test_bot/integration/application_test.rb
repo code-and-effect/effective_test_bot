@@ -4,7 +4,7 @@ require 'test_helper'
 # Scan through every route and run a test suite against it
 
 module TestBot
-  class ApplicationTest < ActionDispatch::IntegrationTest
+  class ApplicationTest < ::Capybara::Rails::TestCase
     CRUD_ACTIONS = %w(index create new edit show update destroy) # Same order as resources :object creates them in
 
     class << self

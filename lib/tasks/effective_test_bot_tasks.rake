@@ -1,5 +1,4 @@
 require 'rake/testtask'
-require 'rails/test_unit/sub_test_task'
 
 # rake test:bot
 # rake test:bot TEST=documents#new
@@ -28,7 +27,7 @@ namespace :test do
       ENV['TEST'] = nil
     end
 
-    Rake::Task['test:effective_test_bot'].invoke
+    system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb")
   end
 
   desc "Runs 'rake test' with effective_test_bot tour mode enabled"
@@ -46,7 +45,7 @@ namespace :test do
   namespace :bot do
     desc 'Runs effective_test_bot environment test'
     task :environment do
-      Rake::Task['test:effective_test_bot_environment'].invoke
+      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb")
     end
 
     desc 'Deletes all effective_test_bot temporary, failure and tour screenshots'
@@ -112,16 +111,16 @@ namespace :test do
     load(seeds) if File.exists?(seeds)
   end
 
-  # This ensures rake test:prepare is run before rake test:bot or rake test:bot:environment run
-  # Test files stuff is minitest hackery to just load the 1 test file
-  Rails::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
-    t.libs << 'test'
-    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb"]
-  end
+  # # This ensures rake test:prepare is run before rake test:bot or rake test:bot:environment run
+  # # Test files stuff is minitest hackery to just load the 1 test file
+  # Rake::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
+  #   t.libs << 'test'
+  #   t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb"]
+  # end
 
-  Rails::TestTask.new('effective_test_bot_environment' => 'test:prepare') do |t|
-    t.libs << 'test'
-    t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb"]
-  end
+  # Rake::TestTask.new('effective_test_bot_environment' => 'test:prepare') do |t|
+  #   t.libs << 'test'
+  #   t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb"]
+  # end
 
 end

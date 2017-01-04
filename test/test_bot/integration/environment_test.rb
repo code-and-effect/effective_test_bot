@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
 module TestBot
-  class EnvironmentTest < ActionDispatch::IntegrationTest
+  class EnvironmentTest < ::Capybara::Rails::TestCase
     @@original_users_count = User.count
     let(:original_users_count) { @@original_users_count }
 
