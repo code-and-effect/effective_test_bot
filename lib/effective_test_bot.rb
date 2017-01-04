@@ -1,4 +1,5 @@
 require "effective_test_bot/engine"
+require "effective_test_bot/dsl"
 require "effective_test_bot/middleware"
 require "effective_test_bot/version"
 

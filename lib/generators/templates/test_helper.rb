@@ -1,5 +1,6 @@
 ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../../config/environment', __FILE__)
+require 'rake'
 require 'rails/test_help'
 require 'minitest/rails'
 require 'minitest/rails/capybara'
@@ -21,12 +22,14 @@ class ActiveSupport::TestCase
   use_transactional_fixtures = true
 end
 
-class ActionDispatch::IntegrationTest
+class Capybara::Rails::TestCase
   # Make the Capybara DSL available in all integration tests
   include Capybara::DSL
   include Capybara::Assertions
   include Capybara::Screenshot::MiniTestPlugin
   include Warden::Test::Helpers if defined?(Devise)
+
+  include EffectiveTestBot::DSL
 
   def after_setup
     super()
@@ -47,7 +50,7 @@ Capybara::Screenshot.prune_strategy = :keep_last_run
 Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
 Capybara::Webkit.configure { |config| config.allow_unknown_urls }
 
-Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
+#Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 # These three lines are needed as of minitest-reporters 1.1.2
 Rails.backtrace_cleaner.remove_silencers!
@@ -58,21 +61,21 @@ Rails.backtrace_cleaner.add_silencer { |line| line =~ /effective_test_bot/ }
 ### Effective Test Bot specific stuff below ###
 ###############################################
 
+Rails.application.load_tasks
+
 # So the very first thing we do is consistently reset the database.
 # This can be done with Snippet 1 or Snippet 2.
 # Snippet 1 is faster, and will usually work.  Snippet 2 should always work.
 
 # Snippet 1:
-silence_stream(STDOUT) { Rake::Task['db:schema:load'].invoke }
+Rake::Task['db:schema:load'].invoke
 ActiveRecord::Migration.maintain_test_schema!
 
 # Snippet 2:
 
-# silence_stream(STDOUT) do
-#   Rake::Task['db:drop'].invoke
-#   Rake::Task['db:create'].invoke
-#   Rake::Task['db:migrate'].invoke
-# end
+# Rake::Task['db:drop'].invoke
+# Rake::Task['db:create'].invoke
+# Rake::Task['db:migrate'].invoke
 
 # Now we populate our test data:
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything

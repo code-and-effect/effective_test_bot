@@ -12,41 +12,6 @@ module EffectiveTestBot
       eval File.read("#{config.root}/config/effective_test_bot.rb")
     end
 
-    # initializer 'effective_test_bot.test_suite' do |app|
-    #   if Rails.env.test?
-    #     Rails.application.config.to_prepare do
-    #       binding.pry
-
-    #       # test/support/
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotAssertions
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotFormHelper
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotFormFiller
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotLoginHelper
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotMinitestHelper
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotScreenshotsHelper
-    #       ActionDispatch::IntegrationTest.include EffectiveTestBotTestHelper
-
-    #       # test/test_botable/
-    #       ActionDispatch::IntegrationTest.include BaseTest
-    #       ActionDispatch::IntegrationTest.include CrudTest
-    #       ActionDispatch::IntegrationTest.include DeviseTest
-    #       ActionDispatch::IntegrationTest.include MemberTest
-    #       ActionDispatch::IntegrationTest.include PageTest
-    #       ActionDispatch::IntegrationTest.include RedirectTest
-    #       ActionDispatch::IntegrationTest.include WizardTest
-
-    #       # test/concerns/test_botable/
-    #       ActionDispatch::IntegrationTest.include TestBotable::BaseDsl
-    #       ActionDispatch::IntegrationTest.include TestBotable::CrudDsl
-    #       ActionDispatch::IntegrationTest.include TestBotable::DeviseDsl
-    #       ActionDispatch::IntegrationTest.include TestBotable::MemberDsl
-    #       ActionDispatch::IntegrationTest.include TestBotable::PageDsl
-    #       ActionDispatch::IntegrationTest.include TestBotable::RedirectDsl
-    #       ActionDispatch::IntegrationTest.include TestBotable::WizardDsl
-    #     end
-    #   end
-    # end
-
     initializer 'effective_test_bot.middleware' do |app|
       if Rails.env.test?
         Rails.application.config.middleware.use EffectiveTestBot::Middleware
