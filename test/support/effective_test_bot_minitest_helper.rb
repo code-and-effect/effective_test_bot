@@ -4,10 +4,18 @@ module EffectiveTestBotMinitestHelper
   # end
 
   # This gets called after every test.  Minitest hook for plugin developers
-  def after_teardown
+  def before_teardown
+    super
+
     if EffectiveTestBot.screenshots? && (@test_bot_screenshot_id || 0) > 0
-      save_test_bot_failure_gif if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
-      save_test_bot_tour_gif if passed? && EffectiveTestBot.tour_mode?
+      if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
+        save_test_bot_screenshot
+        save_test_bot_failure_gif
+      end
+
+      if passed? && EffectiveTestBot.tour_mode?
+        save_test_bot_tour_gif
+      end
     end
 
     if passed? && !EffectiveTestBot.passed_tests[current_test_name]
