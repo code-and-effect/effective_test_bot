@@ -7,9 +7,6 @@ require 'minitest/rails/capybara'
 require 'minitest/pride'
 require 'minitest/reporters'
 
-require 'shoulda-matchers'
-require 'shoulda'
-
 require 'capybara/webkit'
 require 'capybara-screenshot/minitest'
 require 'capybara/slow_finder_errors'

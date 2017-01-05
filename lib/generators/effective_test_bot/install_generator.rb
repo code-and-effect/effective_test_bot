@@ -18,7 +18,7 @@ module EffectiveTestBot
       end
 
       def overwrite_minitest
-        template 'test_helper.rb', 'test/test_helper.rb'
+        template ('../' * 3) +  'config/test_helper.rb', 'test/test_helper.rb'
       end
 
       def thank_you

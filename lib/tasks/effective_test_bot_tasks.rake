@@ -27,10 +27,10 @@ namespace :test do
       ENV['TEST'] = nil
     end
 
-    if Rails.version.start_with?('5')
-      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb")
-    else
+    if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
       Rake::Task['test:effective_test_bot'].invoke
+    else
+      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb")
     end
   end
 
@@ -49,10 +49,10 @@ namespace :test do
   namespace :bot do
     desc 'Runs effective_test_bot environment test'
     task :environment do
-      if Rails.version.start_with?('5')
-        system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb")
-      else
+      if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
         Rake::Task['test:effective_test_bot_environment'].invoke
+      else
+        system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb")
       end
     end
 
@@ -121,7 +121,7 @@ namespace :test do
 
   # This ensures rake test:prepare is run before rake test:bot or rake test:bot:environment run
   # Test files stuff is minitest hackery to just load the 1 test file
-  unless Rails.version.start_with?('5')
+  if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
     Rake::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
       t.libs << 'test'
       t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb"]

@@ -146,7 +146,7 @@ It clicks through bootstrap tabs and fill them nicely left-to-right, one tab at 
 You can pass a Hash of 'fills' to specify specific input values:
 
 ```ruby
-class PostTest < ActionDispatch::IntegrationTest
+class PostTest < Capybara::Rails::TestCase
   test 'creating a new post' do
     visit new_post_path
     fill_form(:title => 'A Cool Post', 'author.last_name' => 'Smith')
@@ -178,7 +178,7 @@ Clicks the first `input[type='submit']` field (or first submit field with the gi
 Automatically checks for `assert_no_html5_form_validation_errors`, `assert_jquery_ujs_disable_with` and `assert_no_unpermitted_params`
 
 ```ruby
-class PostTest < ActionDispatch::IntegrationTest
+class PostTest < Capybara::Rails::TestCase
   test 'creating a new post' do
     visit(new_post_path) and fill_form
     submit_form    # or submit_form('Save and Continue')
@@ -251,7 +251,7 @@ A quick note on speed:  You can speed up these test suites by fixturing, seeding
 There are a few variations on the one-liner method:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   # Runs all 9 crud_action tests against /posts
   crud_test(resource: Post, user: User.first)
 
@@ -275,7 +275,7 @@ end
 The individual test suites may also be used as part of a larger test:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   test 'user may only update a post once' do
     crud_action_test(test: :create_valid, resource: Post, user: User.first)
     assert_text 'successfully created post.  You may only update it once.'
@@ -303,7 +303,7 @@ This test runs through the the [devise](https://github.com/plataformatec/devise)
 Use as a one-liner:
 
 ```ruby
-class MyApplicationTest < ActionDispatch::IntegrationTest
+class MyApplicationTest < Capybara::Rails::TestCase
   devise_test  # Runs all tests (sign_up, sign_in_valid, and sign_in_invalid)
 end
 ```
@@ -311,7 +311,7 @@ end
 Or each individually in part of a regular test:
 
 ```ruby
-class MyApplicationTest < ActionDispatch::IntegrationTest
+class MyApplicationTest < Capybara::Rails::TestCase
   test 'user receives 10 tokens after signing up' do
     devise_action_test(test: :sign_up)
     assert_text 'Tokens: 10'
@@ -336,7 +336,7 @@ This test signs in as the given user, visits the given controller/action/page an
 Use it as a one-liner:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   # Uses find_or_create_resource! to load a seeded resource or create a new one
   member_test(controller: 'posts', action: 'unarchive', user: User.first)
 
@@ -348,7 +348,7 @@ end
 Or as part of a regular test:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   test 'posts can be unarchived' do
     post = Post.create(title: 'first post', archived: true)
 
@@ -366,7 +366,7 @@ This test signs in as the given user, visits the given page and simply checks `a
 Use it as a one-liner:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   page_test(path: :posts_path, user: User.first)  # Runs the page_test test suite against posts_path as User.first
 end
 ```
@@ -374,7 +374,7 @@ end
 Or as part of a regular test:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   test 'posts are displayed on the index page' do
     Post.create(title: 'first post')
 
@@ -393,7 +393,7 @@ This test signs in as the given user, visits the given page then checks `assert_
 Use it as a one-liner:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   # Visits /blog and tests that it redirects to a working /posts page
   redirect_test(from: '/blog', to: '/posts', user: User.first)
 end
@@ -402,7 +402,7 @@ end
 Or as part of a regular test:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   test 'visiting blog redirects to posts' do
     Post.create(title: 'first post')
     redirect_action_test(from: '/blog', to: '/posts', user: User.first)
@@ -422,7 +422,7 @@ As well, in the `wizard_action_test`, each page is yielded to the calling method
 Use it as a one-liner:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   wizard_test(from: '/build_post/step1', to: '/build_post/step5', user: User.first)
 end
 ```
@@ -430,7 +430,7 @@ end
 Or as part of a regular test:
 
 ```ruby
-class PostsTest < ActionDispatch::IntegrationTest
+class PostsTest < Capybara::Rails::TestCase
   test 'building a post in 5 steps' do
     wizard_action_test(from: '/build_post/step1', to: '/build_post/step5', user: User.first) do
       if page.current_path.end_with?('step4')
