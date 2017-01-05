@@ -50,7 +50,7 @@ Capybara::Screenshot.prune_strategy = :keep_last_run
 Capybara::Screenshot.webkit_options = { width: 1024, height: 768 }
 Capybara::Webkit.configure { |config| config.allow_unknown_urls }
 
-#Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 # These three lines are needed as of minitest-reporters 1.1.2
 Rails.backtrace_cleaner.remove_silencers!
