@@ -85,7 +85,7 @@ end
 
 # "Connection not rolling back" snippets
 # These are some snippets that the internet has collected to fix test threading issues.
-# They are unneeded with effective_test_bot.  On my machine. But I leave them here as a reference.
+# They are unneeded with effective_test_bot. On my machine. But I leave them here as a reference.
 # Try one or both if you are having issues passing rake test:bot:environment
 
 # class ActiveRecord::Base

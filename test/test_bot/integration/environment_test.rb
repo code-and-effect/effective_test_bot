@@ -48,27 +48,37 @@ module TestBot
       assert_signed_out
     end
 
-    test '08: capybara can execute javascript' do
+    test '08: capybara database connection is shared' do
+      user = User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123')
+      user.username = 'unique-username' if user.respond_to?(:username)
+      user.login = 'unique-login' if user.respond_to?(:login)
+      user.save(validate: false)
+
+      without_screenshots { sign_in_manually(user, '!Password123') }
+
+      assert_signed_in('Unable to manually sign in via devise with a user created in this test.')
+    end
+
+    test '09: capybara can execute javascript' do
       visit root_path
       assert_capybara_can_execute_javascript
     end
 
-    test '09: jquery is present' do
+    test '10: jquery is present' do
       visit root_path
       assert_jquery_present
     end
 
-    test '10: rails jquery_ujs is present' do
+    test '11: rails jquery_ujs is present' do
       visit root_path
       assert_jquery_ujs_present
     end
 
-    test '11: action_mailer.default_url_options are present' do
+    test '12: action_mailer.default_url_options are present' do
       assert(
         (Rails.application.config.action_mailer.default_url_options[:host] rescue nil).present?,
         "expected action_mailer.default_url_options[:host] to be present.\nAdd config.action_mailer.default_url_options = { host: 'example.com' } to config/environments/test.rb"
       )
-
     end
   end
 end
