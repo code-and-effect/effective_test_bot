@@ -15,6 +15,7 @@ module DeviseTest
     end
 
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
 
     assert_signed_in('Expected @current_user to be present after sign up')
     assert User.where(email: email).first.present?, "Expected user to be present after submitting sign up form at #{new_user_registration_path}"
@@ -37,6 +38,7 @@ module DeviseTest
     end
 
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
 
     assert_signed_in
     assert_page_content(I18n.t('devise.sessions.signed_in')) unless test_bot_skip?(:page_content)

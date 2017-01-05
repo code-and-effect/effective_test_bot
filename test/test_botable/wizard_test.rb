@@ -25,7 +25,7 @@ module WizardTest
         submit_form
       end
 
-      assert_no_assigns_errors
+      assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
 
       if to.present?
         # Keep going till we hit a certain to_path

@@ -14,6 +14,7 @@ module PageTest
     end
 
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
   end
 
 end

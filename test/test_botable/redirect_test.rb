@@ -9,6 +9,7 @@ module RedirectTest
 
     assert_redirect(from, to)
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
 
     #page.save_screenshot("#{from.parameterize}.png")
   end

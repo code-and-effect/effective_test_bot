@@ -90,6 +90,7 @@ module CrudTest
     after = { count: resource_class.count, path: page.current_path }
 
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
 
     # In a rails controller, if I redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set
@@ -179,6 +180,7 @@ module CrudTest
     after = { count: resource_class.count, updated_at: (resource.updated_at rescue nil) }
 
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
 
     # In a rails controller, if i redirect to resources_path it may not assign the instance variable
     # Wheras if I redirect to edit_resource_path I must ensure that the instance variable is set

@@ -12,6 +12,8 @@ module MemberTest
     visit(path)
 
     assert_page_normal
+    assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
+
     assert_assigns(resource_name) unless (was_redirect?(path) || test_bot_skip?(:assigns))
   end
 
