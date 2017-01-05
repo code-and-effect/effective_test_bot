@@ -94,7 +94,7 @@ module EffectiveTestBotAssertions
   def assert_no_exceptions(message = "(no_exceptions) Unexpected rails server exception:\n:exception:")
     # this file is created by EffectiveTestBot::Middleware when an exception is encountered in the rails app
     file = File.join(Dir.pwd, 'tmp', 'test_bot', 'exception.txt')
-    return unless File.exists?(file)
+    return unless File.exist?(file)
 
     exception = File.read(file)
     File.delete(file)

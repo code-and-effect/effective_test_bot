@@ -16,7 +16,7 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def save_test_bot_failure_gif
-    Dir.mkdir(current_test_failure_path) unless File.exists?(current_test_failure_path)
+    Dir.mkdir(current_test_failure_path) unless File.exist?(current_test_failure_path)
     full_path = (current_test_failure_path + '/' + current_test_failure_filename)
 
     save_test_bot_gif(full_path)
@@ -24,7 +24,7 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def save_test_bot_tour_gif
-    Dir.mkdir(current_test_tour_path) unless File.exists?(current_test_tour_path)
+    Dir.mkdir(current_test_tour_path) unless File.exist?(current_test_tour_path)
     full_path = (current_test_tour_path + '/' + current_test_tour_filename)
 
     save_test_bot_gif(full_path)

@@ -8,7 +8,7 @@ module EffectiveTestBot
       source_root File.expand_path('../../templates', __FILE__)
 
       def install_minitest
-        return if File.exists?('test/test_helper.rb')
+        return if File.exist?('test/test_helper.rb')
         puts '[effective_test_bot] installing minitest'
         run 'bundle exec rails generate minitest:install'
       end

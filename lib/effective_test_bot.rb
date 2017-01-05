@@ -120,7 +120,7 @@ module EffectiveTestBot
   def self.save_passed_test(name)
     EffectiveTestBot.passed_tests[name] = true
 
-    Dir.mkdir(passed_tests_path) unless File.exists?(passed_tests_path)
+    Dir.mkdir(passed_tests_path) unless File.exist?(passed_tests_path)
 
     File.open(passed_tests_filename, 'w') do |file|
       passed_tests.each { |test_name, _| file.puts(test_name) }

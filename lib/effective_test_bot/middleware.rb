@@ -27,8 +27,8 @@ module EffectiveTestBot
       dir = File.join(Dir.pwd, 'tmp', 'test_bot')
       file = File.join(dir, 'exception.txt')
 
-      Dir.mkdir(dir) unless File.exists?(dir)
-      File.delete(file) if File.exists?(file)
+      Dir.mkdir(dir) unless File.exist?(dir)
+      File.delete(file) if File.exist?(file)
 
       File.open(file, 'w') do |file|
         file.write "================== Start server exception ==================\n"

@@ -116,7 +116,7 @@ namespace :test do
   desc 'loads test/fixtures/seeds.rb'
   task :load_fixture_seeds => :environment do
     seeds = "#{Rails.root}/test/fixtures/seeds.rb"
-    load(seeds) if File.exists?(seeds)
+    load(seeds) if File.exist?(seeds)
   end
 
   # This ensures rake test:prepare is run before rake test:bot or rake test:bot:environment run
