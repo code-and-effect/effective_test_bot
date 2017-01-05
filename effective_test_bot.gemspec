@@ -28,8 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'capybara-screenshot'
   s.add_dependency 'capybara-slow_finder_errors'
   s.add_dependency 'database_cleaner'
-  s.add_dependency 'shoulda'
-  s.add_dependency 'shoulda-matchers'
   s.add_dependency 'rmagick'
   s.add_dependency 'faker'
 end
