@@ -125,11 +125,13 @@ namespace :test do
     Rake::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
       t.libs << 'test'
       t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb"]
+      t.warning = false
     end
 
     Rake::TestTask.new('effective_test_bot_environment' => 'test:prepare') do |t|
       t.libs << 'test'
       t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb"]
+      t.warning = false
     end
   end
 
