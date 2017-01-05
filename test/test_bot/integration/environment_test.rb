@@ -55,8 +55,7 @@ module TestBot
       user.save(validate: false)
 
       without_screenshots { sign_in_manually(user, '!Password123') }
-
-      assert_signed_in('Unable to manually sign in via devise with a user created in this test.')
+      assert_signed_in("expected successful devise manual sign in with user created in this test.\nTry using one of the ActiveRecord shared_connection snippets in test/test_helper.rb")
     end
 
     test '09: capybara can execute javascript' do
