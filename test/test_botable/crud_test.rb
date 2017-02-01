@@ -48,7 +48,7 @@ module CrudTest
   def test_bot_create_invalid_test
     sign_in(user) and visit(new_resource_path)
 
-    before = { count: resource_class.count }
+    before = { count: (resource_class.count if resource_class.respond_to?(:count)) }
 
     assert_form("form#new_#{resource_name}") unless test_bot_skip?(:form)
 
@@ -59,14 +59,14 @@ module CrudTest
 
     save_test_bot_screenshot
 
-    after = { count: resource_class.count }
+    after = { count: (resource_class.count if resource_class.respond_to?(:count)) }
 
     assert_page_normal
 
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
 
-    assert_equal before[:count], after[:count], "Expected #{resource_class}.count to be unchanged"
+    assert_equal(before[:count], after[:count], "Expected #{resource_class}.count to be unchanged") if resource_class.respond_to?(:count)
     assert_equal(resources_path, page.current_path, "(path) Expected current_path to match resource #create path #{resources_path}") unless test_bot_skip?(:path)
 
     assert_flash(:danger) unless test_bot_skip?(:flash)
@@ -76,7 +76,7 @@ module CrudTest
     sign_in(user) and visit(new_resource_path)
     save_test_bot_screenshot
 
-    before = { count: resource_class.count, path: page.current_path }
+    before = { count: (resource_class.count if resource_class.respond_to?(:count)), path: page.current_path }
 
     assert_form("form#new_#{resource_name}") unless test_bot_skip?(:form)
 
@@ -87,7 +87,7 @@ module CrudTest
 
     save_test_bot_screenshot
 
-    after = { count: resource_class.count, path: page.current_path }
+    after = { count: (resource_class.count if resource_class.respond_to?(:count)), path: page.current_path }
 
     assert_page_normal
     assert_no_flash_errors unless test_bot_skip?(:no_flash_errors)
@@ -97,7 +97,7 @@ module CrudTest
     assert_assigns(resource_name) if (after[:path].include?('/edit/') && !test_bot_skip?(:assigns))
     assert_no_assigns_errors(resource_name) unless test_bot_skip?(:no_assigns_errors)
 
-    refute_equal before[:count], after[:count], "Expected fill_form to create a #{resource_class} object"
+    refute_equal(before[:count], after[:count], "Expected fill_form to create a #{resource_class} object") if resource_class.respond_to?(:count)
     refute_equal(before[:path], after[:path], "(path) Expected unique before and after paths") unless test_bot_skip?(:path)
   end
 
