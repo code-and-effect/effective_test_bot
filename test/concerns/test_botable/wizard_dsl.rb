@@ -24,17 +24,18 @@ module TestBotable
         return if EffectiveTestBot.skip?(options[:current_test])
 
         method_name = test_bot_method_name('wizard_test', options[:current_test])
-        method_user = user || _test_bot_user(method_name)
 
-        define_method(method_name) { wizard_action_test(from: from, to: to, user: method_user, **options) }
+        define_method(method_name) { wizard_action_test(from: from, to: to, user: user, **options) }
       end
 
     end
 
     # Instance Methods - Call me from within a test
-    def wizard_action_test(from:, to: nil, user: _test_bot_user(), **options)
+    def wizard_action_test(from:, to: nil, user: nil, **options)
+      method_user = user || _test_bot_user(options[:current_test])
+
       begin
-        assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: user))
+        assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: method_user))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: wizard_action_test(from: '/fee_wizard/step1', to: ('/fee_wizard/step5' || nil), user: User.first)"
       end

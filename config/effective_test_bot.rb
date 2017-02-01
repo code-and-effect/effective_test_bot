@@ -18,6 +18,10 @@ if Rails.env.test?
     # Silence skipped routes
     config.silence_skipped_routes = false
 
+    # Set the current user on a per test basis. You must have at least 1 user seeded.
+    # test is a String as per the except, only and TEST= test names
+    config.user = proc { |test| User.first }
+
     # Exits immediately if there is a test failure
     config.fail_fast = false
 

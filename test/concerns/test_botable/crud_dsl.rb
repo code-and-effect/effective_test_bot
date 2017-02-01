@@ -45,9 +45,8 @@ module TestBotable
           next if EffectiveTestBot.skip?(label || options_for_method[:current_test])
 
           method_name = test_bot_method_name('crud_test', label || options_for_method[:current_test])
-          method_user = user || _test_bot_user(method_name)
 
-          define_method(method_name) { crud_action_test(test: test, resource: resource, user: method_user, **options_for_method) }
+          define_method(method_name) { crud_action_test(test: test, resource: resource, user: user, **options_for_method) }
         end
       end
 
@@ -79,9 +78,11 @@ module TestBotable
     #
     # If obj is a Hash {:resource => ...} just skip over parsing options
     # And assume it's already been done (by the ClassMethod crud_test)
-    def crud_action_test(test:, resource:, user: _test_bot_user(), **options)
+    def crud_action_test(test:, resource:, user: nil, **options)
+      method_user = user || _test_bot_user(options[:current_test])
+
       begin
-        assign_test_bot_lets!(options.reverse_merge!(resource: resource, user: user))
+        assign_test_bot_lets!(options.reverse_merge!(resource: resource, user: method_user))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: crud_action_test(test: :new, resource: (Post || Post.new), user: User.first)"
       end

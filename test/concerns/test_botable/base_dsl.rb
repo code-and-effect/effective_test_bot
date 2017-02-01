@@ -5,14 +5,6 @@ module TestBotable
     module ClassMethods
       TEST_BOT_TEST_PREFIXES = ['crud_test', 'devise_test', 'member_test', 'page_test', 'redirect_test', 'wizard_test']
 
-      def _test_bot_user(method_name)
-        user = EffectiveTestBot.user.call(method_name)
-
-        binding.pry
-
-        puts "TEST BOT USER CLASS"
-      end
-
       # Parses and validates lots of options
       # This is a big manual merge wherein we translate some DSL methods into one consistent Hash here
       # The output is what gets sent to each test and defined as lets
@@ -125,9 +117,18 @@ module TestBotable
 
     # Instance Methods
 
-    def _test_bot_user
-      puts "TEST BOT USER INSTANCE"
-      @test_bot_user
+    def _test_bot_user(test_name)
+      unless EffectiveTestBot.user.kind_of?(Proc)
+        raise 'expected EffectiveTestBot.user to be a proc. Set config.user = Proc.new { |test| User.first }'
+      end
+
+      user = EffectiveTestBot.user.call(test_name)
+
+      unless user
+        raise "no user returned for #{test_name}. Please make sure the /config/initializers/effective_test_bot.rb config.user proc returns a user for this test."
+      end
+
+      user
     end
 
     # Using reverse_merge! in the dsl action_tests makes sure that the

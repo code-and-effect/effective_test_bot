@@ -19,16 +19,17 @@ module TestBotable
         return if EffectiveTestBot.skip?(options[:current_test])
 
         method_name = test_bot_method_name('redirect_test', options[:current_test])
-        method_user = user || _test_bot_user(method_name)
 
-        define_method(method_name) { redirect_action_test(from: from, to: to, user: method_user, **options) }
+        define_method(method_name) { redirect_action_test(from: from, to: to, user: user, **options) }
       end
     end
 
     # Instance Methods - Call me from within a test
-    def redirect_action_test(from:, to:, user: _test_bot_user(), **options)
+    def redirect_action_test(from:, to:, user: nil, **options)
+      method_user = user || _test_bot_user(options[:current_test])
+
       begin
-        assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: user))
+        assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: method_user))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: redirect_action_test(from: '/about', to: '/new-about', user: User.first)"
       end

@@ -21,17 +21,18 @@ module TestBotable
         return if EffectiveTestBot.skip?(options[:current_test])
 
         method_name = test_bot_method_name('member_test', options[:current_test])
-        method_user = user || _test_bot_user(method_name)
 
-        define_method(method_name) { member_action_test(controller: controller, action: action, user: method_user, member: member, **options) }
+        define_method(method_name) { member_action_test(controller: controller, action: action, user: user, member: member, **options) }
       end
 
     end
 
     # Instance Methods - Call me from within a test
-    def member_action_test(controller:, action:, user: _test_bot_user(), member:, **options)
+    def member_action_test(controller:, action:, user: nil, member:, **options)
+      method_user = user || _test_bot_user(options[:current_test])
+
       begin
-        assign_test_bot_lets!(options.reverse_merge!(resource: controller, action: action, user: user, member: member))
+        assign_test_bot_lets!(options.reverse_merge!(resource: controller, action: action, user: method_user, member: member))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: member_test(controller: 'admin/jobs', action: 'unarchive', user: User.first, member: (Post.first || nil))"
       end
