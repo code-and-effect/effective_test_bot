@@ -5,6 +5,7 @@ require 'effective_test_bot/middleware'
 require 'effective_test_bot/version'
 
 module EffectiveTestBot
+  mattr_accessor :user
   mattr_accessor :except
   mattr_accessor :only
   mattr_accessor :fail_fast

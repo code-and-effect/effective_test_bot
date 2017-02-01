@@ -5,8 +5,12 @@ module TestBotable
     module ClassMethods
       TEST_BOT_TEST_PREFIXES = ['crud_test', 'devise_test', 'member_test', 'page_test', 'redirect_test', 'wizard_test']
 
-      def _test_bot_user
-        @test_bot_user
+      def _test_bot_user(method_name)
+        user = EffectiveTestBot.user.call(method_name)
+
+        binding.pry
+
+        puts "TEST BOT USER CLASS"
       end
 
       # Parses and validates lots of options
@@ -28,8 +32,6 @@ module TestBotable
 
       def normalize_test_bot_options!(options)
         raise 'expected options to be a Hash' unless options.kind_of?(Hash)
-        raise 'expected key :user to be a User' unless (options[:user].kind_of?(User) || options[:user] == false)
-        #raise 'expected key :current_test to be a String' unless options[:current_test].kind_of?(String)
 
         # Controller stuff
         options[:controller_namespace] ||= options[:namespace]
@@ -124,6 +126,7 @@ module TestBotable
     # Instance Methods
 
     def _test_bot_user
+      puts "TEST BOT USER INSTANCE"
       @test_bot_user
     end
 

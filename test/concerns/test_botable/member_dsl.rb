@@ -16,13 +16,14 @@ module TestBotable
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def member_test(controller:, action:, user: _test_bot_user(), member: nil, label: nil, **options)
+      def member_test(controller:, action:, user: nil, member: nil, label: nil, **options)
         options[:current_test] = label || "#{controller}##{action}"
         return if EffectiveTestBot.skip?(options[:current_test])
 
         method_name = test_bot_method_name('member_test', options[:current_test])
+        method_user = user || _test_bot_user(method_name)
 
-        define_method(method_name) { member_action_test(controller: controller, action: action, user: user, member: member, **options) }
+        define_method(method_name) { member_action_test(controller: controller, action: action, user: method_user, member: member, **options) }
       end
 
     end

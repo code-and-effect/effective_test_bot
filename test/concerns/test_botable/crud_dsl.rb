@@ -18,7 +18,7 @@ module TestBotable
 
       # All this does is define a 'test_bot' method for each required action on this class
       # So that MiniTest will see the test functions and run them
-      def crud_test(resource:, user: _test_bot_user(), label: nil, skip: {}, only: nil, except: nil, **options)
+      def crud_test(resource:, user: nil, label: nil, skip: {}, only: nil, except: nil, **options)
         # This skips paramaters is different than the initializer skips, which affect just the rake task
 
         # These are specificially for the DSL
@@ -28,7 +28,7 @@ module TestBotable
         current_crud_tests = crud_tests_to_define(only, except)
 
         begin
-          normalize_test_bot_options!(options.merge!(resource: resource, user: user, current_crud_tests: current_crud_tests))
+          normalize_test_bot_options!(options.merge!(resource: resource, current_crud_tests: current_crud_tests))
         rescue => e
           raise "Error: #{e.message}.  Expected usage: crud_test(resource: (Post || Post.new), user: User.first, only: [:new, :create], skip: {create_invalid: [:path]})"
         end
@@ -45,8 +45,9 @@ module TestBotable
           next if EffectiveTestBot.skip?(label || options_for_method[:current_test])
 
           method_name = test_bot_method_name('crud_test', label || options_for_method[:current_test])
+          method_user = user || _test_bot_user(method_name)
 
-          define_method(method_name) { crud_action_test(test: test, resource: resource, user: user, **options_for_method) }
+          define_method(method_name) { crud_action_test(test: test, resource: resource, user: method_user, **options_for_method) }
         end
       end
 
