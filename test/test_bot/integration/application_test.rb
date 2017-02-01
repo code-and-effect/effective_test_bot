@@ -127,20 +127,8 @@ module TestBot
         return :none unless route.defaults[:controller] && route.defaults[:action]
 
         @_controller_instances ||= {}
-        @_controller_instances[route.defaults[:controller]] ||= build_controller_instance(route)
+        @_controller_instances[route.defaults[:controller]] ||= (Effective::Resource.new(route).controller_klass.new() rescue :none)
       end
-
-      def build_controller_instance(route)
-        # Find the correct route.app that links to the controller
-        # If there is a routing constraint, we have to traverse the route.app linked list to find the route with a controller
-        route_app = route
-        route_app = route_app.app while (route_app.respond_to?(:app) && route_app != route_app.app)
-
-        return :none unless route_app.respond_to?(:controller)
-
-        (route_app.controller(route.defaults).new() rescue :none)
-      end
-
     end
 
     initialize_tests

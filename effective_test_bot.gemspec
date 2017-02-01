@@ -16,7 +16,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib,spec,test}/**/*"] + ['MIT-LICENSE', 'README.md']
 
-  s.add_dependency 'rails'
+  s.add_dependency 'rails', ['>= 3.2.0']
+  s.add_dependency 'effective_resources'
+
   s.add_dependency 'minitest'
   s.add_dependency 'minitest-rails'
   s.add_dependency 'minitest-capybara'
