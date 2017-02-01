@@ -20,6 +20,7 @@ if Rails.env.test?
 
     # Set the current user on a per test basis. You must have at least 1 user seeded.
     # test is a String as per the except, only and TEST= test names
+    # proc = { |test| user = User.first; puts "#{test} #{user}"; user }
     config.user = proc { |test| User.first }
 
     # Exits immediately if there is a test failure
