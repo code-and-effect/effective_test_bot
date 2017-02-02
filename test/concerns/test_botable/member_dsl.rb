@@ -29,10 +29,10 @@ module TestBotable
 
     # Instance Methods - Call me from within a test
     def member_action_test(controller:, action:, user: nil, member:, **options)
-      method_user = user || _test_bot_user(options[:current_test])
+      user ||= test_bot_user(options[:current_test])
 
       begin
-        assign_test_bot_lets!(options.reverse_merge!(resource: controller, action: action, user: method_user, member: member))
+        assign_test_bot_lets!(options.reverse_merge!(resource: controller, action: action, user: user, member: member))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: member_test(controller: 'admin/jobs', action: 'unarchive', user: User.first, member: (Post.first || nil))"
       end

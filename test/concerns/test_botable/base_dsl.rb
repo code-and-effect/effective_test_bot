@@ -117,7 +117,9 @@ module TestBotable
 
     # Instance Methods
 
-    def _test_bot_user(test_name)
+    def test_bot_user(test_name)
+      return @test_bot_user if @test_bot_user
+
       unless EffectiveTestBot.user.kind_of?(Proc)
         raise 'expected EffectiveTestBot.user to be a proc. Set config.user = Proc.new { |test| User.first }'
       end

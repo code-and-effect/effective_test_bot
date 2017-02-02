@@ -32,10 +32,10 @@ module TestBotable
 
     # Instance Methods - Call me from within a test
     def wizard_action_test(from:, to: nil, user: nil, **options)
-      method_user = user || _test_bot_user(options[:current_test])
+      user ||= test_bot_user(options[:current_test])
 
       begin
-        assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: method_user))
+        assign_test_bot_lets!(options.reverse_merge!(from: from, to: to, user: user))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: wizard_action_test(from: '/fee_wizard/step1', to: ('/fee_wizard/step5' || nil), user: User.first)"
       end

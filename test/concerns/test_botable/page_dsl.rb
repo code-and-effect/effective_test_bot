@@ -28,10 +28,10 @@ module TestBotable
 
     # Instance Methods - Call me from within a test
     def page_action_test(path:, user: nil, **options)
-      method_user = user || _test_bot_user(options[:current_test])
+      user ||= test_bot_user(options[:current_test])
 
       begin
-        assign_test_bot_lets!(options.reverse_merge!(user: method_user, page_path: path))
+        assign_test_bot_lets!(options.reverse_merge!(user: user, page_path: path))
       rescue => e
         raise "Error: #{e.message}.  Expected usage: page_action_test(path: root_path, user: User.first)"
       end
