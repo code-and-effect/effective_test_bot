@@ -60,7 +60,7 @@ module EffectiveTestBotAssertions
 
       info = [
         "Encountered a 403 Access Denied",
-        ("(cannot :#{exception['action']}, :#{exception['subject']})" if exception.present?),
+        ("(cannot :#{exception['action']}, #{exception['subject']})" if exception.present?),
         "on #{page.current_path} as user #{user || 'no user'}.",
         ("\nAdd assign_test_bot_access_denied_exception(exception) to your ApplicationController's rescue_from block to gather more information." unless exception.present?),
       ].compact.join(' ')

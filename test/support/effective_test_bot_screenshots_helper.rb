@@ -95,7 +95,7 @@ module EffectiveTestBotScreenshotsHelper
 
   def current_test_failure_filename
     # Match Capybara-screenshots format-ish
-    "#{current_test_name.parameterize}_failure_#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
+    "#{current_test_name.parameterize}-failure-#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
   end
 
   # Where the tour animated gif ends up

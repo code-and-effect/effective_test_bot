@@ -33,7 +33,20 @@ module EffectiveTestBotControllerHelper
 
   def assign_test_bot_access_denied_exception(exception)
     return unless Rails.env.test?
-    response.headers['Test-Bot-Access-Denied'] = Base64.encode64({exception: exception, action: exception.action, subject: exception.subject }.to_json)
+
+    response.headers['Test-Bot-Access-Denied'] = Base64.encode64({
+      exception: exception,
+      action: exception.action,
+      subject: (
+        if exception.subject.kind_of?(Symbol)
+          ":#{exception.subject}"
+        elsif exception.subject.class == Class
+          exception.subject.name
+        else
+          exception.subject.class.name
+        end
+      )
+    }.to_json)
   end
 
 end

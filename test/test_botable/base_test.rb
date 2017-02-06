@@ -52,8 +52,9 @@ module BaseTest
       assert(new_path.present?, "TestBotError: Generated polymorphic route new_#{[*controller_namespace, resource_name].compact.join('_')}_path is undefined. #{hint}")
 
       visit(new_path)
+
       assert_no_exceptions
-      assert_authorization
+      assert_authorization(hint)
       assert_page_status
 
       assert_form("form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
@@ -65,7 +66,7 @@ module BaseTest
         submit_novalidate_form
 
         assert_no_exceptions
-        assert_authorization
+        assert_authorization(hint)
         assert_page_status
       end
 
