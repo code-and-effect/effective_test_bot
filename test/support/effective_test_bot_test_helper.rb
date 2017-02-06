@@ -69,8 +69,8 @@ module EffectiveTestBotTestHelper
     (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
   end
 
-  def exceptions
-    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Exceptions'])) rescue [])
+  def access_denied_exception
+    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Access-Denied'])) rescue {})
   end
 
 end

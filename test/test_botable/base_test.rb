@@ -8,6 +8,7 @@ module BaseTest
     return if test_bot_skip?(:normal)
 
     assert_no_exceptions unless test_bot_skip?(:exceptions)
+    assert_authorization unless test_bot_skip?(:authorization)
     assert_page_status unless test_bot_skip?(:page_status)
     assert_no_js_errors unless test_bot_skip?(:no_js_errors)
     assert_page_title unless (test_bot_skip?(:page_title) || all('head').blank? || was_download?)
@@ -52,6 +53,7 @@ module BaseTest
 
       visit(new_path)
       assert_no_exceptions
+      assert_authorization
       assert_page_status
 
       assert_form("form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
@@ -63,6 +65,7 @@ module BaseTest
         submit_novalidate_form
 
         assert_no_exceptions
+        assert_authorization
         assert_page_status
       end
 

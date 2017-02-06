@@ -54,6 +54,21 @@ module EffectiveTestBotAssertions
     assert all("input[type='submit'],button[type='submit']").present?, message
   end
 
+  def assert_authorization(message = '(authorization) Expected authorized access')
+    if page.status_code == 403
+      exception = access_denied_exception
+
+      info = [
+        "Encountered a 403 Access Denied",
+        ("(cannot :#{exception['action']}, :#{exception['subject']})" if exception.present?),
+        "on #{page.current_path} as user #{user || 'no user'}.",
+        ("\nAdd assign_test_bot_access_denied_exception(exception) to your ApplicationController's rescue_from block to gather more information." unless exception.present?),
+      ].compact.join(' ')
+
+      assert false, "#{message}.\n#{info}"
+    end
+  end
+
   def assert_page_status(status = 200, message = '(page_status) Expected :status: HTTP status code')
     assert_equal status, page.status_code, message.sub(':status:', status.to_s)
   end

@@ -116,6 +116,7 @@ module TestBotable
     end
 
     # Instance Methods
+    protected
 
     def test_bot_user(test_name)
       return @test_bot_user if @test_bot_user

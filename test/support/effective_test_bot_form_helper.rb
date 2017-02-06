@@ -30,6 +30,7 @@ module EffectiveTestBotFormHelper
     assert_no_unpermitted_params unless test_bot_skip?(:no_unpermitted_params)
     assert_no_assigns_errors unless test_bot_skip?(:no_assigns_errors)
     assert_no_exceptions unless test_bot_skip?(:exceptions)
+    assert_authorization unless test_bot_skip?(:authorization)
     assert_page_status unless test_bot_skip?(:page_status)
 
     true
@@ -45,7 +46,7 @@ module EffectiveTestBotFormHelper
   def clear_form
     all('input,select,textarea').each do |field|
       if field.tag_name == 'select' && field['class'].to_s.include?('select2') # effective_select
-        within(field.parent) { first(:css, '.select2-selection__clear').try(:click) }
+        within(field.query_scope) { first(:css, '.select2-selection__clear').try(:click) }
       end
 
       begin
