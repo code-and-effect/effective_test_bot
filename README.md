@@ -105,7 +105,7 @@ The following assertions are added for use in any integration test:
 
 - `assert_assigns` asserts a given rails view_assigns object is present.
 - `assert_assigns_errors` use after an intentionally invalid form submit to make sure your assigned rails object has errors, or a specific error.
-- `assert_authorization` checks for a 403 Access Denied error.  Add `assign_test_bot_access_denied_exception(exception)` to your ApplicationController's `rescue_from` block to generate more information.
+- `assert_authorization` checks for a 403 Access Denied error.  For this to work, please add `assign_test_bot_access_denied_exception(exception) if defined?(EffectiveTestBot)` to your ApplicationController's `rescue_from` block to generate more information.
 - `assert_no_assigns_errors` should be used after any form submit to make sure your assigned rails object has no errors.  Prints out any errors if they exist.
 - `assert_current_path(path)` asserts the current page path.
 - `assert_email(action)` asserts an email with the given action name was sent. Also supports `assert_email(to: email)` type syntax with to, from, subject, body.
