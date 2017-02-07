@@ -212,7 +212,6 @@ effective_test_bot fills in this knowledge gap by serializing any interesting va
 The following representations of the rails internal state are made available:
 
 - `assigns` a Hash representation of the current page's rails `view_assigns`. Serializes any `ActiveRecord` objects, as well as any `TrueClass`, `FalseClass`, `NilClass`, `String`, `Symbol`, and `Numeric` objects.  Does not serialize anything else, but sets a symbol `assigns[key] == :present_but_not_serialized`.
-- `exceptions` an Array with the exception message and a stacktrace.
 - `flash` a Hash representation of the current page's flash.
 - `unpermitted_params` an Array of any unpermitted parameters that were encountered by the last request.
 
