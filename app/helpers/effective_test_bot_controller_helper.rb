@@ -13,6 +13,9 @@ module EffectiveTestBotControllerHelper
       when ActiveRecord::Base
         test_bot_assigns[key] = object.attributes
         test_bot_assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
+      when (ActiveModel::Model rescue nil)
+        test_bot_assigns[key] = object.respond_to?(:attributes) ? object.attributes : {present_but_not_serialized: true}
+        test_bot_assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
       when TrueClass, FalseClass, NilClass, String, Symbol, Numeric
         test_bot_assigns[key] = object
       else
