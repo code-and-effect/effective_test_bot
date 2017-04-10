@@ -18,6 +18,8 @@ module TestBotable
 
       # All this does is define a 'test_bot' method for each required action on this class
       # So that MiniTest will see the test functions and run them
+      # Expected usage: crud_test(resource: Post)
+      # Expected usage: crud_test(resource: (Post || Post.new), user: User.first, only: [:new, :create], skip: {create_invalid: [:path]})"
       def crud_test(resource:, user: nil, label: nil, skip: {}, only: nil, except: nil, **options)
         # This skips paramaters is different than the initializer skips, which affect just the rake task
 
@@ -30,7 +32,7 @@ module TestBotable
         begin
           normalize_test_bot_options!(options.merge!(resource: resource, current_crud_tests: current_crud_tests))
         rescue => e
-          raise "Error: #{e.message}.  Expected usage: crud_test(resource: (Post || Post.new), user: User.first, only: [:new, :create], skip: {create_invalid: [:path]})"
+          raise "\e[33mError\e[0m: #{e.message}"
         end
 
         current_crud_tests.each do |test|
