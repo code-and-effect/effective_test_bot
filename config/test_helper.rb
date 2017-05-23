@@ -11,7 +11,7 @@ require 'capybara/webkit'
 require 'capybara-screenshot/minitest'
 require 'capybara/slow_finder_errors'
 
-require 'database_cleaner'
+# require 'database_cleaner'
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
@@ -28,16 +28,17 @@ class Capybara::Rails::TestCase
 
   include EffectiveTestBot::DSL
 
-  def after_setup
-    super()
-    DatabaseCleaner.start
-  end
+  # Needed for Rails < 5.1
+  # def after_setup
+  #   super()
+  #   DatabaseCleaner.start
+  # end
 
-  def after_teardown
-    super()
-    DatabaseCleaner.clean
-    Capybara.reset_sessions!  # Some apps seem to need this to correctly reset the test_06:_capybara_can_sign_in
-  end
+  # def after_teardown
+  #   super()
+  #   DatabaseCleaner.clean
+  #   Capybara.reset_sessions!  # Some apps seem to need this to correctly reset the test_06:_capybara_can_sign_in
+  # end
 end
 
 Capybara.default_driver = :webkit
