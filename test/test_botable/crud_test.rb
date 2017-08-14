@@ -98,7 +98,6 @@ module CrudTest
     assert_no_assigns_errors(resource_name) unless test_bot_skip?(:no_assigns_errors)
 
     refute_equal(before[:count], after[:count], "Expected fill_form to create a #{resource_class} object") if resource_class.respond_to?(:count)
-    refute_equal(before[:path], after[:path], "(path) Expected unique before and after paths") unless test_bot_skip?(:path)
   end
 
   def test_bot_show_test
