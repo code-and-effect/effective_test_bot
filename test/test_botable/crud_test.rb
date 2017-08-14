@@ -217,7 +217,6 @@ module CrudTest
       # So we just assert the 200 status code, and page title present manually
       # Javascript errors cannot be detected
 
-      puts 'test_bot_destroy_test failed to find_or_create_rails_ujs_link_to_delete  Falling back to selenium DELETE request.'
       visit_delete(resource_path(resource), user)
       assert_equal(200, @visit_delete_page.try(:status_code), '(page_status) Expected 200 HTTP status code') unless test_bot_skip?(:page_status)
       assert((@visit_delete_page.find(:xpath, '//title', visible: false) rescue nil).present?, '(page_title) Expected page title to be present') unless test_bot_skip?(:page_title)

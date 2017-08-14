@@ -155,7 +155,7 @@ module EffectiveTestBotFormFiller
         Faker::Internet.email
       elsif classes.include?('price') # effective_form_inputs price
         4.times.map { DIGITS.sample }.join('') + '.00'
-      elsif classes.include?('numeric')
+      elsif classes.include?('numeric') || attribute.include?('number')
         min = (Float(field['min']) rescue 1)
         max = (Float(field['max']) rescue 1000)
         number = Random.new.rand(min..max)
