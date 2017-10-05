@@ -50,4 +50,9 @@ module EffectiveTestBotLoginHelper
 
     User.find_by_email(email)
   end
+
+  def current_user
+    User.where(id: assigns['current_user']['id']).first if (assigns['current_user'] && assigns['current_user']['id'])
+  end
+
 end
