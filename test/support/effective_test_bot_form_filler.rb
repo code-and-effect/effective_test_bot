@@ -78,12 +78,14 @@ module EffectiveTestBotFormFiller
         value = value_for_field(field, fills)
         ckeditor_text_area?(field) ? fill_ckeditor_text_area(field, value) : field.set(value)
       when 'select'
+        value = value_for_field(field, fills)
+
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
           page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
           save_test_bot_screenshot
         end
 
-        field.select(value_for_field(field, fills), match: :first)
+        field.select(value, match: :first) unless value == :unselect
 
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2')
           page.execute_script("try { $('select##{field['id']}').select2('close'); } catch(e) {};")
@@ -100,6 +102,8 @@ module EffectiveTestBotFormFiller
       else
         raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
       end
+
+      wait_for_ajax
 
       if EffectiveTestBot.tour_mode_extreme?
         save_test_bot_screenshot unless skip_field_screenshot
@@ -125,7 +129,7 @@ module EffectiveTestBotFormFiller
     attributes = field['name'].to_s.gsub(']', '').split('[') # user[something_attributes][last_name] => ['user', 'something_attributes', 'last_name']
     attribute = attributes.last.to_s
 
-    fill_value = fill_value_for_field(fills, attributes, field['value'])
+    fill_value = fill_value_for_field(fills, attributes, field['value'], field_name)
 
     # If there is a predefined fill value for this field return it now
     # except for select, checkbox and radio fields which we want to match by value or label
@@ -219,6 +223,8 @@ module EffectiveTestBotFormFiller
       value_for_input_radio_field(field, fill_value)
 
     when 'select'
+      return fill_value if fill_value == :unselect
+
       if fill_value.present? # accept a value or text
         field.all('option:enabled').each do |option|
           if (option.text == fill_value || option.value.to_s == fill_value)
@@ -388,12 +394,14 @@ module EffectiveTestBotFormFiller
 
   private
 
-  def fill_value_for_field(fills, attributes, value)
+  def fill_value_for_field(fills, attributes, value, field_name)
     return if fills.blank? || (attributes.blank? && value.blank?)
 
     key = nil
     attributes.reverse_each do |name|  # match last_name, then something_attributes.last_name, then user.something_attributes.last_name
       key = (key.present? ? "#{name}.#{key}" : name) # builds up the string as we go along
+
+      return :unselect if field_name == 'select' && fills.key?(key) && [nil, ''].include?(fills[key])
       return fills[key].to_s if fills.key?(key)
     end
 
