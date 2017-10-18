@@ -81,7 +81,7 @@ module EffectiveTestBotFormHelper
     submit.click
     synchronize!
 
-    save_test_bot_screenshot if EffectiveTestBot.screenshots?
+    save_test_bot_screenshot if EffectiveTestBot.screenshots? && page.current_path.present?
 
     true
   end
