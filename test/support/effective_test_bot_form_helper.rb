@@ -80,6 +80,9 @@ module EffectiveTestBotFormHelper
 
     submit.click
     synchronize!
+
+    save_test_bot_screenshot if EffectiveTestBot.screenshots?
+
     true
   end
 
