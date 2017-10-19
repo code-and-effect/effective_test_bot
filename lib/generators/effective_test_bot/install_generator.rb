@@ -24,8 +24,8 @@ module EffectiveTestBot
       def thank_you
         puts "Thanks for using EffectiveTestBot"
         puts "Make sure you create a user in your db/seeds.rb, test/fixtures/users.yml, or test/fixtures/seeds.rb"
-        puts "Run `rake test:bot:environment` once to ensure the testing environment is correctly configured"
-        puts "Test your app with 'rake test:bot'"
+        puts "Run `rails test:bot:environment` once to ensure the testing environment is correctly configured"
+        puts "Test your app with 'rails test:bot'"
       end
     end
   end

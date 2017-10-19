@@ -69,32 +69,32 @@ module EffectiveTestBotFormFiller
       next if skip_form_field?(field)
       skip_field_screenshot = false
 
+      value = value_for_field(field, fills)
+
       case [field.tag_name, field['type']].compact.join('_')
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'input_url', 'input_color'
-        field.set(value_for_field(field, fills))
-
+        field.set(value)
         close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
       when 'textarea'
-        value = value_for_field(field, fills)
         ckeditor_text_area?(field) ? fill_ckeditor_text_area(field, value) : field.set(value)
       when 'select'
-        value = value_for_field(field, fills)
-
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
           page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
           save_test_bot_screenshot
         end
 
-        field.select(value, match: :first) unless value == :unselect
+        if field.all('option:enabled').length > 0 && value != :unselect
+          field.select(value, match: :first, disabled: false)
+        end
 
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2')
           page.execute_script("try { $('select##{field['id']}').select2('close'); } catch(e) {};")
         end
       when 'input_file'
         if field['class'].to_s.include?('asset-box-uploader-fileinput')
-          upload_effective_asset(field, value_for_field(field, fills))
+          upload_effective_asset(field, value)
         else
-          field.set(value_for_field(field, fills))
+          field.set(value)
         end
       when 'input_submit', 'input_search', 'input_button'
         skip_field_screenshot = true
@@ -249,6 +249,9 @@ module EffectiveTestBotFormFiller
 
     when 'textarea'
       Faker::Lorem.paragraph
+
+    when 'input_submit', 'input_search', 'input_button'
+      nil
 
     else
       raise "fill_value unsupported field type: #{field['type']}"
@@ -425,8 +428,13 @@ module EffectiveTestBotFormFiller
   def skip_form_field?(field)
     field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
 
-    (field.visible? == false && !ckeditor_text_area?(field)) ||
+    field_id = field['id'].to_s
+
+    field_id.start_with?('datatable_') ||
+    field_id.start_with?('filters_scope_') ||
+    field_id.start_with?('filters_') && field['name'].blank? ||
     field.disabled? ||
+    (!field.visible? && !ckeditor_text_area?(field)) ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
   end
