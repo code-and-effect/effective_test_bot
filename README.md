@@ -8,13 +8,13 @@ Adds many additional assertions and quality of life helper functions.
 
 Provides a curated set of minitest and capybara focused rails testing gems and a well configured `test_helper.rb` file.
 
-Run `rake test:bot:environment` to validate your testing environment.  Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
+Run `rails test:bot:environment` to validate your testing environment.  Ensures that all fixtures and seeds are properly initialized.  Makes sure database transactions and web sessions correctly reset between tests.
 
 Adds many class and instance level 1-liners to run entire test suites and check many assertions all at once.
 
 Autosaves an animated .gif for any failing test.
 
-Run `rake test:bot` to automatically check every route in your application against an appropriate test suite, without writing any code.  Clicks through every page, intelligently fills forms with appropriate pseudo-random input and checks for all kinds of errors and omissions.
+Run `rails test:bot` to automatically check every route in your application against an appropriate test suite, without writing any code.  Clicks through every page, intelligently fills forms with appropriate pseudo-random input and checks for all kinds of errors and omissions.
 
 Turn on tour mode to programatically generate an animated .gif of every workflow in your website.
 
@@ -60,7 +60,7 @@ The generator will run `minitest:install` if not already present and create an i
 
 Fixture or seed one user. At least one user -- ideally a fully priviledged admin type user -- must be created.
 
-(there are future plans to make this better.  Right now `rake test:bot` just runs everything as one user.  There really isn't support for 'this user should not be able to' yet.)
+(there are future plans to make this better.  Right now `rails test:bot` just runs everything as one user.  There really isn't support for 'this user should not be able to' yet.)
 
 To create the initial user, please add it to either `test/fixtures/users.yml`, the `db/seeds.db` file or the effective_test_bot specific `test/fixtures/seeds.rb` file.
 
@@ -68,13 +68,13 @@ As per the included `test/test_helper.rb`, the following tasks run when minitest
 
 ```
 # Rails default task, load fixtures from test/fixtures/*.yml (including users.yml if it exists)
-rake db:fixtures:load
+rails db:fixtures:load
 
 # Rails default task, loads db/seeds.rb
-rake db:seed
+rails db:seed
 
 # Added by effective_test_bot.  loads test/fixtures/seeds.rb. 'cause screw yaml.
-rake test:load_fixture_seeds
+rails test:load_fixture_seeds
 ```
 
 Your initial user may be created by any of the above 3 tasks.
@@ -82,7 +82,7 @@ Your initial user may be created by any of the above 3 tasks.
 Finally, to test that your testing environment is set up correctly run and work through any issues with:
 
 ```
-rake test:bot:environment
+rails test:bot:environment
 ```
 
 You now have effective_test_bot configured and you're ready to go.
@@ -97,7 +97,7 @@ Effective TestBot provides 4 areas of support in writing [minitest](https://gith
 
 3.) Produce animated .gifs of test runs. Enable autosave_animated_gif_on_failure to help debug a tricky test, or run in tour mode and record walkthroughs of features.
 
-4.) Apply full stack automated testing. Just run `rake test:bot` to scan every route in your application and without writing any code check every controller action with an appropriate test suite.
+4.) Apply full stack automated testing. Just run `rails test:bot` to scan every route in your application and without writing any code check every controller action with an appropriate test suite.
 
 ## Minitest Assertions
 
@@ -486,7 +486,7 @@ User sessions need to properly reset and database transactions must be correctly
 
 Included with this gem is the `rails generate effective_test_bot:install` that does its best to provide a known-good set of configuration files that initialize all required testing gems.  However, every developer's machine is different, and there are just too many points of failure.  Everyone's `test/test_helper.rb` will be slightly different.
 
-Run `rake test:bot:environment` to check that capybara is doing the right thing, everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, devise works and rails' jquery-ujs is present.
+Run `rails test:bot:environment` to check that capybara is doing the right thing, everything is reset properly between test runs, an initial user record exists, all seeded and fixtured data is valid, devise works and rails' jquery-ujs is present.
 
 If all environment tests pass, you will have a great experience with automated testing.
 
@@ -494,7 +494,7 @@ If all environment tests pass, you will have a great experience with automated t
 
 One of the main goals of `effective_test_bot` is to increase the speed at which tests can be written in any ruby on rails application.  Well, there's no faster way of writing tests than by not writing them at all.
 
-Run `rake test:bot` to scan every route defined in `routes.rb` and run an appropriate test suite.
+Run `rails test:bot` to scan every route defined in `routes.rb` and run an appropriate test suite.
 
 You can configure test bot to skip individual tests or assertions, tweak screenshot behaviour and toggle tour mode via the `config/initializers/effective_test_bot.rb` file.  As well, there are a few command line options available.
 
@@ -502,13 +502,13 @@ These are some quick ways to customize test bot's behaviour:
 
 ```
 # Scan every route in the application as per config/initializers/effective_test_bot.rb
-rake test:bot
+rails test:bot
 
 # Test a specific controller (any routes matching posts)
-rake test:bot TEST=posts
+rails test:bot TEST=posts
 
 # Test a specific controller and action
-rake test:bot TEST=posts#index
+rails test:bot TEST=posts#index
 ```
 
 ## Animated gifs and screenshots
@@ -535,44 +535,44 @@ You can run test bot in tour mode by setting `config.tour_mode = true` in the `c
 
 ```
 # Run test:bot in tour mode, saving an animated .gif for all successful tests
-rake test:bot:tour
-rake test:bot TOUR=true
+rails test:bot:tour
+rails test:bot TOUR=true
 
 # Also prints the animated .gif file path to stdout
-rake test:bot:tourv
-rake test:bot TOUR=verbose
+rails test:bot:tourv
+rails test:bot TOUR=verbose
 
 # Makes a whole bunch of extra screenshots when filling out forms
-rake test:bot TOUR=extreme
+rails test:bot TOUR=extreme
 
 # Runs in tour mode and tests only a specific controller or action
-rake test:bot:tour TEST=posts
-rake test:bot:tour TEST=posts#index
+rails test:bot:tour TEST=posts
+rails test:bot:tour TEST=posts#index
 ```
 
 To print out the file location of all tour files, run the following:
 
 ```
 # Prints out all animated .gif file locations
-rake test:bot:tours
+rails test:bot:tours
 
 # Prints out any animated .gif files locations with a file name matching posts
-rake test:bot:tours TEST=posts
+rails test:bot:tours TEST=posts
 ```
 
 To delete all tour and autosave on failure animated .gifs, run the following:
 
 ```
 # Deletes all tour and failure animated .gifs
-rake test:bot:purge
+rails test:bot:purge
 ```
 
-As well, to enable tour mode when running the standard `rake test`:
+As well, to enable tour mode when running the standard `rails test`:
 
 ```
 # Runs all regular minitest tests with tour mode enabled
-rake test:tour
-rake test:tourv
+rails test:tour
+rails test:tourv
 ```
 
 ### Fail fast
@@ -582,7 +582,7 @@ Set `config.fail_fast = true` to exit immediately if there is a test failure.
 Or, override the config setting by running the following:
 
 ```
-rake test:bot FAILFAST=true
+rails test:bot FAILFAST=true
 ```
 
 This functionality is provided thanks to [minitest-fail-fast](https://github.com/teoljungberg/minitest-fail-fast/)
@@ -592,13 +592,13 @@ This functionality is provided thanks to [minitest-fail-fast](https://github.com
 Skip any previously passed tests by running the following:
 
 ```
-rake test:bot:fails
+rails test:bot:fails
 ```
 
 or
 
 ```
-rake test:bot FAILS=true
+rails test:bot FAILS=true
 ```
 
 ## License
