@@ -12,6 +12,7 @@ module EffectiveTestBotScreenshotsHelper
 
   def save_test_bot_screenshot
     return unless EffectiveTestBot.screenshots?
+    return unless page.current_path.present?
     page.save_screenshot("#{current_test_temp_path}/#{current_test_screenshot_id}.png")
   end
 
