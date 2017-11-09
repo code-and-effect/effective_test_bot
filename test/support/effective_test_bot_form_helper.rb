@@ -17,14 +17,14 @@ module EffectiveTestBotFormHelper
   end
 
   # This submits the form, while checking for html5 form validation errors and unpermitted params
-  def submit_form(label = nil, last: false)
+  def submit_form(label = nil, last: false, debug: false)
     assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
     assert_jquery_ujs_disable_with(label) unless test_bot_skip?(:jquery_ujs_disable_with)
 
     if test_bot_skip?(:no_unpermitted_params)
-      click_submit(label, last: last)
+      click_submit(label, last: last, debug: debug)
     else
-      with_raised_unpermitted_params_exceptions { click_submit(label, last: last) }
+      with_raised_unpermitted_params_exceptions { click_submit(label, last: last, debug: debug) }
     end
 
     assert_no_unpermitted_params unless test_bot_skip?(:no_unpermitted_params)
@@ -63,12 +63,13 @@ module EffectiveTestBotFormHelper
   # This kind of sucks, as we want to simulate mouse movements with the tour
   # Instead we manually trigger submit buttons and use the data-disable-with to
   # make the 'submit form' step look nice
-  def click_submit(label, last: false)
+  def click_submit(label, last: false, debug: false)
     if label.present?
       submit = find(:link_or_button, label)
       assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
     else
-      submit = all("input[type='submit'],button[type='submit']").send(last ? :last : :first)
+      submit = find("input[type='submit'],button[type='submit']", match: :first)
+      submit = all("input[type='submit'],button[type='submit']").last if last
       assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] or button[type='submit'] on #{page.current_path}"
     end
 
@@ -76,6 +77,10 @@ module EffectiveTestBotFormHelper
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.disableFormElement($(this)); });"
       save_test_bot_screenshot
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
+    end
+
+    if debug
+      puts "Clicking: <#{submit.tag_name} id='#{submit['id']}' class='#{submit['class']}' name='#{submit['name']}' value='#{submit['value']}' />"
     end
 
     submit.click
