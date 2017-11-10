@@ -65,7 +65,7 @@ module EffectiveTestBotFormHelper
   # make the 'submit form' step look nice
   def click_submit(label, last: false, debug: false)
     if label.present?
-      submit = find(:link_or_button, label)
+      submit = find(:link_or_button, label, match: :first)
       assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
     else
       submit = find("input[type='submit'],button[type='submit']", match: :first)
