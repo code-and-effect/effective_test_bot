@@ -128,7 +128,7 @@ module EffectiveTestBotAssertions
   # Rails jquery-ujs data-disable-with
   # = f.button :submit, 'Save', data: { disable_with: 'Saving...' }
   def assert_jquery_ujs_disable_with(label = nil, message = nil)
-    submits = label.present? ? [find(:link_or_button, label)] : all("input[type='submit']")
+    submits = label.present? ? all("input[type='submit']", text: label) : all("input[type='submit']")
     all_disabled_with = submits.all? { |submit| submit['data-disable-with'].present? }
 
     assert all_disabled_with, message || "(jquery_ujs_disable_with) Expected rails jquery-ujs data-disable-with to be present on #{(label || "all input[type='submit'] fields")}\nInclude it on your submit buttons by adding \"data: { disable_with: 'Saving...' }\""
