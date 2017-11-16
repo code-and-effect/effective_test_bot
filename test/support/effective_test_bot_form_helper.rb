@@ -86,6 +86,8 @@ module EffectiveTestBotFormHelper
 
   # Keys are :value, should be one of :count, :minimum, :maximum, :between, :text, :id, :class, :visible, :exact, :exact_text, :match, :wait, :filter_se
   def find_submit(label, last: false)
+    submit = nil
+
     if label.present?
       submit = (find("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']", match: :first) rescue nil)
       submit ||= find(:link_or_button, label, match: :first)
