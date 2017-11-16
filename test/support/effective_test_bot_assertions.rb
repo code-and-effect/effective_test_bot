@@ -93,6 +93,16 @@ module EffectiveTestBotAssertions
     assert (active.blank? || active.zero?), message.sub(':count:', active.to_s)
   end
 
+  def assert_no_active_jobs(message = "(no_active_jobs) :count: Unexpected ActiveJob jobs present")
+    jobs = if defined?(SuckerPunch)
+      SuckerPunch::Queue.all.length
+    else
+      ActiveJob::Base.queue_adapter.enqueued_jobs.count
+    end
+
+    assert (jobs == 0), message.sub(':count:', jobs.to_s)
+  end
+
   def assert_no_js_errors(message = nil)
     errors = page.driver.error_messages
     assert errors.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{errors.first.to_s}"
@@ -184,16 +194,17 @@ module EffectiveTestBotAssertions
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
   def assert_email(action = nil, to: nil, from: nil, subject: nil, body: nil, message: nil)
-
     if (action || to || from || subject || body).nil?
       assert ActionMailer::Base.deliveries.present?, message || "(assert_email) Expected email to have been delivered"
       return
     end
 
+    actions = ActionMailer::Base.instance_variable_get(:@mailer_actions)
+
     ActionMailer::Base.deliveries.each do |message|
       matches = true
 
-      matches &&= (message.instance_variable_get(:@mailer_action) == action.to_s) if action
+      matches &&= (actions.include?(action.to_s)) if action
       matches &&= (Array(message.to).include?(to)) if to
       matches &&= (Array(message.from).include?(from)) if from
       matches &&= (message.subject == subject) if subject

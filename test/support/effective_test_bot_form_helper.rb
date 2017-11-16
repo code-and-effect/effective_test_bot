@@ -73,7 +73,7 @@ module EffectiveTestBotFormHelper
     end
 
     if debug
-      puts "Clicking: <#{submit.tag_name} id='#{submit['id']}' class='#{submit['class']}' name='#{submit['name']}' value='#{submit['value']}' />"
+      puts "Clicking: <#{submit.tag_name} id='#{submit['id']}' class='#{submit['class']}' name='#{submit['name']}' value='#{submit['value']}' href='#{submit['href']}' />"
     end
 
     submit.click
@@ -87,8 +87,14 @@ module EffectiveTestBotFormHelper
   # Keys are :value, should be one of :count, :minimum, :maximum, :between, :text, :id, :class, :visible, :exact, :exact_text, :match, :wait, :filter_se
   def find_submit(label, last: false)
     if label.present?
-      submit = find("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']", match: :first)
-      submit = all("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']").last if last
+      submit = (find("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']", match: :first) rescue nil)
+      submit ||= find(:link_or_button, label, match: :first)
+
+      if last
+        submit = all("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']").last
+        submit ||= all('a', text: label).last
+      end
+
       assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
     else
       submit = find("input[type='submit'],button[type='submit']", match: :first)

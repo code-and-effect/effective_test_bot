@@ -16,6 +16,20 @@ module EffectiveTestBotTestHelper
     end
   end
 
+  def wait_for_active_job
+    begin
+      Timeout.timeout(Capybara.default_max_wait_time * 2) do
+        if defined?(SuckerPunch)
+          loop until SuckerPunch::Queue.all.length == 0
+        else
+          loop until ActiveJob::Base.queue_adapter.enqueued_jobs.count == 0
+        end
+      end
+    rescue => e
+      assert_no_active_jobs
+    end
+  end
+
   def finished_all_ajax_requests?
     ajax_request_count = page.evaluate_script('jQuery.active')
     ajax_request_count.blank? || ajax_request_count.zero?
