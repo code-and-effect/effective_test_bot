@@ -64,14 +64,7 @@ module EffectiveTestBotFormHelper
   # Instead we manually trigger submit buttons and use the data-disable-with to
   # make the 'submit form' step look nice
   def click_submit(label, last: false, debug: false)
-    if label.present?
-      submit = find(:link_or_button, label, match: :first)
-      assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
-    else
-      submit = find("input[type='submit'],button[type='submit']", match: :first)
-      submit = all("input[type='submit'],button[type='submit']").last if last
-      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] or button[type='submit'] on #{page.current_path}"
-    end
+    submit = find_submit(label, last: last)
 
     if EffectiveTestBot.screenshots?
       page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.disableFormElement($(this)); });"
@@ -89,6 +82,21 @@ module EffectiveTestBotFormHelper
     save_test_bot_screenshot if EffectiveTestBot.screenshots? && page.current_path.present?
 
     true
+  end
+
+  # Keys are :value, should be one of :count, :minimum, :maximum, :between, :text, :id, :class, :visible, :exact, :exact_text, :match, :wait, :filter_se
+  def find_submit(label, last: false)
+    if label.present?
+      submit = find("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']", match: :first)
+      submit = all("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']").last if last
+      assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
+    else
+      submit = find("input[type='submit'],button[type='submit']", match: :first)
+      submit = all("input[type='submit'],button[type='submit']").last if last
+      assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] or button[type='submit'] on #{page.current_path}"
+    end
+
+    submit
   end
 
   def with_raised_unpermitted_params_exceptions(&block)
