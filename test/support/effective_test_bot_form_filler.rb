@@ -69,15 +69,16 @@ module EffectiveTestBotFormFiller
       next if skip_form_field?(field)
       skip_field_screenshot = false
 
+      field_name = [field.tag_name, field['type']].compact.join('_')
       value = value_for_field(field, fills)
 
-      case [field.tag_name, field['type']].compact.join('_')
+      case field_name
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'input_url', 'input_color'
         field.set(value)
         close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
-      when 'textarea'
+      when 'textarea', 'textarea_textarea'
         ckeditor_text_area?(field) ? fill_ckeditor_text_area(field, value) : field.set(value)
-      when 'select'
+      when 'select', 'select_select-one'
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
           page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
           save_test_bot_screenshot
@@ -100,7 +101,7 @@ module EffectiveTestBotFormFiller
         skip_field_screenshot = true
         # Do nothing
       else
-        raise "unsupported field type #{[field.tag_name, field['type']].compact.join('_')}"
+        raise "unsupported field type #{field_name}"
       end
 
       wait_for_ajax
@@ -222,7 +223,7 @@ module EffectiveTestBotFormFiller
     when 'input_radio'
       value_for_input_radio_field(field, fill_value)
 
-    when 'select'
+    when 'select', 'select_select-one'
       return fill_value if fill_value == :unselect
 
       if fill_value.present? # accept a value or text
@@ -247,14 +248,14 @@ module EffectiveTestBotFormFiller
     when 'input_url'
       Faker::Internet.url
 
-    when 'textarea'
+    when 'textarea', 'textarea_textarea'
       Faker::Lorem.paragraph
 
     when 'input_submit', 'input_search', 'input_button'
       nil
 
     else
-      raise "fill_value unsupported field type: #{field['type']}"
+      raise "fill_value unsupported field type: #{field_name}"
     end
   end
 
