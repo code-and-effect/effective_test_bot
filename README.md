@@ -20,6 +20,15 @@ Turn on tour mode to programatically generate an animated .gif of every workflow
 
 Make sure everything actually works.
 
+## Capybara Webkit
+
+This is the `capybara` branch of effective_test_bot which supports Rails <= 5.1 and Capybara Webkit.
+
+All published effective_test_bot 0.x gems will support Rails <= 5.1 and Capybara Webkit.
+
+For Rails 5.2+ please see the master branch and/or effective_test_bot 1.x gems.
+
+
 ## Getting Started
 
 First, make sure your site is using [devise](https://github.com/plataformatec/devise) and that your application javascript includes [jQuery](http://jquery.com/) and rails' [jquery_ujs](https://github.com/rails/jquery-ujs).
