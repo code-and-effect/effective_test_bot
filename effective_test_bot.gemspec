@@ -1,22 +1,22 @@
-$:.push File.expand_path("../lib", __FILE__)
+$:.push File.expand_path('../lib', __FILE__)
 
 # Maintain your gem's version:
 require 'effective_test_bot/version'
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "effective_test_bot"
+  s.name        = 'effective_test_bot'
   s.version     = EffectiveTestBot::VERSION
-  s.email       = ["info@codeandeffect.com"]
-  s.authors     = ["Code and Effect"]
-  s.homepage    = "https://github.com/code-and-effect/effective_test_bot"
-  s.summary     = "A shared library of rails model & capybara-based feature tests that should pass in every Rails application."
-  s.description = "A shared library of rails model & capybara-based feature tests that should pass in every Rails application."
+  s.email       = ['info@codeandeffect.com']
+  s.authors     = ['Code and Effect']
+  s.homepage    = 'https://github.com/code-and-effect/effective_test_bot'
+  s.summary     = 'A shared library of rails model & capybara-based feature tests that should pass in every Rails application.'
+  s.description = 'A shared library of rails model & capybara-based feature tests that should pass in every Rails application.'
   s.licenses    = ['MIT']
 
-  s.files = Dir["{app,config,db,lib,spec,test}/**/*"] + ['MIT-LICENSE', 'README.md']
+  s.files = Dir['{app,config,lib,test}/**/*'] + ['MIT-LICENSE', 'README.md']
 
-  s.add_dependency 'rails', ['>= 3.2.0']
+  s.add_dependency 'rails', ['>= 3.2.0', '< 5.2']
   s.add_dependency 'effective_resources'
 
   s.add_dependency 'minitest'
