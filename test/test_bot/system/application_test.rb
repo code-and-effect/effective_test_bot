@@ -1,10 +1,10 @@
-require 'test_helper'
+require 'application_system_test_case'
 
 # This gets run when we type `rake test:bot`
 # Scan through every route and run a test suite against it
 
 module TestBot
-  class ApplicationTest < ::Capybara::Rails::TestCase
+  class ApplicationTest < ApplicationSystemTestCase
     CRUD_ACTIONS = %w(index create new edit show update destroy) # Same order as resources :object creates them in
 
     class << self

@@ -1,7 +1,7 @@
-require "test_helper"
+require 'application_system_test_case'
 
 module TestBot
-  class EnvironmentTest < ::Capybara::Rails::TestCase
+  class EnvironmentTest < ApplicationSystemTestCase
     @@original_users_count = User.count
     let(:original_users_count) { @@original_users_count }
 
@@ -52,7 +52,7 @@ module TestBot
       user = User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123')
       user.username = 'unique-username' if user.respond_to?(:username)
       user.login = 'unique-login' if user.respond_to?(:login)
-      user.save(validate: false)
+      user.save!
 
       without_screenshots { sign_in_manually(user, '!Password123') }
       assert_signed_in("expected successful devise manual sign in with user created in this test.\nTry using one of the ActiveRecord shared_connection snippets in test/test_helper.rb")

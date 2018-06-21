@@ -7,7 +7,7 @@ module EffectiveTestBot
     config.autoload_paths += Dir["#{config.root}/test/support/**/"]
 
     # Set up our default configuration options.
-    initializer "effective_test_bot.defaults", :before => :load_config_initializers do |app|
+    initializer 'effective_test_bot.defaults', before: :load_config_initializers do |app|
       # Set up our defaults, as per our initializer template
       eval File.read("#{config.root}/config/effective_test_bot.rb")
     end
@@ -23,11 +23,7 @@ module EffectiveTestBot
         ActiveSupport.on_load :action_mailer do
           ActionMailer::Base.send :include, ::EffectiveTestBotMailerHelper
 
-          if ActionMailer::Base.respond_to?(:after_action)
-            ActionMailer::Base.send :after_action, :assign_test_bot_mailer_info
-          else
-            ActionMailer::Base.send :after_filter, :assign_test_bot_mailer_info
-          end
+          ActionMailer::Base.send :after_action, :assign_test_bot_mailer_info
         end
       end
     end
@@ -37,13 +33,8 @@ module EffectiveTestBot
         ActiveSupport.on_load :action_controller do
           ActionController::Base.send :include, ::EffectiveTestBotControllerHelper
 
-          if ActionController::Base.respond_to?(:before_action)
-            ActionController::Base.send :before_action, :expires_now # Prevent 304 Not Modified caching
-            ActionController::Base.send :after_action, :assign_test_bot_http_headers
-          else
-            ActionController::Base.send :before_filter, :expires_now # Prevent 304 Not Modified caching
-            ActionController::Base.send :after_filter, :assign_test_bot_http_headers
-          end
+          ActionController::Base.send :before_action, :expires_now # Prevent 304 Not Modified caching
+          ActionController::Base.send :after_action, :assign_test_bot_http_headers
 
           ApplicationController.instance_exec do
             rescue_from ActionController::UnpermittedParameters do |exception|

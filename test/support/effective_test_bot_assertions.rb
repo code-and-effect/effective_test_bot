@@ -21,12 +21,12 @@ module EffectiveTestBotAssertions
     error = nil; result = nil;
 
     begin
-      result = page.evaluate_script("var js = 'javascript'; js;")
+      result = page.evaluate_script('1+1').to_s
     rescue => e
       error = e.message
     end
 
-    assert (result == 'javascript'), "#{message}. Error was: #{error}"
+    assert (result == '2'), "#{message}. Error was: #{error}"
   end
 
   def assert_jquery_present(message = "Expected jquery ($.fn.jquery) to be present")

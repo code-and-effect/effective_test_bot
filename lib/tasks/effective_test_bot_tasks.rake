@@ -30,7 +30,7 @@ namespace :test do
     if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
       Rake::Task['test:effective_test_bot'].invoke
     else
-      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb")
+      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/application_test.rb")
     end
   end
 
@@ -52,7 +52,7 @@ namespace :test do
       if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
         Rake::Task['test:effective_test_bot_environment'].invoke
       else
-        system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb")
+        system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/environment_test.rb")
       end
     end
 
@@ -125,13 +125,13 @@ namespace :test do
   if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
     Rake::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
       t.libs << 'test'
-      t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/application_test.rb"]
+      t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/system/application_test.rb"]
       t.warning = false
     end
 
     Rake::TestTask.new('effective_test_bot_environment' => 'test:prepare') do |t|
       t.libs << 'test'
-      t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/integration/environment_test.rb"]
+      t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/system/environment_test.rb"]
       t.warning = false
     end
   end

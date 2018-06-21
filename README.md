@@ -20,14 +20,14 @@ Turn on tour mode to programatically generate an animated .gif of every workflow
 
 Make sure everything actually works.
 
-## Capybara Webkit
 
-This is the `capybara` branch of effective_test_bot which supports Rails <= 5.1 and Capybara Webkit.
+## Rails System Tests
 
-All published effective_test_bot 0.x gems will support Rails <= 5.1 and Capybara Webkit.
+This is the 'Rails System Test' branch of effective_test_bot.
 
-For Rails 5.2+ please see the master branch and/or effective_test_bot 1.x gems.
+This requires Rails 5.1+
 
+Please check out [Effective TestBot Capybara branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara) for more information using this gem with Capybara Webkit and Rails < 5.1.
 
 ## Getting Started
 
