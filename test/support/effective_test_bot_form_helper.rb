@@ -37,6 +37,7 @@ module EffectiveTestBotFormHelper
   # Submit form after disabling any HTML5 validations
   def submit_novalidate_form(label = nil)
     page.execute_script "for(var f=document.forms,i=f.length;i--;)f[i].setAttribute('novalidate','');"
+    page.execute_script "$('form').find('[required]').removeAttr('required');"
     click_submit(label)
     true
   end
