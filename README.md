@@ -27,7 +27,7 @@ This is the 'Rails System Test' branch of effective_test_bot.
 
 This requires Rails 5.1+
 
-Please check out [Effective TestBot Capybara-Webkit branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara) for more information using this gem with Capybara Webkit and Rails < 5.1.
+Please check out [Effective TestBot Capybara-Webkit branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara-webit) for more information using this gem with Capybara Webkit and Rails < 5.1.
 
 ## Getting Started
 
