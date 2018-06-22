@@ -18,6 +18,10 @@ end
 
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
+Rails.backtrace_cleaner.remove_silencers!
+Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
+#Rails.backtrace_cleaner.add_silencer { |line| line =~ /effective_test_bot/ }
+
 ###############################################
 ### Effective Test Bot specific stuff below ###
 ###############################################

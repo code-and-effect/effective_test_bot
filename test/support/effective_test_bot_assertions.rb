@@ -104,8 +104,10 @@ module EffectiveTestBotAssertions
   end
 
   def assert_no_js_errors(message = nil)
-    errors = page.driver.error_messages
-    assert errors.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{errors.first.to_s}"
+    error = page.driver.browser.manage.logs.get(:browser).first # headless_chrome
+    error = error.message.gsub(/^http.+js \d+:\d+ /, '') if error.present?
+
+    assert error.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{error}"
   end
 
   def assert_no_flash_errors(message = "(no_flash_errors) Unexpected flash error:\n:flash_errors:")
