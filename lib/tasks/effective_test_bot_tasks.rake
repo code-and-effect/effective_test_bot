@@ -1,5 +1,3 @@
-require 'rake/testtask'
-
 # rake test:bot
 # rake test:bot TEST=documents#new
 # rake test:bot TEST=documents#new,documents#show
@@ -27,11 +25,7 @@ namespace :test do
       ENV['TEST'] = nil
     end
 
-    if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
-      Rake::Task['test:effective_test_bot'].invoke
-    else
-      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/application_test.rb")
-    end
+    system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/application_test.rb")
   end
 
   desc "Runs 'rake test' with effective_test_bot tour mode enabled"
@@ -49,11 +43,7 @@ namespace :test do
   namespace :bot do
     desc 'Runs effective_test_bot environment test'
     task :environment do
-      if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
-        Rake::Task['test:effective_test_bot_environment'].invoke
-      else
-        system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/environment_test.rb")
-      end
+      system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/environment_test.rb")
     end
 
     desc 'Deletes all effective_test_bot temporary, failure and tour screenshots'
@@ -114,26 +104,10 @@ namespace :test do
   end # /namespace bot
 
   desc 'loads test/fixtures/seeds.rb'
-  task :load_fixture_seeds => :environment do
+  task load_fixture_seeds: :environment do
     puts 'loading fixture seed'
     seeds = "#{Rails.root}/test/fixtures/seeds.rb"
     load(seeds) if File.exist?(seeds)
-  end
-
-  # This ensures rake test:prepare is run before rake test:bot or rake test:bot:environment run
-  # Test files stuff is minitest hackery to just load the 1 test file
-  if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
-    Rake::TestTask.new('effective_test_bot' => 'test:prepare') do |t|
-      t.libs << 'test'
-      t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/system/application_test.rb"]
-      t.warning = false
-    end
-
-    Rake::TestTask.new('effective_test_bot_environment' => 'test:prepare') do |t|
-      t.libs << 'test'
-      t.test_files = FileList["#{File.dirname(__FILE__)}/../../test/test_bot/system/environment_test.rb"]
-      t.warning = false
-    end
   end
 
 end

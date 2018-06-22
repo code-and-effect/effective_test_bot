@@ -60,7 +60,7 @@ module TestBot
 
     test '09: capybara can execute javascript' do
       visit root_path
-      assert_capybara_can_execute_javascript
+      assert_can_execute_javascript
     end
 
     test '10: jquery is present' do
@@ -79,5 +79,6 @@ module TestBot
         "expected action_mailer.default_url_options[:host] to be present.\nAdd config.action_mailer.default_url_options = { host: 'example.com' } to config/environments/test.rb"
       )
     end
+
   end
 end

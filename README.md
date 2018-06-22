@@ -120,7 +120,6 @@ The following assertions are added for use in any integration test:
 - `assert_email(action)` asserts an email with the given action name was sent. Also supports `assert_email(to: email)` type syntax with to, from, subject, body.
 - `assert_flash`, optionally with the desired `:success`, `:error` key and/or message, makes sure the flash is set.
 - `assert_jquery_ujs_disable_with` makes sure all `input[type=submit]` elements on the page have the `data-disable-with` property set.
-- `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was.
 - `assert_no_html_form_validation_errors` checks for frontend html5 errors.
 - `assert_no_js_errors` - checks for any javascript errors on the page.
 - `assert_page_content(content)` checks that the given content is present without waiting the capybara default wait time.
@@ -134,7 +133,7 @@ The following assertions are added for use in any integration test:
 
 As well,
 
-- `assert_page_normal` checks for general errors on the current page.  Checks include  `assert_no_exceptions`, `assert_page_status`, `assert_no_js_errors`, and `assert_page_title`.
+- `assert_page_normal` checks for general errors on the current page.  Checks include `assert_page_status`, `assert_no_js_errors`, and `assert_page_title`.
 
 ## Capybara Extras
 
@@ -206,7 +205,6 @@ end
 - `sign_up` visits the devise `new_user_registration_path` and signs up as a new user.
 - `synchronize!` should fix any timing issues waiting for page elements.
 - `was_redirect?` returns true/false if the last time we changed pages was a 304 redirect.
-- `was_download?` if clicking a link returned a file of any type rather than a page change.
 - `within_if(selector, boolean) do .. end` runs the block inside capybara's `within do .. end` if boolean is true, otherwise runs the same block skipping the `within`.
 
 ## Capybara Super Extras

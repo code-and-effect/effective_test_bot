@@ -51,15 +51,6 @@ module EffectiveTestBotTestHelper
     from_path != (to_path || page.current_path)
   end
 
-  def was_download?(filename = nil)
-    if filename.present?
-      page.response_headers['Content-Disposition'].to_s.include?('filename=') &&
-      page.response_headers['Content-Disposition'].to_s.include?(filename)
-    else
-      page.response_headers['Content-Disposition'].to_s.include?('filename=')
-    end
-  end
-
   # Calls capybara within do .. end if selector is present and bool is true
   def within_if(selector, bool = true, &block)
     (selector.present? && bool) ? within(selector) { yield } : yield

@@ -12,12 +12,6 @@ module EffectiveTestBot
       eval File.read("#{config.root}/config/effective_test_bot.rb")
     end
 
-    initializer 'effective_test_bot.middleware' do |app|
-      if Rails.env.test?
-        Rails.application.config.middleware.use EffectiveTestBot::Middleware
-      end
-    end
-
     initializer 'effective_test_bot.email_logger' do |app|
       if Rails.env.test?
         ActiveSupport.on_load :action_mailer do
