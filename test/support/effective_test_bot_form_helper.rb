@@ -27,7 +27,6 @@ module EffectiveTestBotFormHelper
       with_raised_unpermitted_params_exceptions { click_submit(label, last: last, debug: debug) }
     end
 
-    assert_no_unpermitted_params unless test_bot_skip?(:no_unpermitted_params)
     assert_no_assigns_errors unless test_bot_skip?(:no_assigns_errors)
     assert_no_exceptions unless test_bot_skip?(:exceptions)
     assert_authorization unless test_bot_skip?(:authorization)

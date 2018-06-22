@@ -22,7 +22,7 @@ module EffectiveTestBot
     end
 
     def save(exception)
-      lines = [exception.message] + exception.backtrace.first(EffectiveTestBot.backtrace_lines)
+      lines = [exception.message] + exception.backtrace.first(EffectiveTestBot&.backtrace_lines || 10)
 
       dir = File.join(Dir.pwd, 'tmp', 'test_bot')
       file = File.join(dir, 'exception.txt')

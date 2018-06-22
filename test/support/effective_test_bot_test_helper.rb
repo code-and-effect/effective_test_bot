@@ -71,20 +71,26 @@ module EffectiveTestBotTestHelper
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # These values are 'from the last page submit or refresh'
+  def response_code
+    page.evaluate_script('window.effective_test_bot.response_code')&.to_i
+  end
+
   def flash
-    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Flash'])) rescue {})
+    page.evaluate_script('window.effective_test_bot.flash')
   end
 
   def assigns
-    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Assigns'])) rescue {})
-  end
-
-  def unpermitted_params
-    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Unpermitted-Params'])) rescue [])
+    page.evaluate_script('window.effective_test_bot.assigns')
   end
 
   def access_denied_exception
-    (JSON.parse(Base64.decode64(page.response_headers['Test-Bot-Access-Denied'])) rescue {})
+    return nil unless page.evaluate_script('window.effective_test_bot.access_denied').present?
+
+    {
+      'exception': page.evaluate_script('window.effective_test_bot.access_denied'),
+      'action': page.evaluate_script('window.effective_test_bot.action'),
+      'subject': page.evaluate_script('window.effective_test_bot.subject')
+    }
   end
 
 end

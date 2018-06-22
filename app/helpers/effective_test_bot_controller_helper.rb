@@ -1,44 +1,36 @@
 module EffectiveTestBotControllerHelper
-  # This is included as an after_filter
-  def assign_test_bot_http_headers
-    response.headers['Test-Bot-Flash'] = Base64.encode64(flash.to_hash.to_json)
+  BODY = '</body>'
 
-    # Assign the Assigns now
-    # With the assigns, we're a little bit more selective
-    # Anything that's a simple object can be serialized
-    test_bot_assigns = {}
+  # This is included as an after_action in the controller
+  def assign_test_bot_payload(payload = {})
+    return unless response.content_type == 'text/html'.freeze
+    return unless !!(response.body[BODY])
 
-    view_assigns.each do |key, object|
-      case object
-      when ActiveRecord::Base
-        test_bot_assigns[key] = object.attributes
-        test_bot_assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
-      when (ActiveModel::Model rescue nil)
-        test_bot_assigns[key] = object.respond_to?(:attributes) ? object.attributes : {present_but_not_serialized: true}
-        test_bot_assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
-      when TrueClass, FalseClass, NilClass, String, Symbol, Numeric
-        test_bot_assigns[key] = object
-      else
-        # We don't want to serialize them, but they should be present
-        test_bot_assigns[key] = :present_but_not_serialized
-      end
+    payload.merge!({ response_code: response.code, assigns: test_bot_view_assigns, flash: flash.to_hash })
+
+    payload = view_context.content_tag(:script, id: 'test_bot_payload') do
+      [
+        '',
+        'window.effective_test_bot = {};',
+        payload.map { |k, v| "window.effective_test_bot.#{k} = #{v.respond_to?(:to_json) ? v.to_json : ("'" + v + "'")};" },
+        '',
+      ].join("\n").html_safe
     end
 
-    response.headers['Test-Bot-Assigns'] = Base64.encode64(test_bot_assigns.to_hash.to_json)
+    split = response.body.split(BODY)
+    response.body = "#{split.first}#{payload}#{BODY}#{split.last if split.size > 1}"
   end
 
-  # We get here if ApplicationController raised a ActionController::UnpermittedParameters error
-  def assign_test_bot_unpermitted_params_header(exception)
-    if exception.kind_of?(ActionController::UnpermittedParameters)
-      response.headers['Test-Bot-Unpermitted-Params'] = Base64.encode64(exception.params.to_json)
-    end
-  end
-
+  # This is called in an ActionController rescue_from.
   def assign_test_bot_access_denied_exception(exception)
-    return unless Rails.env.test?
+    assign_test_bot_payload(test_bot_access_denied(exception))
+  end
 
-    response.headers['Test-Bot-Access-Denied'] = Base64.encode64({
-      exception: exception,
+  private
+
+  def test_bot_access_denied(exception)
+    {
+      access_denied: exception,
       action: exception.action,
       subject: (
         if exception.subject.kind_of?(Symbol)
@@ -49,7 +41,29 @@ module EffectiveTestBotControllerHelper
           exception.subject.class.name
         end
       )
-    }.to_json)
+    }
+  end
+
+  def test_bot_view_assigns
+    assigns = {}
+
+    view_assigns.each do |key, object|
+      case object
+      when ActiveRecord::Base
+        assigns[key] = object.attributes
+        assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
+      when (ActiveModel::Model rescue nil)
+        assigns[key] = object.respond_to?(:attributes) ? object.attributes : { present_but_not_serialized: true }
+        assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
+      when TrueClass, FalseClass, NilClass, String, Symbol, Numeric
+        assigns[key] = object
+      else
+        # We don't want to serialize them, but they should be present
+        assigns[key] = :present_but_not_serialized
+      end
+    end
+
+    assigns
   end
 
 end

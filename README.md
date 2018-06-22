@@ -123,7 +123,6 @@ The following assertions are added for use in any integration test:
 - `assert_no_exceptions` checks for any exceptions in the last page request and gives a stacktrace if there was.
 - `assert_no_html_form_validation_errors` checks for frontend html5 errors.
 - `assert_no_js_errors` - checks for any javascript errors on the page.
-- `assert_no_unpermitted_params` makes sure the last submitted form did not include any unpermitted params and prints out any unpermitted params that do exist.
 - `assert_page_content(content)` checks that the given content is present without waiting the capybara default wait time.
 - `assert_no_page_content(content)` checks that the given content is blank without waiting the capybara default wait time.
 - `assert_page_status` checks for a given http status, default 200.

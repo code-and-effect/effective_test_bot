@@ -55,14 +55,14 @@ module EffectiveTestBotAssertions
   end
 
   def assert_authorization(message = '(authorization) Expected authorized access')
-    if page.status_code == 403
+    if response_code == 403
       exception = access_denied_exception
 
       info = [
         "Encountered a 403 Access Denied",
         ("(cannot :#{exception['action']}, #{exception['subject']})" if exception.present?),
         "on #{page.current_path} as user #{user || 'no user'}.",
-        ("\nAdd assign_test_bot_access_denied_exception(exception) if defined?(EffectiveTestBot) to your ApplicationController's rescue_from block to gather more information." unless exception.present?),
+        ("\nAdd assign_test_bot_access_denied_exception(exception) if defined?(EffectiveTestBot) to the very bottom of your ApplicationController's rescue_from block to gather more information." unless exception.present?),
       ].compact.join(' ')
 
       assert false, "#{message}.\n#{info}"
@@ -70,7 +70,7 @@ module EffectiveTestBotAssertions
   end
 
   def assert_page_status(status = 200, message = '(page_status) Expected :status: HTTP status code')
-    assert_equal status, page.status_code, message.sub(':status:', status.to_s)
+    assert_equal status, response_code, message.sub(':status:', status.to_s)
   end
 
   def assert_current_path(path, message = '(current_path) Expected current_path to be :path:')
@@ -106,10 +106,6 @@ module EffectiveTestBotAssertions
   def assert_no_js_errors(message = nil)
     errors = page.driver.error_messages
     assert errors.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{errors.first.to_s}"
-  end
-
-  def assert_no_unpermitted_params(message = "(no_unpermitted_params) Unexpected unpermitted params:\n:unpermitted_params:")
-    assert unpermitted_params.blank?, message.sub(':unpermitted_params:', unpermitted_params.to_s)
   end
 
   def assert_no_flash_errors(message = "(no_flash_errors) Unexpected flash error:\n:flash_errors:")

@@ -6,6 +6,7 @@ require 'rails/test_help'
 
 require 'minitest/spec'
 require 'minitest/reporters'
+require 'minitest/fail_fast' if EffectiveTestBot.fail_fast?
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
@@ -41,7 +42,3 @@ ActiveRecord::Migration.maintain_test_schema!
 Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
 Rake::Task['db:seed'].invoke
 Rake::Task['test:load_fixture_seeds'].invoke # This is included by effective_test_bot.  It just runs the app's test/fixtures/seeds.rb if it exists
-
-if EffectiveTestBot.fail_fast?
-  require 'minitest/fail_fast'
-end
