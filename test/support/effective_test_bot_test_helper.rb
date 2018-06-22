@@ -78,9 +78,9 @@ module EffectiveTestBotTestHelper
     return nil unless page.evaluate_script('window.effective_test_bot.access_denied').present?
 
     {
-      'exception': page.evaluate_script('window.effective_test_bot.access_denied'),
-      'action': page.evaluate_script('window.effective_test_bot.action'),
-      'subject': page.evaluate_script('window.effective_test_bot.subject')
+      exception: page.evaluate_script('window.effective_test_bot.access_denied'),
+      action: page.evaluate_script('window.effective_test_bot.action'),
+      subject: page.evaluate_script('window.effective_test_bot.subject')
     }
   end
 

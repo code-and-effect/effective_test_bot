@@ -93,23 +93,23 @@ module BaseTest
     (page.document.first(:css, selector) rescue nil)
   end
 
+  def effective_resource
+    @effective_resource ||= Effective::Resource.new([controller_namespace, resource_class].join('/'))
+  end
+
   def resources_path # index, create
-    path = polymorphic_path([*controller_namespace, resource_class]) rescue nil
-    path || polymorphic_path([*controller_namespace.try(:singularize), resource_class])
+    effective_resource.action_path(:index)
   end
 
   def resource_path(resource) # show, update, destroy
-    path = polymorphic_path([*controller_namespace, resource]) rescue nil
-    path || polymorphic_path([*controller_namespace.try(:singularize), resource])
+    effective_resource.action_path(:show, resource)
   end
 
   def new_resource_path # new
-    path = new_polymorphic_path([*controller_namespace, resource_class]) rescue nil
-    path || new_polymorphic_path([*controller_namespace.try(:singularize), resource_class])
+    effective_resource.action_path(:new)
   end
 
   def edit_resource_path(resource) # edit
-    path = edit_polymorphic_path([*controller_namespace, resource]) rescue nil
-    path || edit_polymorphic_path([*controller_namespace.try(:singularize), resource])
+    effective_resource.action_path(:edit, resource)
   end
 end
