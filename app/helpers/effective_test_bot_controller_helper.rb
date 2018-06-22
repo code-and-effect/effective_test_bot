@@ -1,10 +1,10 @@
 module EffectiveTestBotControllerHelper
-  BODY = '</body>'
+  BODY_TAG = '</body>'
 
   # This is included as an after_action in the controller
   def assign_test_bot_payload(payload = {})
     return unless response.content_type == 'text/html'.freeze
-    return unless !!(response.body[BODY])
+    return unless !!(response.body[BODY_TAG])
 
     payload.merge!({ response_code: response.code, assigns: test_bot_view_assigns, flash: flash.to_hash })
 
@@ -17,8 +17,8 @@ module EffectiveTestBotControllerHelper
       ].join("\n").html_safe
     end
 
-    split = response.body.split(BODY)
-    response.body = "#{split.first}#{payload}#{BODY}#{split.last if split.size > 1}"
+    split = response.body.split(BODY_TAG)
+    response.body = "#{split.first}#{payload}#{BODY_TAG}#{split.last if split.size > 1}"
   end
 
   # This is called in an ActionController rescue_from.

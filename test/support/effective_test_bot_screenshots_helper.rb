@@ -87,7 +87,7 @@ module EffectiveTestBotScreenshotsHelper
   # current_test_failure_path: destination for .gifs of failing tests
 
   def current_test_temp_path
-    @_current_test_temp_path ||= "#{Rails.root}/tmp/test_bot/#{current_test_name.parameterize}"
+    @_current_test_temp_path ||= "#{Rails.root}/tmp/test_bot/screenshots/#{current_test_name.parameterize}"
   end
 
   def current_test_failure_path
@@ -95,8 +95,7 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def current_test_failure_filename
-    # Match Capybara-screenshots format-ish
-    "#{current_test_name.parameterize}-failure-#{Time.now.strftime('%Y-%m-%d-%H-%M-%S')}.gif"
+    "failures_#{current_test_name}.gif"
   end
 
   # Where the tour animated gif ends up

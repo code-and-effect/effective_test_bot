@@ -16,16 +16,17 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,lib,test}/**/*'] + ['MIT-LICENSE', 'README.md']
 
-  s.add_dependency 'rails', ['>= 5.2']
-  s.add_dependency 'effective_resources'
-  s.add_dependency 'rmagick'
-  s.add_dependency 'faker'
+  s.add_dependency 'rails', ['>= 5.1']
 
   # Match Rails 5.2 new Gemfile
   s.add_dependency 'capybara', '>= 2.15', '< 4.0'
-  s.add_dependency 'selenium-webdriver'
   s.add_dependency 'chromedriver-helper'
+  s.add_dependency 'selenium-webdriver'
 
-  s.add_dependency 'minitest-reporters'
+  # Extras we need
+  s.add_dependency 'effective_resources'
+  s.add_dependency 'faker'
   s.add_dependency 'minitest-fail-fast'
+  s.add_dependency 'minitest-reporters'
+  s.add_dependency 'rmagick'
 end

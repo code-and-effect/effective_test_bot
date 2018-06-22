@@ -30,7 +30,7 @@ Rails.application.load_tasks
 
 # So the very first thing we do is consistently reset the database.
 # This can be done with Snippet 1 or Snippet 2.
-# Snippet 1 is faster, and will usually work.  Snippet 2 should always work.
+# Snippet 1 is faster, and will usually work. Snippet 2 should always work.
 
 # Snippet 1:
 Rake::Task['db:schema:load'].invoke
@@ -43,6 +43,6 @@ ActiveRecord::Migration.maintain_test_schema!
 # Rake::Task['db:migrate'].invoke
 
 # Now we populate our test data:
-Rake::Task['db:fixtures:load'].invoke # There's just no way to get the seeds first, as this has to delete everything
+Rake::Task['db:fixtures:load'].invoke
 Rake::Task['db:seed'].invoke
-Rake::Task['test:load_fixture_seeds'].invoke # This is included by effective_test_bot.  It just runs the app's test/fixtures/seeds.rb if it exists
+Rake::Task['test:load_fixture_seeds'].invoke # from effective_test_bot. Loads test/fixtures/seeds.rb
