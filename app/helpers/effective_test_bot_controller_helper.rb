@@ -3,22 +3,18 @@ module EffectiveTestBotControllerHelper
 
   # This is included as an after_action in the controller
   def assign_test_bot_payload(payload = {})
-    return unless response.content_type == 'text/html'.freeze
-    return unless !!(response.body[BODY_TAG])
-
     payload.merge!({ response_code: response.code, assigns: test_bot_view_assigns, flash: flash.to_hash })
 
-    payload = view_context.content_tag(:script, id: 'test_bot_payload') do
-      [
-        '',
-        'window.effective_test_bot = {};',
-        payload.map { |k, v| "window.effective_test_bot.#{k} = #{v.respond_to?(:to_json) ? v.to_json : ("'" + v + "'")};" },
-        '',
-      ].join("\n").html_safe
-    end
+    if response.content_type == 'text/html' && response.body[BODY_TAG].present?
+      payload = view_context.content_tag(:script, build_payload_javascript(payload), id: 'test_bot_payload')
 
-    split = response.body.split(BODY_TAG)
-    response.body = "#{split.first}#{payload}#{BODY_TAG}#{split.last if split.size > 1}"
+      split = response.body.split(BODY_TAG)
+      response.body = "#{split.first}#{payload}#{BODY_TAG}#{split.last if split.size > 1}"
+    elsif response.content_type == 'text/javascript' && response.body.present?
+      payload = build_payload_javascript(payload)
+
+      response.body = "#{response.body};#{payload}"
+    end
   end
 
   # This is called in an ActionController rescue_from.
@@ -27,6 +23,15 @@ module EffectiveTestBotControllerHelper
   end
 
   private
+
+  def build_payload_javascript(payload)
+    [
+      '',
+      'window.effective_test_bot = {};',
+      payload.map { |k, v| "window.effective_test_bot.#{k} = #{v.respond_to?(:to_json) ? v.to_json : ("'" + v + "'")};" },
+      '',
+    ].join("\n").html_safe
+  end
 
   def test_bot_access_denied(exception)
     {
