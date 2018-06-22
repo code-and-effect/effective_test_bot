@@ -28,6 +28,7 @@ module EffectiveTestBotFormHelper
     end
 
     assert_no_assigns_errors unless test_bot_skip?(:no_assigns_errors)
+    assert_no_exceptions unless test_bot_skip?(:exceptions)
     assert_authorization unless test_bot_skip?(:authorization)
     assert_page_status unless test_bot_skip?(:page_status)
 

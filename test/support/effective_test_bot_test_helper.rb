@@ -67,7 +67,7 @@ module EffectiveTestBotTestHelper
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
   # These values are 'from the last page submit or refresh'
   def response_code
-    page.evaluate_script('window.effective_test_bot.response_code')&.to_i
+    (page.evaluate_script('window.effective_test_bot.response_code')&.to_i rescue nil)
   end
 
   def flash

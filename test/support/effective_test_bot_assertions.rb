@@ -17,6 +17,17 @@ module EffectiveTestBotAssertions
     assert assigns['current_user'].blank?, message || 'Expected @current_user to be blank when signed out'
   end
 
+  def assert_no_exceptions(message = "(no_exceptions) Unexpected rails server exception:\n:exception:")
+    # this file is created by EffectiveTestBot::Middleware when an exception is encountered in the rails app
+    file = File.join(Dir.pwd, 'tmp', 'test_bot', 'exception.txt')
+    return unless File.exist?(file)
+
+    exception = File.read(file)
+    File.delete(file)
+
+    assert false, message.sub(':exception:', exception)
+  end
+
   def assert_can_execute_javascript(message = "Expected page.evaluate_script() to be successful")
     error = nil; result = nil;
 
