@@ -105,9 +105,12 @@ namespace :test do
 
   desc 'loads test/fixtures/seeds.rb'
   task load_fixture_seeds: :environment do
-    puts 'loading fixture seed'
     seeds = "#{Rails.root}/test/fixtures/seeds.rb"
-    load(seeds) if File.exist?(seeds)
+
+    if File.exist?(seeds)
+      puts 'loading fixture seed'
+      load(seeds)
+    end
   end
 
 end

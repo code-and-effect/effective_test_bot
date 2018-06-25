@@ -103,7 +103,7 @@ module EffectiveTestBot
 
   def self.tour_mode_verbose?
     if ENV['TOUR'].present?
-      ['extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
+      ['true', 'extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
       screenshots? && ['extreme', 'verbose', 'debug'].include?(tour_mode.to_s)
     end
@@ -123,10 +123,7 @@ module EffectiveTestBot
     EffectiveTestBot.passed_tests[name] = true
 
     Dir.mkdir(passed_tests_path) unless File.exist?(passed_tests_path)
-
-    File.open(passed_tests_filename, 'w') do |file|
-      passed_tests.each { |test_name, _| file.puts(test_name) }
-    end
+    File.open(passed_tests_filename, 'w') { |file| passed_tests.each { |test_name, _| file.puts(test_name) } }
   end
 
   private
