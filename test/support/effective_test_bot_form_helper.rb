@@ -46,11 +46,11 @@ module EffectiveTestBotFormHelper
   def clear_form
     all('input,select,textarea').each do |field|
       if field.tag_name == 'select' && field['class'].to_s.include?('select2') # effective_select
-        within(field.query_scope) { first(:css, '.select2-selection__clear').try(:click) }
+        clear_effective_select(field)
       end
 
       begin
-        field.set('');
+        field.set('')
         close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
         save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme?
       rescue => e; end

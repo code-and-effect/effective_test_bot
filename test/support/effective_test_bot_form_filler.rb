@@ -392,6 +392,10 @@ module EffectiveTestBotFormFiller
     end
   end
 
+  def clear_effective_select(field)
+    page.execute_script("try { $('select##{field['id']}').val('').trigger('change.select2'); } catch(e) {};")
+  end
+
   def close_effective_date_time_picker(field)
     page.execute_script("try { $('input##{field['id']}').data('DateTimePicker').hide(); } catch(e) {};")
   end
