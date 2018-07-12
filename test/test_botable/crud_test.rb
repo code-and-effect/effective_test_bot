@@ -67,7 +67,10 @@ module CrudTest
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
 
     assert_equal(before[:count], after[:count], "Expected #{resource_class}.count to be unchanged") if resource_class.respond_to?(:count)
-    assert_equal(resources_path, page.current_path, "(path) Expected current_path to match resource #create path #{resources_path}") unless test_bot_skip?(:path)
+
+    if resources_path.present? && !test_bot_skip?(:path)
+      assert_equal(resources_path, page.current_path, "(path) Expected current_path to match resource #create path #{resources_path}")
+    end
 
     assert_flash(:danger) unless test_bot_skip?(:flash)
   end
@@ -150,13 +153,14 @@ module CrudTest
     assert_assigns(resource_name) unless test_bot_skip?(:assigns)
     assert_assigns_errors(resource_name) unless test_bot_skip?(:assigns_errors)
 
-    assert_equal(resource_path(resource), page.current_path, "(path) Expected current_path to match resource #update path") unless test_bot_skip?(:path)
+    if effective_resource.action_path(:update, resource) && !test_bot_skip?(:path)
+      assert_equal(effective_resource.action_path(:update, resource), page.current_path, "(path) Expected current_path to match resource #update path") unless test_bot_skip?(:path)
+    end
 
     assert_equal before[:count], after[:count], "Expected: #{resource_class}.count to be unchanged"
     assert_equal(before[:updated_at], after[:updated_at], "(updated_at) Expected @#{resource_name}.updated_at to be unchanged") if (resource.respond_to?(:updated_at) && !test_bot_skip?(:updated_at))
 
     assert_flash(:danger) unless test_bot_skip?(:flash)
-
   end
 
   def test_bot_update_valid_test
@@ -203,7 +207,7 @@ module CrudTest
     visit(resources_path)
     save_test_bot_screenshot
 
-    link_to_delete = find_or_create_rails_ujs_link_to_delete(resource)
+    link_to_delete = create_rails_ujs_link_to_delete(resource)
 
     if link_to_delete.present? && (link_to_delete.click() rescue false)
       synchronize!
@@ -217,7 +221,7 @@ module CrudTest
       # So we just assert the 200 status code, and page title present manually
       # Javascript errors cannot be detected
 
-      visit_delete(resource_path(resource), user)
+      visit_delete(destroy_resource_path(resource), user)
       assert_equal(200, @visit_delete_page.try(:status_code), '(page_status) Expected 200 HTTP status code') unless test_bot_skip?(:page_status)
       assert((@visit_delete_page.find(:xpath, '//title', visible: false) rescue nil).present?, '(page_title) Expected page title to be present') unless test_bot_skip?(:page_title)
     end

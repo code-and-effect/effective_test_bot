@@ -80,18 +80,10 @@ module BaseTest
   # Try to find a link_to_delete already on this page
   # Otherwise create one
   # Returns the link element
-  def find_or_create_rails_ujs_link_to_delete(resource)
-    selector = "a[href='#{resource_path(resource)}'][data-method='delete']"
-    link_to_delete = page.document.all(selector, visible: false).first # could be nil, but this is a non-blocking selector
+  def create_rails_ujs_link_to_delete(resource)
+    selector = "a[href='#{destroy_resource_path(resource)}'][data-method='delete']"
 
-    if link_to_delete.present? # Take excessive efforts to ensure it's visible and clickable
-      page.execute_script("$('body').prepend($(\"#{selector}\").first().clone().show().removeProp('disabled').html('Delete'));")
-    else  # Create our own link
-      page.execute_script("$('body').prepend($('<a>').attr({href: '#{resource_path(resource)}', 'data-method': 'delete', 'data-confirm': 'Are you sure?'}).html('Delete'));")
-    end
-
-    # capybara-webkit doesn't seem to stop on the alert 'Are you sure?'.
-    # Otherwise we'd want to take a screenshot of it
+    page.execute_script("$('body').prepend($('<a>').attr({href: '#{destroy_resource_path(resource)}', 'data-method': 'delete'}).html('Delete'));")
 
     (page.document.first(:css, selector) rescue nil)
   end
@@ -115,4 +107,9 @@ module BaseTest
   def edit_resource_path(resource) # edit
     effective_resource.action_path(:edit, resource)
   end
+
+  def destroy_resource_path(resource)
+    effective_resource.action_path(:destroy, resource)
+  end
+
 end
