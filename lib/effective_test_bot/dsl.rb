@@ -29,5 +29,10 @@ module EffectiveTestBot
       include TestBotable::RedirectDsl
       include TestBotable::WizardDsl
     end
+
+    def absolute_image_path
+      Rails.root.join("tmp/screenshots/#{image_name.gsub('/', '-')}.png")
+    end
+
   end
 end
