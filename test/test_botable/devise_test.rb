@@ -57,9 +57,10 @@ module DeviseTest
 
     within_if('form#new_user', !test_bot_skip?(:form)) do
       fill_form(email: email, password: 'not-correct-password')
-      submit_form
+      submit_novalidate_form
     end
 
+    assert_assigns_errors(:user)
     assert_page_normal
 
     assert_signed_out
