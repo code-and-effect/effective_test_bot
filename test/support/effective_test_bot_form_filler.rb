@@ -208,9 +208,9 @@ module EffectiveTestBotFormFiller
 
     when 'input_file'
       if field['class'].to_s.include?('asset-box-uploader-fileinput')
-        "#{File.dirname(__FILE__)}/../fixtures/documents._test"
+        "#{File.dirname(__FILE__).sub('test/support', 'test/fixtures')}/documents._test"
       else
-        "#{File.dirname(__FILE__)}/../fixtures/logo.png"
+        "#{File.dirname(__FILE__).sub('test/support', 'test/fixtures')}/logo.png"
       end
 
     when 'input_number'
