@@ -70,12 +70,14 @@ module EffectiveTestBotTestHelper
     (page.evaluate_script('window.effective_test_bot.response_code')&.to_i rescue nil)
   end
 
-  def flash
-    page.evaluate_script('window.effective_test_bot.flash')
+  def flash(key = nil)
+    flash = page.evaluate_script('window.effective_test_bot.flash')
+    key ? flash[key.to_s] : flash
   end
 
-  def assigns
-    page.evaluate_script('window.effective_test_bot.assigns')
+  def assigns(key = nil)
+    assigns = page.evaluate_script('window.effective_test_bot.assigns')
+    key ? assigns[key.to_s] : assigns
   end
 
   def access_denied_exception
