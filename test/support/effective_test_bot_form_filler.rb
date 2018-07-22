@@ -73,9 +73,16 @@ module EffectiveTestBotFormFiller
       value = value_for_field(field, fills)
 
       case field_name
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_checkbox', 'input_radio', 'input_url', 'input_color'
+      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_url', 'input_color'
         field.set(value)
         close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
+      when 'input_checkbox', 'input_radio'
+        begin
+          field.set(value)
+        rescue => e
+          label = first(:label, for: field['id'])
+          label.click if label
+        end
       when 'textarea', 'textarea_textarea'
         ckeditor_text_area?(field) ? fill_ckeditor_text_area(field, value) : field.set(value)
       when 'select', 'select_select-one'
