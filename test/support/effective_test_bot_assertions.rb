@@ -100,7 +100,7 @@ module EffectiveTestBotAssertions
   end
 
   def assert_no_ajax_requests(message = "(no_ajax_requests) :count: Unexpected AJAX requests present")
-    active = page.evaluate_script('jQuery.active')
+    active = page.evaluate_script('$.active')
     assert (active.blank? || active.zero?), message.sub(':count:', active.to_s)
   end
 

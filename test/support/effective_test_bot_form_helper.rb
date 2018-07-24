@@ -43,6 +43,30 @@ module EffectiveTestBotFormHelper
     true
   end
 
+  # submit_stripe(content: 'Thank you!'), or
+  #
+  # submit_stripe
+  # assert page.has_content?('Thank you for your support!', wait: 10)
+  def submit_stripe(success_content: nil)
+    stripe_iframe = find('iframe[name=stripe_checkout_app]')
+    assert stripe_iframe.present?, 'unable to find stripe iframe'
+
+    within_frame(stripe_iframe) do
+      fill_in('Card number', with: '4242424242424242')
+      fill_in('Expiry', with: "12#{Time.zone.now.year - 1999}")
+      fill_in('CVC', with: '123')
+      find_submit.click
+    end
+
+    synchronize! # Doesn't seem to work
+
+    if success_content
+      assert page.has_content?(success_content, wait: Capybara.default_max_wait_time * 10), "#{success_content} not found"
+    end
+
+    true
+  end
+
   def clear_form
     all('input,select,textarea').each do |field|
       if field.tag_name == 'select' && field['class'].to_s.include?('select2') # effective_select
