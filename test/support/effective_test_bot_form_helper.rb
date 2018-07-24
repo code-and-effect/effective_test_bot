@@ -67,9 +67,9 @@ module EffectiveTestBotFormHelper
     submit = find_submit(label, last: last)
 
     if EffectiveTestBot.screenshots?
-      page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.disableFormElement($(this)); });"
+      try_script "$('input[data-disable-with]').each(function(i) { $.rails.disableFormElement($(this)); });"
       save_test_bot_screenshot
-      page.execute_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
+      try_script "$('input[data-disable-with]').each(function(i) { $.rails.enableFormElement($(this)); });"
     end
 
     if debug

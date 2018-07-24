@@ -87,7 +87,7 @@ module EffectiveTestBotFormFiller
         ckeditor_text_area?(field) ? fill_ckeditor_text_area(field, value) : field.set(value)
       when 'select', 'select_select-one'
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
-          page.execute_script("try { $('select##{field['id']}').select2('open'); } catch(e) {};")
+          try_script "$('select##{field['id']}').select2('open')"
           save_test_bot_screenshot
         end
 
@@ -96,7 +96,7 @@ module EffectiveTestBotFormFiller
         end
 
         if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2')
-          page.execute_script("try { $('select##{field['id']}').select2('close'); } catch(e) {};")
+          try_script "$('select##{field['id']}').select2('close')"
         end
       when 'input_file'
         if field['class'].to_s.include?('asset-box-uploader-fileinput')
@@ -348,7 +348,7 @@ module EffectiveTestBotFormFiller
 
   def fill_ckeditor_text_area(field, value)
     value = "<p>#{value.gsub("'", '')}</p>"
-    page.execute_script("try { CKEDITOR.instances['#{field['id']}'].setData('#{value}'); } catch(e) {};")
+    try_script "CKEDITOR.instances['#{field['id']}'].setData('#{value}')"
   end
 
   # The field here is going to be the %input{:type => file}. Files can be one or more pathnames
@@ -400,11 +400,11 @@ module EffectiveTestBotFormFiller
   end
 
   def clear_effective_select(field)
-    page.execute_script("try { $('select##{field['id']}').val('').trigger('change.select2'); } catch(e) {};")
+    try_script "$('select##{field['id']}').val('').trigger('change.select2')"
   end
 
   def close_effective_date_time_picker(field)
-    page.execute_script("try { $('input##{field['id']}').data('DateTimePicker').hide(); } catch(e) {};")
+    try_script "$('input##{field['id']}').data('DateTimePicker').hide()"
   end
 
   private

@@ -51,6 +51,10 @@ module EffectiveTestBotTestHelper
     from_path != (to_path || page.current_path)
   end
 
+  def try_script(script)
+    page.execute_script("try { #{script}; } catch(e) {};")
+  end
+
   # Calls capybara within do .. end if selector is present and bool is true
   def within_if(selector, bool = true, &block)
     (selector.present? && bool) ? within(first(selector)) { yield } : yield
