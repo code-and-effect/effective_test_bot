@@ -222,4 +222,10 @@ module EffectiveTestBotAssertions
     assert false, message || "(assert_email) Expected email with #{expected} to have been delivered"
   end
 
+  def assert_access_denied(message = nil)
+    assert_equal 403, response_code, message || "Expected response code 403 when access denied, but it was: #{response_code || 'nil'}"
+    assert_content 'Access Denied'
+    assert_no_exceptions
+  end
+
 end

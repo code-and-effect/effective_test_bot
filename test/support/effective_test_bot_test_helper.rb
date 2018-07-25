@@ -75,17 +75,17 @@ module EffectiveTestBotTestHelper
   end
 
   def flash(key = nil)
-    flash = page.evaluate_script('window.effective_test_bot.flash')
+    flash = (page.evaluate_script('window.effective_test_bot.flash') rescue nil) || {}
     key ? flash[key.to_s] : flash
   end
 
   def assigns(key = nil)
-    assigns = page.evaluate_script('window.effective_test_bot.assigns')
+    assigns = (page.evaluate_script('window.effective_test_bot.assigns') rescue nil) || {}
     key ? assigns[key.to_s] : assigns
   end
 
   def access_denied_exception
-    return nil unless page.evaluate_script('window.effective_test_bot.access_denied').present?
+    return nil unless (page.evaluate_script('window.effective_test_bot.access_denied') rescue nil).present?
 
     {
       exception: page.evaluate_script('window.effective_test_bot.access_denied'),
