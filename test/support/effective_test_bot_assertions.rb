@@ -114,9 +114,12 @@ module EffectiveTestBotAssertions
     assert (jobs == 0), message.sub(':count:', jobs.to_s)
   end
 
-  def assert_no_js_errors(message = nil)
+  def assert_no_js_errors(message = nil, strict: false)
     error = page.driver.browser.manage.logs.get(:browser).first # headless_chrome
-    error = error.message.gsub(/^http.+js \d+:\d+ /, '') if error.present?
+
+    if strict == false
+      return if error.present? && error.to_s.include?('Failed to load resource: the server responded with a status of 403 (Forbidden)')
+    end
 
     assert error.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{error}"
   end
