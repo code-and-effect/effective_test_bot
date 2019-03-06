@@ -19,7 +19,7 @@ module EffectiveTestBotFormFiller
 
     active_tab = all("li.active > a[data-toggle='tab']").first
 
-    tab_content = if active_tab
+    tab_content = if active_tab && active_tab['href'].present?
       find('div' + active_tab['href']).find(:xpath, '..')
     end
 
