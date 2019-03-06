@@ -1,21 +1,22 @@
-# rake test:bot
-# rake test:bot TEST=documents#new
-# rake test:bot TEST=documents#new,documents#show
-# rake test:bot TOUR=true
-# rake test:bot TOUR=verbose   # Prints out the animated gif patch after test is run
-# rake test:bot TOUR=extreme   # Makes a whole bunch of extra screenshots
+# rails test:bot
+# rails test:bot TEST=documents#new
+# rails test:bot TEST=documents#new,documents#show
+# rails test:bot TOUR=true
+# rails test:bot TOUR=verbose   # Prints out the animated gif patch after test is run
+# rails test:bot TOUR=extreme   # Makes a whole bunch of extra screenshots
 
-# rake test:bot:tour
-# rake test:bot:tour TEST=documents#new
+# rails test:bot:tour
+# rails test:bot:tour TEST=documents#new
 
-# rake test:bot:environment
-# rake test:bot:purge
+# rails test:bot:seed
+# rails test:bot:environment
+# rails test:bot:purge
 
-# rake test:bot:tours
-# rake test:bot:tours TEST=documents
+# rails test:bot:tours
+# rails test:bot:tours TEST=documents
 
-# rake test:tour  # Not the bot, just regular minitest 'rake test'
-# rake test:tourv
+# rails test:tour  # Not the bot, just regular minitest 'rails test'
+# rails test:tourv
 
 namespace :test do
   desc 'Runs the effective_test_bot automated test suite'
@@ -44,6 +45,12 @@ namespace :test do
     desc 'Runs effective_test_bot environment test'
     task :environment do
       system("rails test #{File.dirname(__FILE__)}/../../test/test_bot/system/environment_test.rb")
+    end
+
+    desc 'Rebuilds the database from schema and runs seeds'
+    task :seed do
+      setup = ['db:schema:load', 'db:fixtures:load', 'db:seed', 'test:load_fixture_seeds'].join(' ')
+      system("rails #{setup} RAILS_ENV=test")
     end
 
     desc 'Deletes all effective_test_bot temporary, failure and tour screenshots'

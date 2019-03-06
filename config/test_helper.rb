@@ -17,8 +17,7 @@ Rails.backtrace_cleaner.remove_silencers!
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
 #Rails.backtrace_cleaner.add_silencer { |line| line =~ /effective_test_bot/ }
 
-setup = ['db:schema:load', 'db:fixtures:load', 'db:seed', 'test:load_fixture_seeds'].join(' ')
-system("rails #{setup} RAILS_ENV=test")
+# rails test:bot:seed
 
 # rails test
 # rails test:system
