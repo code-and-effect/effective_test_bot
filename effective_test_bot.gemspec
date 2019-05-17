@@ -28,8 +28,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'minitest-fail-fast'
   s.add_dependency 'minitest-reporters'
 
+  # RMagick has been implemented and generates animated gifs.
+  # s.add_dependency 'rmagick'
+
   # Same image processing library as Active Storage variant
   # s.add_dependency 'image_processing'
-  
 end
 
