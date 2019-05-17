@@ -21,15 +21,17 @@ Turn on tour mode to programatically generate an animated .gif of every workflow
 Make sure everything actually works.
 
 
-## Rails System Tests
+## effective_test_bot 1.0
 
-This is the 'Rails System Test' branch of effective_test_bot.
+This is the 1.0 series of effective_test_bot.
 
 This requires Rails 5.1+
 
 Please check out [Effective TestBot Capybara-Webkit branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara-webit) for more information using this gem with Capybara Webkit and Rails < 5.1.
 
-This is now targetting and tested on Rails 6.0.0.rc1 but I think Rails 5.2 is fine too.
+This works with Rails 6.0.0.rc1 and parallelization.
+
+See [effective_website](https://github.com/code-and-effect/effective_website) for a working rails website example that uses effective_test_bot.
 
 ## Getting Started
 
@@ -56,8 +58,8 @@ group :test do
   gem 'webdrivers'
   gem 'effective_test_bot'
 
-  # Required for animated gif / tour mode. Optional otherwise.
-  gem 'image_processing'
+  # Optional.  Only required if you want animated gifs.
+  gem 'rmagick'
 end
 ```
 
@@ -98,9 +100,10 @@ rails test:bot TEST=posts#index
 
 rails test:bot:tour
 
-rails test:bot:fail
 rails test:bot:fails
 rails test:bot:fails TOUR=true
+
+rails test:bot:fail   # Kind of weird with parallelization
 ```
 
 ## How to use this gem
@@ -162,8 +165,6 @@ You can pass a Hash of 'fills' to specify specific input values:
 
 ```ruby
 # app/test/system/posts_test.rb
-require 'application_system_test_case'
-
 class PostTest < ApplicationSystemTestCase
   test 'creating a new post' do
     visit new_post_path
@@ -196,8 +197,6 @@ Clicks the first `input[type='submit']` field (or first submit field with the gi
 Automatically checks for `assert_no_html5_form_validation_errors`, `assert_jquery_ujs_disable_with` and `assert_no_unpermitted_params`
 
 ```ruby
-require 'application_system_test_case'
-
 class PostTest < ApplicationSystemTestCase
   test 'creating a new post' do
     visit(new_post_path) and fill_form
@@ -267,8 +266,6 @@ A quick note on speed: You can speed up these test suites by fixturing, seeding 
 There are a few variations on the one-liner method:
 
 ```ruby
-require 'application_system_test_case'
-
 class PostTest < ApplicationSystemTestCase
   # Runs all 9 crud_action tests against /posts
   crud_test(resource: Post)
@@ -293,8 +290,6 @@ end
 The individual test suites may also be used as part of a larger test:
 
 ```ruby
-require 'application_system_test_case'
-
 class PostTest < ApplicationSystemTestCase
   test 'user may only update a post once' do
     crud_action_test(test: :create_valid, resource: Post, user: User.first)
@@ -548,6 +543,7 @@ This method is already called by `fill_form` and `submit_form`.
 
 To disable taking screenshots entirely set `config.screenshots = false` in the `config/initializers/effective_test_bot.rb` initializer file.
 
+You must have `gem 'rmagick'` installed to use animated gifs.
 
 ### Tour mode
 
@@ -610,6 +606,8 @@ rails test:bot FAILFAST=true
 ```
 
 This functionality is provided thanks to [minitest-fail-fast](https://github.com/teoljungberg/minitest-fail-fast/)
+
+It's kind of busted with parallelization but mostly works.
 
 ### Failed tests only
 
