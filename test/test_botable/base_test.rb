@@ -53,19 +53,19 @@ module BaseTest
 
       visit(new_path)
 
-      assert_authorization(hint)
+      assert_authorization(message: hint)
       assert_no_exceptions
       assert_page_status
 
-      assert_form("form#new_#{resource_name}", "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
+      assert_form("form#new_#{resource_name}", message: "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
 
       within_if("form#new_#{resource_name}", !test_bot_skip?(:form)) do
-        assert_submit_input("TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}")
+        assert_submit_input(message: "TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}")
 
         fill_form(resource_attributes)
         submit_novalidate_form
 
-        assert_authorization(hint)
+        assert_authorization(message: hint)
         assert_no_exceptions
         assert_page_status
       end

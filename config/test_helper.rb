@@ -28,6 +28,8 @@ Rails.backtrace_cleaner.add_silencer { |line| line =~ /parallelization/ }
 # rails test:system
 # rails test:bot:environment
 # rails test:bot
+# rails test:bot:fails
+# rails test:bot:fail
 
 # rails test:system TOUR=true
 # rails test:bot TEST=posts#index
