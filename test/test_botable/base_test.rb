@@ -59,8 +59,6 @@ module BaseTest
 
       assert_form("form#new_#{resource_name}", message: "TestBotError: Failed to find form#new_#{resource_name}. #{hint}") unless test_bot_skip?(:form)
 
-      before_created_at = Time.zone.now
-
       within_if("form#new_#{resource_name}", !test_bot_skip?(:form)) do
         assert_submit_input(message: "TestBotError: Failed to find a visible input[type='submit'] on #{page.current_path}. #{hint}")
 
@@ -73,7 +71,9 @@ module BaseTest
       end
 
       obj = resource_class.last
-      assert (obj.present? && (obj.created_at > before_created_at)), "TestBotError: Failed to create a resource after submitting form. Errors: #{(assigns[resource_name] || {})['errors']}\n#{hint}."
+      assert obj.present?, "TestBotError: Failed to create a resource after submitting form. Errors: #{(assigns[resource_name] || {})['errors']}\n#{hint}."
+
+      visit root_path
     end
 
     obj
