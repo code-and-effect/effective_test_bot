@@ -1,23 +1,25 @@
 module EffectiveTestBotAssertions
-  def assert_page_content(content, message = "(page_content) Expected page content :content: to be present")
+  def assert_page_content(content, message: "(page_content) Expected page content :content: to be present")
     assert page.has_text?(/#{Regexp.escape(content)}/i, wait: 0), message.sub(':content:', content)
   end
 
-  def assert_no_page_content(content, message = "(page_content) Expected page content :content: to be blank")
+  def assert_no_page_content(content, message: "(page_content) Expected page content :content: to be blank")
     assert page.has_no_text?(/#{Regexp.escape(content)}/i, wait: 0), message.sub(':content:', content)
   end
 
-  def assert_signed_in(message = nil)
-    visit(root_path) if page.current_path.blank?
-    assert assigns['current_user'].present?, message || 'Expected @current_user to be present when signed in'
+  def assert_signed_in(message: 'Expected @current_user to be present when signed in')
+    visit(root_path)
+    assert_page_normal
+    assert assigns['current_user'].present?, message
   end
 
-  def assert_signed_out(message = nil)
-    visit(root_path) if page.current_path.blank? || assigns['current_user'].present?
-    assert assigns['current_user'].blank?, message || 'Expected @current_user to be blank when signed out'
+  def assert_signed_out(message: 'Expected @current_user to be blank when signed out')
+    visit(root_path)
+    assert_page_normal
+    assert assigns['current_user'].blank?, message
   end
 
-  def assert_no_exceptions(message = "(no_exceptions) Unexpected rails server exception:\n:exception:")
+  def assert_no_exceptions(message: "(no_exceptions) Unexpected rails server exception:\n:exception:")
     # this file is created by EffectiveTestBot::Middleware when an exception is encountered in the rails app
     file = File.join(Dir.pwd, 'tmp', 'test_bot', 'exception.txt')
     return unless File.exist?(file)
@@ -28,7 +30,7 @@ module EffectiveTestBotAssertions
     assert false, message.sub(':exception:', exception)
   end
 
-  def assert_can_execute_javascript(message = "Expected page.evaluate_script() to be successful")
+  def assert_can_execute_javascript(message: "Expected page.evaluate_script() to be successful")
     error = nil; result = nil;
 
     begin
@@ -40,15 +42,15 @@ module EffectiveTestBotAssertions
     assert (result == '2'), "#{message}. Error was: #{error}"
   end
 
-  def assert_jquery_present(message = "Expected jquery ($.fn.jquery) to be present")
+  def assert_jquery_present(message: "Expected jquery ($.fn.jquery) to be present")
     assert((page.evaluate_script('$.fn.jquery') rescue nil).to_s.length > 0, message)
   end
 
-  def assert_jquery_ujs_present(message = "Expected rails' jquery_ujs ($.rails) to be present")
+  def assert_jquery_ujs_present(message: "Expected rails' jquery_ujs ($.rails) to be present")
     assert((page.evaluate_script('$.rails') rescue nil).to_s.length > 0, message)
   end
 
-  def assert_page_title(title = :any, message = '(page_title) Expected page title to be present')
+  def assert_page_title(title = :any, message: '(page_title) Expected page title to be present')
     if title.present? && title != :any
       assert_title(title) # Capybara TitleQuery, match this text
     else
@@ -57,15 +59,15 @@ module EffectiveTestBotAssertions
     end
   end
 
-  def assert_form(selector, message = "(form) Expected visible form with selector :selector: to be present")
+  def assert_form(selector, message: "(form) Expected visible form with selector :selector: to be present")
     assert all(selector).present?, message.sub(':selector:', selector)
   end
 
-  def assert_submit_input(message = "(submit_input) Expected one or more visible input[type='submit'] or button[type='submit'] to be present")
+  def assert_submit_input(message: "(submit_input) Expected one or more visible input[type='submit'] or button[type='submit'] to be present")
     assert all("input[type='submit'],button[type='submit']").present?, message
   end
 
-  def assert_authorization(message = '(authorization) Expected authorized access')
+  def assert_authorization(message: '(authorization) Expected authorized access')
     if response_code == 403
       exception = access_denied_exception
 
@@ -80,18 +82,18 @@ module EffectiveTestBotAssertions
     end
   end
 
-  def assert_page_status(status = 200, message = '(page_status) Expected :status: HTTP status code')
+  def assert_page_status(status = 200, message: '(page_status) Expected :status: HTTP status code')
     assert_equal status, response_code, message.sub(':status:', status.to_s)
   end
 
-  def assert_current_path(path, message = '(current_path) Expected current_path to be :path:')
+  def assert_current_path(path, message: '(current_path) Expected current_path to be :path:')
     path = public_send(path) if path.kind_of?(Symbol)
     assert_equal path, page.current_path, message.sub(':path:', path.to_s)
   end
 
   # assert_redirect '/about'
   # assert_redirect '/about', '/about-us'
-  def assert_redirect(from_path, to_path = nil, message = nil)
+  def assert_redirect(from_path, to_path = nil, message: nil)
     if to_path.present?
       assert_equal to_path, page.current_path, message || "(redirect) Expected redirect from #{from_path} to #{to_path}"
     else
@@ -99,12 +101,12 @@ module EffectiveTestBotAssertions
     end
   end
 
-  def assert_no_ajax_requests(message = "(no_ajax_requests) :count: Unexpected AJAX requests present")
+  def assert_no_ajax_requests(message: "(no_ajax_requests) :count: Unexpected AJAX requests present")
     active = page.evaluate_script('$.active')
     assert (active.blank? || active.zero?), message.sub(':count:', active.to_s)
   end
 
-  def assert_no_active_jobs(message = "(no_active_jobs) :count: Unexpected ActiveJob jobs present")
+  def assert_no_active_jobs(message: "(no_active_jobs) :count: Unexpected ActiveJob jobs present")
     jobs = if defined?(SuckerPunch)
       SuckerPunch::Queue.all.length
     else
@@ -114,7 +116,7 @@ module EffectiveTestBotAssertions
     assert (jobs == 0), message.sub(':count:', jobs.to_s)
   end
 
-  def assert_no_js_errors(message = nil, strict: false)
+  def assert_no_js_errors(message: nil, strict: false)
     error = page.driver.browser.manage.logs.get(:browser).first # headless_chrome
 
     if strict == false
@@ -124,21 +126,21 @@ module EffectiveTestBotAssertions
     assert error.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{error}"
   end
 
-  def assert_no_flash_errors(message = "(no_flash_errors) Unexpected flash error:\n:flash_errors:")
+  def assert_no_flash_errors(message: "(no_flash_errors) Unexpected flash error:\n:flash_errors:")
     assert (!flash.key?('error') && !flash.key?('danger')), message.sub(':flash_errors:', flash.to_s)
   end
 
   # This must be run after submit_form()
   # It ensures there are no HTML5 validation errors that would prevent the form from being submit
   # Browsers seem to only consider visible fields, so we will to
-  def assert_no_html5_form_validation_errors(message = nil)
+  def assert_no_html5_form_validation_errors(message: nil)
     errors = all(':invalid', visible: true).map { |field| field['name'] }
     assert errors.blank?, message || "(no_html5_form_validation_errors) Unable to submit form, unexpected HTML5 validation error present on the following fields:\n#{errors.join("\n")}"
   end
 
   # Rails jquery-ujs data-disable-with
   # = f.button :submit, 'Save', data: { disable_with: 'Saving...' }
-  def assert_jquery_ujs_disable_with(label = nil, message = nil)
+  def assert_jquery_ujs_disable_with(label = nil, message: nil)
     submits = label.present? ? all("input[type='submit']", text: label) : all("input[type='submit']")
     all_disabled_with = submits.all? { |submit| submit['data-disable-with'].present? }
 
@@ -148,7 +150,7 @@ module EffectiveTestBotAssertions
   # assert_flash
   # assert_flash :success
   # assert_flash :error, 'there was a specific error'
-  def assert_flash(key = nil, value = nil, message = nil)
+  def assert_flash(key = nil, value = nil, message: nil)
     if key.present? && value.present?
       assert_equal value, flash[key.to_s], message || "(flash) Expected flash[#{key}] to equal #{value}. Instead, it was: #{value}"
     elsif key.present?
@@ -161,7 +163,7 @@ module EffectiveTestBotAssertions
   # assert_assigns
   # assert_assigns :current_user
   # assert_assigns :current_user, 'there should a current user'
-  def assert_assigns(key = nil, value = nil, message = nil)
+  def assert_assigns(key = nil, value = nil, message: nil)
     if key.present? && value.present?
       assert_equal value, assigns[key.to_s], message || "(assigns) Expected assigns[#{key}] to equal #{value}. Instead, it was: #{value}"
     elsif key.present?
@@ -173,7 +175,7 @@ module EffectiveTestBotAssertions
 
   # assert_no_assigns_errors
   # assert_no_assigns_errors :post
-  def assert_no_assigns_errors(key = nil, message = nil)
+  def assert_no_assigns_errors(key = nil, message: nil)
     if key.present?
       errors = (assigns[key.to_s] || {})['errors']
       assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
@@ -186,7 +188,7 @@ module EffectiveTestBotAssertions
   end
 
   # assert_assigns_errors :post
-  def assert_assigns_errors(key, message = nil)
+  def assert_assigns_errors(key, message: nil)
     errors = (assigns[key.to_s] || {})['errors']
     assert errors.present?, message || "(assigns_errors) Expected @#{key}.errors to be present"
   end
@@ -225,7 +227,7 @@ module EffectiveTestBotAssertions
     assert false, message || "(assert_email) Expected email with #{expected} to have been delivered"
   end
 
-  def assert_access_denied(message = nil)
+  def assert_access_denied(message: nil)
     assert_equal 403, response_code, message || "Expected response code 403 when access denied, but it was: #{response_code || 'nil'}"
     assert_content 'Access Denied'
     assert_no_exceptions
