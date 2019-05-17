@@ -2,12 +2,8 @@ require 'application_system_test_case'
 
 module TestBot
   class EnvironmentTest < ApplicationSystemTestCase
-    @@original_users_count = User.count
-    #let(:original_users_count) { @@original_users_count }
-
-    setup do
-      Rails.logger.info "SETUP!! #{User.count}"
-    end
+    @@original_users_count = (defined?(User) ? User.count : 0)
+    let(:original_users_count) { @@original_users_count }
 
     def self.test_order
       :alpha

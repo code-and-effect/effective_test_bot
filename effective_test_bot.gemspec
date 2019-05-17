@@ -25,11 +25,11 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'effective_resources'
   s.add_dependency 'faker'
+  s.add_dependency 'minitest-fail-fast'
+  s.add_dependency 'minitest-reporters'
 
   # Same image processing library as Active Storage variant
   # s.add_dependency 'image_processing'
-
-  # Optionals
-  #s.add_dependency 'minitest-fail-fast'
-  #s.add_dependency 'minitest-reporters'
+  
 end
+

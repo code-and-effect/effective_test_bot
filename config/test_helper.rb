@@ -3,6 +3,8 @@ require_relative '../config/environment'
 require 'rails/test_help'
 
 require 'minitest/fail_fast' if EffectiveTestBot.fail_fast?
+require 'minitest/reporters'
+require 'minitest/spec'
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
@@ -11,9 +13,12 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
-  # From effective_test_bot. Loads db/seeds.rb and test/fixtures/seeds.rb file once. :all, :db, :test
   seeds :all
+
+  extend Minitest::Spec::DSL # For the let syntax
 end
+
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 Rails.backtrace_cleaner.remove_silencers!
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
