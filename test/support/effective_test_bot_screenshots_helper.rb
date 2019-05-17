@@ -13,6 +13,9 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def save_test_bot_failure_gif
+    return unless EffectiveTestBot.screenshots?
+    return unless EffectiveTestBot.gifs?
+
     Dir.mkdir(current_test_failure_path) unless File.exist?(current_test_failure_path)
     full_path = (current_test_failure_path + '/' + current_test_failure_filename)
 
@@ -21,6 +24,9 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def save_test_bot_tour_gif
+    return unless EffectiveTestBot.screenshots?
+    return unless EffectiveTestBot.gifs?
+
     Dir.mkdir(current_test_tour_path) unless File.exist?(current_test_tour_path)
     full_path = (current_test_tour_path + '/' + current_test_tour_filename)
 
@@ -39,6 +45,15 @@ module EffectiveTestBotScreenshotsHelper
   protected
 
   def save_test_bot_gif(full_path)
+    case EffectiveTestBot.image_processing_class_name
+    when 'Magick'
+      save_test_bot_gif_with_rmagick(full_path)
+    else
+      save_test_bot_gif_with_image_processing(full_path)
+    end
+  end
+
+  def save_test_bot_gif_with_rmagick(full_path)
     png_images = @test_bot_screenshot_id.times.map do |x|
       current_test_temp_path + '/' + format_screenshot_id(x+1) + '.png'
     end
@@ -73,6 +88,16 @@ module EffectiveTestBotScreenshotsHelper
 
     # Write the final animated gif
     animation.write(full_path)
+  end
+
+  def save_test_bot_gif_with_image_processing(full_path)
+    png_images = @test_bot_screenshot_id.times.map do |x|
+      current_test_temp_path + '/' + format_screenshot_id(x+1) + '.png'
+    end
+
+    # png_images is an Array of file paths
+
+    raise('unsupported. Accepting PRs.')
   end
 
   private

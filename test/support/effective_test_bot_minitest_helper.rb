@@ -7,7 +7,7 @@ module EffectiveTestBotMinitestHelper
   def before_teardown
     super
 
-    if EffectiveTestBot.screenshots? && (@test_bot_screenshot_id || 0) > 0
+    if EffectiveTestBot.gifs? && (@test_bot_screenshot_id || 0) > 0
       if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
         save_test_bot_screenshot
         save_test_bot_failure_gif

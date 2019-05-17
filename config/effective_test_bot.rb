@@ -52,6 +52,19 @@ if Rails.env.test?
     # Valid values are true / false / :verbose
     config.tour_mode = false
 
+    # Rmagick gem is required for animated gifs
+    #
+    # Include the following in your Gemfile:
+    # gem 'rmagick'
+    config.image_processing_class_name = 'Magick'
+
+    # FUTURE SUPPORT: ImageProcessing gem is required for animated gifs
+    # I'm not sure how to make an animated gif with this gem!
+    # gem 'image_processing'
+    # ImageProcessing::MiniMagick
+    # ImageProcessing::Vips
+    # config.image_processing_class_name = 'ImageProcessing::MiniMagick'
+
     # How long to delay in between animated gif frames
     # The last frame is applied animated_gif_frame_delay * 3
     # 100 equals 1 second. (a bit on the slow side, but suitable for a demo)

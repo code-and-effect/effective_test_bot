@@ -16,6 +16,7 @@ module EffectiveTestBot
   mattr_accessor :tour_mode_extreme
   mattr_accessor :animated_gif_delay
   mattr_accessor :animated_gif_background_color
+  mattr_accessor :image_processing_class_name
   mattr_accessor :backtrace_lines
   mattr_accessor :silence_skipped_routes
 
@@ -64,8 +65,16 @@ module EffectiveTestBot
     screenshots == true
   end
 
+  def self.gifs?
+    image_processing_class.present?
+  end
+
+  def self.image_processing_class
+    @@image_processing_class ||= image_processing_class_name.safe_constantize
+  end
+
   def self.autosave_animated_gif_on_failure?
-    screenshots? && autosave_animated_gif_on_failure
+    autosave_animated_gif_on_failure && gifs?
   end
 
   def self.fail_fast?
