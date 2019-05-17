@@ -2,8 +2,9 @@ require 'application_system_test_case'
 
 module TestBot
   class EnvironmentTest < ApplicationSystemTestCase
-    @@original_users_count = (defined?(User) ? User.count : 0)
-    let(:original_users_count) { @@original_users_count }
+    setup do
+      @@original_users_count ||= (defined?(User) ? User.unscoped.count : 0)
+    end
 
     def self.test_order
       :alpha
@@ -27,35 +28,33 @@ module TestBot
     end
 
     test '03: at least one user is present' do
-      assert (User.count > 0), 'please fixture or seed at least 1 user for effective_test_bot to function'
+      assert (User.unscoped.count > 0), 'please fixture or seed at least 1 user for effective_test_bot to function'
     end
 
     test '04: activerecord can save a resource' do
       User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123').save(validate: false)
-      assert_equal (@@original_users_count + 1), User.count
+      assert_equal (@@original_users_count + 1), User.unscoped.count
     end
 
     test '05: database has rolled back' do
-      assert_equal @@original_users_count, User.count, 'the activerecord resource created in a previous test is still present'
+      assert_equal @@original_users_count, User.unscoped.count, 'the activerecord resource created in a previous test is still present'
     end
 
     test '06: capybara can sign_in' do
-      sign_in(User.first)
-      assert_signed_in
+      sign_in(User.unscoped.first)
+      assert_signed_in(message: 'capybara is unable to sign in via the warden devise helpers')
     end
 
     test '07: capybara session has reset' do
-      assert_signed_out
+      assert_signed_out(message: 'capybara should be signed out at the start of a new test')
     end
 
     test '08: capybara database connection is shared' do
       user = User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123')
-      user.username = 'unique-username' if user.respond_to?(:username)
-      user.login = 'unique-login' if user.respond_to?(:login)
-      user.save!
+      user.save!(validate: false)
 
       without_screenshots { sign_in_manually(user, '!Password123') }
-      assert_signed_in("expected successful devise manual sign in with user created in this test.\nTry using one of the ActiveRecord shared_connection snippets in test/test_helper.rb")
+      assert_signed_in(message: "expected successful devise manual sign in with user created in this test.\nTry using one of the ActiveRecord shared_connection snippets in test/test_helper.rb")
     end
 
     test '09: capybara can execute javascript' do
