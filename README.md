@@ -27,7 +27,7 @@ This is the 1.0 series of effective_test_bot.
 
 This requires Rails 5.1+
 
-Please check out [Effective TestBot Capybara-Webkit branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara-webit) for more information using this gem with Capybara Webkit and Rails < 5.1.
+Please check out [Effective TestBot Capybara-Webkit branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara-webkit) for more information using this gem with Capybara Webkit and Rails < 5.1.
 
 This works with Rails 6.0.0.rc1 and parallelization.
 
