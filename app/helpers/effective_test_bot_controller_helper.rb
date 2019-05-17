@@ -1,7 +1,7 @@
 module EffectiveTestBotControllerHelper
   BODY_TAG = '</body>'
 
-  # This is included as an after_action in the controller
+  # This is included automatically as an after_action in the controller
   def assign_test_bot_payload(payload = {})
     payload.merge!({ response_code: response.code, assigns: test_bot_view_assigns, flash: flash.to_hash })
 

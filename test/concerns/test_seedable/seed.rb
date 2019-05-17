@@ -10,15 +10,15 @@ module TestSeedable
           case seed
           when :all
             def before_setup
-              @@_loaded_fixture_seeds ||= load_fixture_seeds(:all); super
+              @@_loaded_seeds ||= load_seeds(:all); super
             end
           when :db
             def before_setup
-              @@_loaded_fixture_seeds ||= load_fixture_seeds(:db); super
+              @@_loaded_seeds ||= load_seeds(:db); super
             end
           when :test
             def before_setup
-              @@_loaded_fixture_seeds ||= load_fixture_seeds(:test); super
+              @@_loaded_seeds ||= load_seeds(:test); super
             end
           end
         end
@@ -26,7 +26,7 @@ module TestSeedable
     end
 
     # Instance Methods
-    def load_fixture_seeds(seed = :all)
+    def load_seeds(seed = :all)
       db_seeds = "#{Rails.root}/db/seeds.rb"
       test_seeds = "#{Rails.root}/test/fixtures/seeds.rb"
 
