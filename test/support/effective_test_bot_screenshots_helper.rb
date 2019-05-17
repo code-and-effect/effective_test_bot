@@ -1,8 +1,4 @@
-require 'RMagick'
-
 module EffectiveTestBotScreenshotsHelper
-  include Magick
-
   # Creates a screenshot based on the current test and the order in this test.
   def debug_test_bot_screenshot
     filepath = "#{current_test_temp_path}/#{current_test_screenshot_id}.png"

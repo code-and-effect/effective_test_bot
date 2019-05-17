@@ -18,15 +18,18 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails', ['>= 5.1']
 
-  # Match Rails 5.2 new Gemfile
-  s.add_dependency 'capybara', '>= 2.15', '< 4.0'
-  s.add_dependency 'chromedriver-helper'
+  # Match Rails 6.0.0.rc1 new Gemfile
+  s.add_dependency 'capybara', '>= 2.15'
   s.add_dependency 'selenium-webdriver'
+  s.add_dependency 'webdrivers'
 
-  # Extras we need
   s.add_dependency 'effective_resources'
   s.add_dependency 'faker'
-  s.add_dependency 'minitest-fail-fast'
-  s.add_dependency 'minitest-reporters'
-  s.add_dependency 'rmagick'
+
+  # Same image processing library as Active Storage variant
+  # s.add_dependency 'image_processing'
+
+  # Optionals
+  #s.add_dependency 'minitest-fail-fast'
+  #s.add_dependency 'minitest-reporters'
 end

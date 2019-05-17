@@ -3,7 +3,11 @@ require 'application_system_test_case'
 module TestBot
   class EnvironmentTest < ApplicationSystemTestCase
     @@original_users_count = User.count
-    let(:original_users_count) { @@original_users_count }
+    #let(:original_users_count) { @@original_users_count }
+
+    setup do
+      Rails.logger.info "SETUP!! #{User.count}"
+    end
 
     def self.test_order
       :alpha
@@ -32,11 +36,11 @@ module TestBot
 
     test '04: activerecord can save a resource' do
       User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123').save(validate: false)
-      assert_equal (original_users_count + 1), User.count
+      assert_equal (@@original_users_count + 1), User.count
     end
 
     test '05: database has rolled back' do
-      assert_equal original_users_count, User.count, 'the activerecord resource created in a previous test is still present'
+      assert_equal @@original_users_count, User.count, 'the activerecord resource created in a previous test is still present'
     end
 
     test '06: capybara can sign_in' do

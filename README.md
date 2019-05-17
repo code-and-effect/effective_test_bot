@@ -49,6 +49,9 @@ Then you're ready to install `effective_test_bot`:
 
 ```ruby
 group :test do
+  gem 'capybara'
+  gem 'selenium-webdriver'
+  gem 'webdrivers'
   gem 'effective_test_bot'
 end
 ```
