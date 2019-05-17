@@ -13,6 +13,7 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
+  # Loads your db/seeds.rb and test/fixtures/seeds.rb before all tests run. Valid options are :all :db and :test
   seeds :all
 
   extend Minitest::Spec::DSL # For the let syntax

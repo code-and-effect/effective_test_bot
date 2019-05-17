@@ -1,3 +1,5 @@
+# This is automatically included into ActiveSupport::TestCase
+# To give us the seeds :all dsl
 module TestSeedable
   module Seed
     extend ActiveSupport::Concern
