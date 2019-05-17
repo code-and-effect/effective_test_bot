@@ -29,6 +29,8 @@ This requires Rails 5.1+
 
 Please check out [Effective TestBot Capybara-Webkit branch](https://github.com/code-and-effect/effective_test_bot/tree/capybara-webit) for more information using this gem with Capybara Webkit and Rails < 5.1.
 
+This is now targetting and tested on Rails 6.0.0.rc1 but I think Rails 5.2 is fine too.
+
 ## Getting Started
 
 First, make sure your site is using [devise](https://github.com/plataformatec/devise) and that your application javascript includes [jQuery](http://jquery.com/) and rails' [jquery_ujs](https://github.com/rails/jquery-ujs).
@@ -53,6 +55,9 @@ group :test do
   gem 'selenium-webdriver'
   gem 'webdrivers'
   gem 'effective_test_bot'
+
+  # Required for animated gif / tour mode. Optional otherwise.
+  gem 'image_processing'
 end
 ```
 
@@ -76,28 +81,27 @@ Fixture or seed one user. At least one user -- ideally a fully priviledged admin
 
 To create the initial user, please add it to either `test/fixtures/users.yml`, the `db/seeds.db` file or the effective_test_bot specific `test/fixtures/seeds.rb` file.
 
-As per the included `test/test_helper.rb`, the following tasks run when minitest starts:
-
-```
-# Rails default task, load fixtures from test/fixtures/*.yml (including users.yml if it exists)
-rails db:fixtures:load
-
-# Rails default task, loads db/seeds.rb
-rails db:seed
-
-# Added by effective_test_bot.  loads test/fixtures/seeds.rb. 'cause screw yaml.
-rails test:load_fixture_seeds
-```
-
-Your initial user may be created by any of the above 3 tasks.
-
 Finally, to test that your testing environment is set up correctly run and work through any issues with:
 
 ```
 rails test:bot:environment
 ```
 
-You now have effective_test_bot configured and you're ready to go.
+You now have effective_test_bot configured and you're ready to go:
+
+```
+rails test
+rails test:system
+
+rails test:bot
+rails test:bot TEST=posts#index
+
+rails test:bot:tour
+
+rails test:bot:fail
+rails test:bot:fails
+rails test:bot:fails TOUR=true
+```
 
 ## How to use this gem
 
@@ -525,6 +529,15 @@ rails test:bot TEST=posts
 
 # Test a specific controller and action
 rails test:bot TEST=posts#index
+
+# Only runs previously failed tests
+rails test:bot:fails
+
+# Only runs failed tests and stops after first failure
+rails test:bot:fails
+
+# Purges all screenshots and fails
+rails test:bot:purge
 ```
 
 ## Animated gifs and screenshots
