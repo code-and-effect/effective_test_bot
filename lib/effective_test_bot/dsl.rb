@@ -4,8 +4,9 @@ module EffectiveTestBot
 
     included do
       include EffectiveTestBotAssertions
-      include EffectiveTestBotFormHelper
+      include EffectiveTestBotFormFaker
       include EffectiveTestBotFormFiller
+      include EffectiveTestBotFormHelper
       include EffectiveTestBotLoginHelper
       include EffectiveTestBotMinitestHelper
       include EffectiveTestBotScreenshotsHelper

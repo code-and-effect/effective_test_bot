@@ -13,6 +13,7 @@ module EffectiveTestBotFormHelper
     else
       fill_form_fields(form_fills)
     end
+    
     true
   end
 
