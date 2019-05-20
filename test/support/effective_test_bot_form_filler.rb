@@ -5,8 +5,8 @@ require 'timeout'
 module EffectiveTestBotFormFiller
 
   # Fill a boostrap tabs based form
-  def fill_bootstrap_tabs_form(fills = {}, boostrap_tab_elements = nil)
-    tabs = boostrap_tab_elements || all("a[data-toggle='tab']")
+  def fill_bootstrap_tabs_form(fills = {})
+    tabs = all("a[data-toggle='tab']")
 
     # If there's only 1 tab, just fill it out
     (fill_form_fields(fills) and return) unless tabs.length > 1

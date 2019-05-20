@@ -9,7 +9,7 @@ module EffectiveTestBotFormHelper
     form_fills = HashWithIndifferentAccess.new((EffectiveTestBot.form_fills || {}).merge(fills || {}))
 
     if bootstrap_tabs.length > 1
-      fill_bootstrap_tabs_form(form_fills, bootstrap_tabs)
+      fill_bootstrap_tabs_form(form_fills)
     else
       fill_form_fields(form_fills)
     end
