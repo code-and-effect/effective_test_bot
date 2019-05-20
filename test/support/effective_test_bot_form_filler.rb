@@ -48,7 +48,7 @@ module EffectiveTestBotFormFiller
 
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
-  def fill_form_fields(fills = {})
+  def fill_form_fields(fills = {}, debug: false)
 
     save_test_bot_screenshot
 
@@ -64,11 +64,21 @@ module EffectiveTestBotFormFiller
     end
 
     all('input,select,textarea', visible: false).each do |field|
-      next if skip_form_field?(field)
+      field_name = [field.tag_name, field['type']].compact.join('_')
       skip_field_screenshot = false
 
-      field_name = [field.tag_name, field['type']].compact.join('_')
+      if debug
+        puts "CONSIDERING #{debug_field_to_s(field)}"
+        puts "  -> SKIPPED" if skip_form_field?(field)
+      end
+
+      next if skip_form_field?(field)
+
       value = faker_value_for_field(field, fills)
+
+      if debug
+        puts "  -> FILLING: #{value}" 
+      end
 
       case field_name
       when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_url', 'input_color'
@@ -135,10 +145,6 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_select(field, value)
-    Rails.logger.info "SELECTING!"
-
-    Rails.logger.info "$('select##{field['id']}').select2('open')"
-
     if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
       try_script "$('select##{field['id']}').select2('open')"
       save_test_bot_screenshot
@@ -148,7 +154,7 @@ module EffectiveTestBotFormFiller
       field.select(value, match: :first, disabled: false)
     end
 
-    if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2')
+    if field['class'].to_s.include?('select2')
       try_script "$('select##{field['id']}').select2('close')"
     end
   end
@@ -227,6 +233,10 @@ module EffectiveTestBotFormFiller
     (field['class'].to_s.include?('ckeditor') || all("span[id='cke_#{field['id']}']").present?)
   end
 
+  def custom_control_input?(field) # Bootstrap 4 radios and checks
+    field['class'].to_s.include?('custom-control-input')
+  end
+
   def skip_form_field?(field)
     field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
 
@@ -236,9 +246,14 @@ module EffectiveTestBotFormFiller
     field_id.start_with?('filters_scope_') ||
     field_id.start_with?('filters_') && field['name'].blank? ||
     field.disabled? ||
-    (!field.visible? && !ckeditor_text_area?(field)) ||
+    (!field.visible? && !ckeditor_text_area?(field) && !custom_control_input?(field)) ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
+  end
+
+  def debug_field_to_s(field)
+    field_name = [field.tag_name, field['type']].compact.join('_')
+    [field_name, ("##{field['id']}" if field['id']), (".#{field['class']}" if field['class']), field['name']].presence.join(' ')
   end
 
 end
