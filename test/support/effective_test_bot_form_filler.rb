@@ -87,8 +87,10 @@ module EffectiveTestBotFormFiller
         else
           fill_input_text(field, value)
         end
-      when 'input_checkbox', 'input_radio'
+      when 'input_checkbox'
         fill_input_checkbox(field, value)
+      when 'input_radio'
+        fill_input_radio(field, value)
       when 'textarea', 'textarea_textarea'
         fill_input_text_area(field, value)
       when 'select', 'select_select-one'
@@ -126,7 +128,18 @@ module EffectiveTestBotFormFiller
     try_script "$('input##{field['id']}').data('DateTimePicker').hide()"
   end
 
-  def fill_input_checkbox(field, value) # Radios too
+  def fill_input_checkbox(field, value)
+    begin
+      field.set(value)
+    rescue => e
+      label = first(:label, for: field['id'])
+      label.click if label
+    end
+  end
+
+  def fill_input_radio(field, value)
+    return if value == false
+    
     begin
       field.set(value)
     rescue => e
