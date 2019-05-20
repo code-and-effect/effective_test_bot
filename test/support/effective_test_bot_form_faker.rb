@@ -203,6 +203,8 @@ module EffectiveTestBotFormFaker
     if fill_value.present? && (fill_value == field['value'] || fill_value == field.find(:xpath, '..').text)
       @filled_radio_fields[field['name']] = fill_value
       true
+    elsif fill_value.present?
+      nil
     else
       @filled_radio_fields[field['name']] ||= true
       retval

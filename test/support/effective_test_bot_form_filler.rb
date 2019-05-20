@@ -129,6 +129,8 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_checkbox(field, value)
+    return if value.nil?
+    
     begin
       field.set(value)
     rescue => e
@@ -138,8 +140,8 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_radio(field, value)
-    return if value == false
-    
+    return if value.nil?
+
     begin
       field.set(value)
     rescue => e
