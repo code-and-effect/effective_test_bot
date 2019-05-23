@@ -95,7 +95,7 @@ module EffectiveTestBot
 
   def self.tour_mode?
     if ENV['TOUR'].present?
-      ['true', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
+      ['true', 'extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
       screenshots? && (tour_mode != false)
     end
