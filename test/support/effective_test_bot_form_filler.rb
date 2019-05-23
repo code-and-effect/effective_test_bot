@@ -49,65 +49,76 @@ module EffectiveTestBotFormFiller
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
   def fill_form_fields(fills = {}, debug: false)
-
     save_test_bot_screenshot
 
-    # Support for the cocoon gem
-    all('a.add_fields[data-association-insertion-template],a.has_many_add').each do |field|
-      next if skip_form_field?(field)
+    seen = {}
 
-      if EffectiveTestBot.tour_mode_extreme?
-        2.times { field.click(); save_test_bot_screenshot }
-      else
-        2.times { field.click() }; save_test_bot_screenshot
-      end
-    end
+    5.times do 
+      # Support for the cocoon gem
+      fields = all('a.add_fields[data-association-insertion-template],a.has_many_add').reject { |field| seen[field_key(field)] }
 
-    all('input,select,textarea', visible: false).each do |field|
-      field_name = [field.tag_name, field['type']].compact.join('_')
-      skip_field_screenshot = false
+      fields.each do |field|
+        seen[field_key(field)] = true
+        next if skip_form_field?(field)
 
-      if debug
-        puts "CONSIDERING #{debug_field_to_s(field)}"
-        puts "  -> SKIPPED" if skip_form_field?(field)
-      end
-
-      next if skip_form_field?(field)
-
-      value = faker_value_for_field(field, fills)
-
-      if debug
-        puts "  -> FILLING: #{value}" 
-      end
-
-      case field_name
-      when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_url', 'input_color'
-        if field['class'].to_s.include?('effective_date')
-          fill_input_date(field, value)
+        if EffectiveTestBot.tour_mode_extreme?
+          2.times { field.click(); save_test_bot_screenshot }
         else
-          fill_input_text(field, value)
+          2.times { field.click() }; save_test_bot_screenshot
         end
-      when 'input_checkbox'
-        fill_input_checkbox(field, value)
-      when 'input_radio'
-        fill_input_radio(field, value)
-      when 'textarea', 'textarea_textarea'
-        fill_input_text_area(field, value)
-      when 'select', 'select_select-one'
-        fill_input_select(field, value)
-      when 'input_file'
-        fill_input_file(file, value)
-      when 'input_submit', 'input_search', 'input_button'
-        skip_field_screenshot = true # Do nothing
-      else
-        raise "unsupported field type #{field_name}"
+      end
+
+      # Fill all fields now
+      fields = all('input,select,textarea', visible: false).reject { |field| seen[field_key(field)] }
+
+      break unless fields.present?
+
+      fields.each do |field|
+        seen[field_key(field)] = true
+        skip_field_screenshot = false
+
+        if debug
+          puts "CONSIDERING: #{field_key(field)}"
+          puts " -> SKIPPED" if skip_form_field?(field)
+        end
+
+        next if skip_form_field?(field)
+
+        value = faker_value_for_field(field, fills)
+
+        if debug
+          puts " -> FILLING: #{value}" 
+        end
+
+        field_name = [field.tag_name, field['type']].compact.join('_')
+
+        case field_name
+        when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_url', 'input_color'
+          if field['class'].to_s.include?('effective_date')
+            fill_input_date(field, value)
+          else
+            fill_input_text(field, value)
+          end
+        when 'input_checkbox'
+          fill_input_checkbox(field, value)
+        when 'input_radio'
+          fill_input_radio(field, value)
+        when 'textarea', 'textarea_textarea'
+          fill_input_text_area(field, value)
+        when 'select', 'select_select-one', 'select_select-multiple'
+          fill_input_select(field, value)
+        when 'input_file'
+          fill_input_file(file, value)
+        when 'input_submit', 'input_search', 'input_button'
+          skip_field_screenshot = true # Do nothing
+        else
+          raise "unsupported field type #{field_name}"
+        end
+
+        save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme? && !skip_field_screenshot
       end
 
       wait_for_ajax
-
-      if EffectiveTestBot.tour_mode_extreme?
-        save_test_bot_screenshot unless skip_field_screenshot
-      end
     end
 
     # Clear any value_for_field momoized values
@@ -166,7 +177,9 @@ module EffectiveTestBotFormFiller
     end
 
     if field.all('option:enabled').length > 0 && value != :unselect
-      field.select(value, match: :first, disabled: false)
+      Array(value).each do |value|
+        field.select(value, match: :first, disabled: false)
+      end
     end
 
     if field['class'].to_s.include?('select2')
@@ -266,9 +279,15 @@ module EffectiveTestBotFormFiller
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
   end
 
-  def debug_field_to_s(field)
+  def field_key(field)
     field_name = [field.tag_name, field['type']].compact.join('_')
-    [field_name, ("##{field['id']}" if field['id']), (".#{field['class']}" if field['class']), field['name']].presence.join(' ')
+
+    [
+      field['name'].presence,
+      ("##{field['id']}" if field['id'].present?), 
+      field_name,
+      (".#{field['class'].split(' ').join('.')}" if field['class'].present?)
+    ].compact.join(' ')
   end
 
 end

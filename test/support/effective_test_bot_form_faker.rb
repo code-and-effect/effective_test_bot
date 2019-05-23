@@ -109,22 +109,10 @@ module EffectiveTestBotFormFaker
       value_for_input_radio_field(field, fill_value)
 
     when 'select', 'select_select-one'
-      return fill_value if fill_value == :unselect
+      value_for_input_select_field(field, fill_value)
 
-      if fill_value.present? # accept a value or text
-        field.all('option:enabled').each do |option|
-          if (option.text == fill_value || option.value.to_s == fill_value)
-            @filled_country_fields = option.value if attribute == 'country_code'
-            return option.text
-          end
-        end
-      end
-
-      option = field.all('option:enabled').select { |option| option.value.present? }.sample
-
-      @filled_country_fields = option.try(:value) if attribute == 'country_code' # So Postal Code can be set to a valid one
-
-      option.try(:text) || ''
+    when 'select_select-multiple'
+      1.upto(3).to_a.map { value_for_input_select_field(field, fill_value) }.uniq
 
     when 'input_tel'
       d = 10.times.map { DIGITS.sample }
@@ -160,6 +148,26 @@ module EffectiveTestBotFormFaker
     return fills[value] if fills.key?(value)
 
     nil
+  end
+
+  def value_for_input_select_field(field, fill_value)
+    return fill_value if fill_value == :unselect
+    country_code = field['name'].to_s.include?('country_code')
+
+    if fill_value.present? # accept a value or text
+      field.all('option:enabled').each do |option|
+        if (option.text == fill_value || option.value.to_s == fill_value)
+          @filled_country_fields = option.value if country_code
+          return option.text
+        end
+      end
+    end
+
+    option = field.all('option:enabled').select { |option| option.value.present? }.sample
+
+    @filled_country_fields = option.try(:value) if country_code # So Postal Code can be set to a valid one
+
+    option.try(:text) || ''
   end
 
   def value_for_input_checkbox_field(field, fill_value)
