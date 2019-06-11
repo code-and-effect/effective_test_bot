@@ -102,6 +102,11 @@ module EffectiveTestBotFormHelper
     end
 
     submit.click
+
+    if submit['data-confirm'] 
+      effective_bootstrap_custom_data_confirm? ? submit.click : page.accept_alert
+    end
+
     synchronize!
 
     save_test_bot_screenshot if EffectiveTestBot.screenshots? && page.current_path.present?
@@ -124,7 +129,7 @@ module EffectiveTestBotFormHelper
 
       assert submit.present?, "TestBotError: Unable to find a visible submit link or button on #{page.current_path} with the label #{label}"
     else
-      submit = find("input[type='submit'],button[type='submit']", match: :first)
+      submit = (find("input[type='submit'],button[type='submit']", match: :first) rescue nil)
       submit = all("input[type='submit'],button[type='submit']").last if last
       assert submit.present?, "TestBotError: Unable to find a visible input[type='submit'] or button[type='submit'] on #{page.current_path}"
     end

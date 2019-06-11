@@ -45,7 +45,7 @@ module EffectiveTestBotFormFaker
         Faker::Internet.email
       elsif classes.include?('price') # effective_form_inputs price
         4.times.map { DIGITS.sample }.join('') + '.00'
-      elsif classes.include?('numeric') || attribute.include?('number')
+      elsif classes.include?('numeric') || classes.include?('effective_number_text') || classes.include?('effective_integer') || attribute.include?('number')
         min = (Float(field['min']) rescue 1)
         max = (Float(field['max']) rescue 1000)
         number = Random.new.rand(min..max)

@@ -64,8 +64,16 @@ module EffectiveTestBotTestHelper
     all(selector).each { |field| within(field) { yield } }
   end
 
+  def within_first(selector, &block)
+    Array(all(selector).first).each { |field| within(field) { yield } }
+  end
+
   def click_first(label)
     click_link(label, match: :first)
+  end
+
+  def effective_bootstrap_custom_data_confirm?
+    (page.evaluate_script('$.rails.effective_bootstrap_custom_data_confirm') rescue nil) == true
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header

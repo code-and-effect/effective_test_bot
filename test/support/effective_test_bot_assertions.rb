@@ -117,7 +117,7 @@ module EffectiveTestBotAssertions
   end
 
   def assert_no_js_errors(message: nil, strict: false)
-    error = page.driver.browser.manage.logs.get(:browser).first # headless_chrome
+    error = (page.driver.browser.manage.logs.get(:browser).first rescue '') # headless_chrome
 
     if strict == false
       return if error.to_s.include?('Failed to load resource')

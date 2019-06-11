@@ -178,7 +178,7 @@ module EffectiveTestBotFormFiller
 
     if field.all('option:enabled').length > 0 && value != :unselect
       Array(value).each do |value|
-        field.select(value, match: :first, disabled: false)
+        field.select(value.to_s, match: :first, disabled: false)
       end
     end
 
