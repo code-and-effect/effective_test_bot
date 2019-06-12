@@ -135,19 +135,35 @@ module EffectiveTestBotFormFaker
   private
 
   def fill_value_for_field(fills, attributes, value, field_name)
-    return if fills.blank? || (attributes.blank? && value.blank?)
+    return nil if fills.blank? || (attributes.blank? && value.blank?)
 
+    fill = nil
+
+    # Match by attributes
     key = nil
+
     attributes.reverse_each do |name|  # match last_name, then something_attributes.last_name, then user.something_attributes.last_name
       key = (key.present? ? "#{name}.#{key}" : name) # builds up the string as we go along
 
-      return :unselect if field_name == 'select' && fills.key?(key) && [nil, ''].include?(fills[key])
-      return fills[key].to_s if fills.key?(key)
+      if fills.key?(key)
+        fill = fills[key].to_s
+        fill = :unselect if field_name == 'select' && fills[key].blank?
+      end
+
+      break if fill.present?
     end
 
-    return fills[value] if fills.key?(value)
+    # Match by value
+    fill ||= fills[value]
 
-    nil
+    # If this is a file field, make sure the file is present at Rails.root/test/fixtures/
+    if fill.present? && field_name == 'input_file'
+      filename = (fill.to_s.include?('/') ? fill : "#{Rails.root}/test/fixtures/#{fill}")
+      raise("Warning: Unable to load fill file #{fill}. Expected file #{filename}") unless File.exists?(filename)
+      return filename
+    end
+
+    fill.presence
   end
 
   def value_for_input_select_field(field, fill_value)
