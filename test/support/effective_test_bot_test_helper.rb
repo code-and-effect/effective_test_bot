@@ -102,4 +102,12 @@ module EffectiveTestBotTestHelper
     }
   end
 
+  def tsputs(message)
+    @last_message ||= Time.zone.now
+    now = Time.zone.now
+
+    puts "[+ #{now - @last_message}] #{message}"
+    @last_message = now
+  end
+
 end
