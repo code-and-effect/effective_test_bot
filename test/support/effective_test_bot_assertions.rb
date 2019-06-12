@@ -117,7 +117,13 @@ module EffectiveTestBotAssertions
   end
 
   def assert_no_js_errors(message: nil, strict: false)
-    error = (page.driver.browser.manage.logs.get(:browser).first rescue '') # headless_chrome
+    error = ''
+
+    begin
+      error = page.driver.browser.manage.logs.get(:browser).first # headless_chrome
+    rescue NotImplementedError
+      return
+    end
 
     if strict == false
       return if error.to_s.include?('Failed to load resource')
@@ -134,14 +140,14 @@ module EffectiveTestBotAssertions
   # It ensures there are no HTML5 validation errors that would prevent the form from being submit
   # Browsers seem to only consider visible fields, so we will to
   def assert_no_html5_form_validation_errors(message: nil)
-    errors = all(':invalid', visible: true).map { |field| field['name'] }
+    errors = all(':invalid', visible: true, wait: false).map { |field| field['name'] }
     assert errors.blank?, message || "(no_html5_form_validation_errors) Unable to submit form, unexpected HTML5 validation error present on the following fields:\n#{errors.join("\n")}"
   end
 
   # Rails jquery-ujs data-disable-with
   # = f.button :submit, 'Save', data: { disable_with: 'Saving...' }
   def assert_jquery_ujs_disable_with(label = nil, message: nil)
-    submits = label.present? ? all("input[type='submit']", text: label) : all("input[type='submit']")
+    submits = label.present? ? all("input[type='submit']", text: label, wait: false) : all("input[type='submit']", wait: false)
     all_disabled_with = submits.all? { |submit| submit['data-disable-with'].present? }
 
     assert all_disabled_with, message || "(jquery_ujs_disable_with) Expected rails jquery-ujs data-disable-with to be present on #{(label || "all input[type='submit'] fields")}\nInclude it on your submit buttons by adding \"data: { disable_with: 'Saving...' }\""

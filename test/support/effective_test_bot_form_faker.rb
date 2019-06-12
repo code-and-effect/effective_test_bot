@@ -155,7 +155,7 @@ module EffectiveTestBotFormFaker
     country_code = field['name'].to_s.include?('country_code')
 
     if fill_value.present? # accept a value or text
-      field.all('option:enabled').each do |option|
+      field.all('option:enabled', wait: false).each do |option|
         if (option.text == fill_value || option.value.to_s == fill_value)
           @filled_country_fields = option.value if country_code
           return option.text
@@ -163,7 +163,7 @@ module EffectiveTestBotFormFaker
       end
     end
 
-    option = field.all('option:enabled').select { |option| option.value.present? }.sample
+    option = field.all('option:enabled', wait: false).select { |option| option.value.present? }.sample
 
     @filled_country_fields = option.try(:value) if country_code # So Postal Code can be set to a valid one
 
@@ -231,7 +231,7 @@ module EffectiveTestBotFormFaker
 
     return number if field['max'].blank?
 
-    shared_max_fields = all(selector)
+    shared_max_fields = all(selector, wait: false)
     return number if shared_max_fields.length <= 1
 
     # So there's definitely 2+ fields that share the same max, named the same

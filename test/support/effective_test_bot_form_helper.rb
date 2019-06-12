@@ -4,7 +4,7 @@ module EffectiveTestBotFormHelper
   # Intelligently fills a form with Faker based randomish input
   # Delegates the form fill logic to effective_test_bot_form_filler
   def fill_form(fills = {})
-    bootstrap_tabs = all("a[data-toggle='tab']")
+    bootstrap_tabs = all("a[data-toggle='tab']", wait: false)
 
     form_fills = HashWithIndifferentAccess.new((EffectiveTestBot.form_fills || {}).merge(fills || {}))
 
@@ -69,7 +69,7 @@ module EffectiveTestBotFormHelper
   end
 
   def clear_form
-    all('input,select,textarea').each do |field|
+    all('input,select,textarea', wait: false).each do |field|
       if field.tag_name == 'select' && field['class'].to_s.include?('select2') # effective_select
         clear_effective_select(field)
       end

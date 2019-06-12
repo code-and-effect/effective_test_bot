@@ -6,7 +6,7 @@ module EffectiveTestBotFormFiller
 
   # Fill a boostrap tabs based form
   def fill_bootstrap_tabs_form(fills = {})
-    tabs = all("a[data-toggle='tab']")
+    tabs = all("a[data-toggle='tab']", wait: false)
 
     # If there's only 1 tab, just fill it out
     (fill_form_fields(fills) and return) unless tabs.length > 1
@@ -16,7 +16,7 @@ module EffectiveTestBotFormFiller
     # Then we start at the first, and go left-to-right through all the tabs
     # clicking each one and filling any form fields found within
 
-    active_tab = all("li.active > a[data-toggle='tab']").first
+    active_tab = all("li.active > a[data-toggle='tab']", wait: false).first
 
     tab_content = if active_tab && active_tab['href'].present?
       find('div' + active_tab['href']).find(:xpath, '..')
@@ -25,7 +25,7 @@ module EffectiveTestBotFormFiller
     excluding_fields_with_parent(tab_content) { fill_form_fields(fills) }
 
     # Refresh the tabs, as they may have changed
-    tabs = all("a[data-toggle='tab']")
+    tabs = all("a[data-toggle='tab']", wait: false)
 
     # Click through each tab and fill the form inside it.
     tabs.each do |tab|
@@ -39,7 +39,7 @@ module EffectiveTestBotFormFiller
     end
 
     # If there is no visible submits, go back to the first tab
-    if all(:css, "input[type='submit']").length == 0
+    if all("input[type='submit']", wait: false).length == 0
       tabs.first.click()
       synchronize!
       save_test_bot_screenshot
@@ -55,7 +55,7 @@ module EffectiveTestBotFormFiller
 
     5.times do 
       # Support for the cocoon gem
-      fields = all('a.add_fields[data-association-insertion-template],a.has_many_add').reject { |field| seen[field_key(field)] }
+      fields = all('a.add_fields[data-association-insertion-template],a.has_many_add', wait: false).reject { |field| seen[field_key(field)] }
 
       fields.each do |field|
         seen[field_key(field)] = true
@@ -176,7 +176,7 @@ module EffectiveTestBotFormFiller
       save_test_bot_screenshot
     end
 
-    if field.all('option:enabled').length > 0 && value != :unselect
+    if field.all('option:enabled', wait: false).length > 0 && value != :unselect
       Array(value).each do |value|
         field.select(value.to_s, match: :first, disabled: false)
       end
@@ -258,7 +258,7 @@ module EffectiveTestBotFormFiller
 
   def ckeditor_text_area?(field)
     return false unless field.tag_name == 'textarea'
-    (field['class'].to_s.include?('ckeditor') || all("span[id='cke_#{field['id']}']").present?)
+    (field['class'].to_s.include?('ckeditor') || all("span[id='cke_#{field['id']}']", wait: false).present?)
   end
 
   def custom_control_input?(field) # Bootstrap 4 radios and checks
