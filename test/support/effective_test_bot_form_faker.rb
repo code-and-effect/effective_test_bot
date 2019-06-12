@@ -41,9 +41,9 @@ module EffectiveTestBotFormFaker
         end
       elsif classes.include?('numeric')
         value_for_input_numeric_field(field, "input.numeric[name$='[#{attribute}]']")
-      elsif classes.include?('email') || attribute.include?('email')
+      elsif classes.include?('email') || classes.include?('effective_email') || attribute.include?('email')
         Faker::Internet.email
-      elsif classes.include?('price') # effective_form_inputs price
+      elsif classes.include?('price') || classes.include?('effective_price')
         4.times.map { DIGITS.sample }.join('') + '.00'
       elsif classes.include?('numeric') || classes.include?('effective_number_text') || classes.include?('effective_integer') || attribute.include?('number')
         min = (Float(field['min']) rescue 1)
