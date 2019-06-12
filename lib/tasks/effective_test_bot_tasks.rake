@@ -10,7 +10,7 @@
 
 # rails test:bot:seed
 # rails test:bot:environment
-# rails test:bot:purge
+# rails test:bot:clobber
 
 # rails test:bot:tours
 # rails test:bot:tours TEST=documents
@@ -54,10 +54,10 @@ namespace :test do
     end
 
     desc 'Deletes all effective_test_bot temporary, failure and tour screenshots'
-    task :purge do
+    task :clobber do
       FileUtils.rm_rf(Rails.root + 'test/tours')
       FileUtils.rm_rf(Rails.root + 'tmp/test_bot')
-      puts "Successfully purged all effective_test_bot screenshots"
+      puts "Successfully clobbered all effective_test_bot screenshots"
     end
 
     desc 'Runs effective_test_bot environment test in tour mode'

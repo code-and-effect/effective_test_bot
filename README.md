@@ -531,8 +531,8 @@ rails test:bot:fails
 # Only runs failed tests and stops after first failure
 rails test:bot:fails
 
-# Purges all screenshots and fails
-rails test:bot:purge
+# Clobber (delete) all screenshots and fails
+rails test:bot:clobber
 ```
 
 ## Animated gifs and screenshots
@@ -584,7 +584,7 @@ To delete all tour and autosave on failure animated .gifs, run the following:
 
 ```
 # Deletes all tour and failure animated .gifs
-rails test:bot:purge
+rails test:bot:clobber
 ```
 
 As well, to enable tour mode when running the standard `rails test`:
