@@ -48,7 +48,7 @@ module EffectiveTestBotFormFiller
 
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
-  def fill_form_fields(fills = {}, debug: true)
+  def fill_form_fields(fills = {}, debug: false)
     save_test_bot_screenshot
 
     seen = {}
