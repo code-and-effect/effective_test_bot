@@ -47,9 +47,9 @@ if Rails.env.test?
     # Also enabled the crud_test #tour type tests
     #
     # You can override this default by setting an ENV or calling
-    # `rake test:bot TOUR=true` or `rake test:bot TEST=posts TOUR=verbose`
+    # `rake test:bot TOUR=true` or `rake test:bot TEST=posts TOUR=extreme`
     #
-    # Valid values are true / false / :verbose
+    # Valid values are true / false / :extreme
     config.tour_mode = false
 
     # Rmagick gem is required for animated gifs

@@ -9,12 +9,16 @@ module EffectiveTestBotScreenshotsHelper
   def save_test_bot_screenshot
     return unless EffectiveTestBot.screenshots?
     return unless page.current_path.present?
+    
     page.save_screenshot("#{current_test_temp_path}/#{current_test_screenshot_id}.png")
+    true
   end
 
   def save_test_bot_failure_gif
     return unless EffectiveTestBot.screenshots?
     return unless EffectiveTestBot.gifs?
+
+    return unless save_test_bot_screenshot
 
     Dir.mkdir(current_test_failure_path) unless File.exist?(current_test_failure_path)
     full_path = (current_test_failure_path + '/' + current_test_failure_filename)
@@ -26,12 +30,13 @@ module EffectiveTestBotScreenshotsHelper
   def save_test_bot_tour_gif
     return unless EffectiveTestBot.screenshots?
     return unless EffectiveTestBot.gifs?
+    return unless (@test_bot_screenshot_id || 0) > 0
 
     Dir.mkdir(current_test_tour_path) unless File.exist?(current_test_tour_path)
     full_path = (current_test_tour_path + '/' + current_test_tour_filename)
 
     save_test_bot_gif(full_path)
-    puts_green("    Tour .gif: #{full_path}") if EffectiveTestBot.tour_mode_verbose?
+    puts_green("    Tour .gif: #{full_path}")
   end
 
   def without_screenshots(&block)

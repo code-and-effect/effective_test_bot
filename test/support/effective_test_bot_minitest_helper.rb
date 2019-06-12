@@ -7,20 +7,15 @@ module EffectiveTestBotMinitestHelper
   def before_teardown
     super
 
-    if EffectiveTestBot.gifs? && (@test_bot_screenshot_id || 0) > 0
-      if !passed? && EffectiveTestBot.autosave_animated_gif_on_failure?
-        save_test_bot_screenshot
-        save_test_bot_failure_gif
-      end
-
-      if passed? && EffectiveTestBot.tour_mode?
-        save_test_bot_tour_gif
-      end
-    end
-
-    if passed? && !EffectiveTestBot.passed_tests[current_test_name]
+    if passed?
       EffectiveTestBot.save_passed_test(current_test_name)
+      save_test_bot_tour_gif if EffectiveTestBot.tour_mode?
     end
+
+    if !passed?
+      save_test_bot_failure_gif if EffectiveTestBot.autosave_animated_gif_on_failure?
+    end
+
   end
 
   protected

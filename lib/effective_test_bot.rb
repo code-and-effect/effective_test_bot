@@ -95,7 +95,7 @@ module EffectiveTestBot
 
   def self.tour_mode?
     if ENV['TOUR'].present?
-      ['true', 'extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
+      ENV['TOUR'].to_s != 'false'
     else
       screenshots? && (tour_mode != false)
     end
@@ -110,14 +110,6 @@ module EffectiveTestBot
     end
   end
 
-  def self.tour_mode_verbose?
-    if ENV['TOUR'].present?
-      ['true', 'extreme', 'verbose', 'debug'].include?(ENV['TOUR'].to_s.downcase)
-    else
-      screenshots? && ['extreme', 'verbose', 'debug'].include?(tour_mode.to_s)
-    end
-  end
-
   def self.passed_tests
     @@passed_tests ||= load_passed_tests
   end
@@ -129,8 +121,9 @@ module EffectiveTestBot
   end
 
   def self.save_passed_test(name)
-    EffectiveTestBot.passed_tests[name] = true
+    return if EffectiveTestBot.passed_tests[name] == true
 
+    EffectiveTestBot.passed_tests[name] = true
     Dir.mkdir(passed_tests_path) unless File.exist?(passed_tests_path)
     File.open(passed_tests_filename, 'w') { |file| passed_tests.each { |test_name, _| file.puts(test_name) } }
   end
