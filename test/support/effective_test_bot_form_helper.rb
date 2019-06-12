@@ -70,15 +70,16 @@ module EffectiveTestBotFormHelper
 
   def clear_form
     all('input,select,textarea', wait: false).each do |field|
-      if field.tag_name == 'select' && field['class'].to_s.include?('select2') # effective_select
+      if effective_select_input?(field)
         clear_effective_select(field)
+      elsif effective_date_input?(field)
+        field.set('')
+        close_effective_date_time_picker(field)
+      else
+        field.set('')
       end
 
-      begin
-        field.set('')
-        close_effective_date_time_picker(field) if field['class'].to_s.include?('effective_date')
-        save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme?
-      rescue => e; end
+      save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme?
     end
 
     true

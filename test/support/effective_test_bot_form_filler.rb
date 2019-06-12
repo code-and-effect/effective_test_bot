@@ -48,7 +48,7 @@ module EffectiveTestBotFormFiller
 
   # Only fills in visible fields
   # fill_form(:email => 'somethign@soneone.com', :password => 'blahblah', 'user.last_name' => 'hlwerewr')
-  def fill_form_fields(fills = {}, debug: false)
+  def fill_form_fields(fills = {}, debug: true)
     save_test_bot_screenshot
 
     seen = {}
@@ -108,7 +108,7 @@ module EffectiveTestBotFormFiller
         when 'select', 'select_select-one', 'select_select-multiple'
           fill_input_select(field, value)
         when 'input_file'
-          fill_input_file(file, value)
+          fill_input_file(field, value)
         when 'input_submit', 'input_search', 'input_button'
           skip_field_screenshot = true # Do nothing
         else
@@ -171,7 +171,7 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_select(field, value)
-    if EffectiveTestBot.tour_mode_extreme? && field['class'].to_s.include?('select2') # select2
+    if EffectiveTestBot.tour_mode_extreme? && select2_input?(field)
       try_script "$('select##{field['id']}').select2('open')"
       save_test_bot_screenshot
     end
@@ -182,9 +182,7 @@ module EffectiveTestBotFormFiller
       end
     end
 
-    if field['class'].to_s.include?('select2')
-      try_script "$('select##{field['id']}').select2('close')"
-    end
+    close_effective_select(field)
   end
 
   def fill_input_file(field, value)
@@ -244,7 +242,18 @@ module EffectiveTestBotFormFiller
   end
 
   def clear_effective_select(field)
+    return unless effective_select_input?(field)
     try_script "$('select##{field['id']}').val('').trigger('change.select2')"
+  end
+
+  def close_effective_select(field)
+    return unless effective_select_input?(field)
+    try_script "$('select##{field['id']}').select2('close')"
+  end
+
+  def close_effective_date_time_picker(field)
+    return unless effective_date_input?(field)
+    # TODO
   end
 
   private
@@ -263,6 +272,14 @@ module EffectiveTestBotFormFiller
 
   def custom_control_input?(field) # Bootstrap 4 radios and checks
     field['class'].to_s.include?('custom-control-input')
+  end
+
+  def effective_date_input?(field)
+    field['class'].to_s.include?('effective_date')
+  end
+
+  def effective_select_input?(field)
+    field['class'].to_s.include?('select2') || field['class'].to_s.include?('effective_select')
   end
 
   def skip_form_field?(field)
