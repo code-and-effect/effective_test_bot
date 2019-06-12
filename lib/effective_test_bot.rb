@@ -125,7 +125,7 @@ module EffectiveTestBot
 
     EffectiveTestBot.passed_tests[name] = true
     Dir.mkdir(passed_tests_path) unless File.exist?(passed_tests_path)
-    File.open(passed_tests_filename, 'w') { |file| passed_tests.each { |test_name, _| file.puts(test_name) } }
+    File.open(passed_tests_filename, 'a') { |file| file.puts(name) }
   end
 
   private
