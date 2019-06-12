@@ -42,7 +42,7 @@ module TestBotable
           raise 'expected resource to be a Class or Instance or String' unless obj.kind_of?(Class) || obj.kind_of?(ActiveRecord::Base) || obj.kind_of?(String)
 
           if obj.kind_of?(String) # Let's assume this is a controller, 'admin/jobs', or just 'jobs', or 'jobs_controller'
-            obj.sub!('_controller', '')
+            obj = obj.sub('_controller', '')
 
             (*namespace, klass) = obj.split('/')
             namespace = Array(namespace).join('/').presence
