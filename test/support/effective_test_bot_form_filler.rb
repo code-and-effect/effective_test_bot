@@ -278,6 +278,10 @@ module EffectiveTestBotFormFiller
     field['class'].to_s.include?('effective_date')
   end
 
+  def file_input?(field)
+    field['type'] == 'file'
+  end
+
   def effective_select_input?(field)
     field['class'].to_s.include?('select2') || field['class'].to_s.include?('effective_select')
   end

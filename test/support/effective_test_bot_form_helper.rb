@@ -75,6 +75,8 @@ module EffectiveTestBotFormHelper
       elsif effective_date_input?(field)
         field.set('')
         close_effective_date_time_picker(field)
+      elsif file_input?(field)
+        # Nothing
       else
         field.set('')
       end
