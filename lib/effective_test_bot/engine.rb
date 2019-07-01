@@ -39,14 +39,5 @@ module EffectiveTestBot
       end
     end
 
-    # Provide the seeds DSL in Ac
-    initializer 'effective_test_bot.test_case' do |app|
-      if Rails.env.test?
-        ActiveSupport.on_load :active_record do
-          ActiveSupport::TestCase.send :include, TestSeedable::Seed
-        end
-      end
-    end
-
   end
 end

@@ -53,7 +53,7 @@ module EffectiveTestBotFormFiller
 
     seen = {}
 
-    5.times do 
+    5.times do
       # Support for the cocoon gem
       fields = all('a.add_fields[data-association-insertion-template],a.has_many_add', wait: false).reject { |field| seen[field_key(field)] }
 
@@ -87,7 +87,7 @@ module EffectiveTestBotFormFiller
         value = faker_value_for_field(field, fills)
 
         if debug
-          puts " -> FILLING: #{value}" 
+          puts " -> FILLING: #{value}"
         end
 
         field_name = [field.tag_name, field['type']].compact.join('_')
@@ -141,7 +141,7 @@ module EffectiveTestBotFormFiller
 
   def fill_input_checkbox(field, value)
     return if value.nil?
-    
+
     begin
       field.set(value)
     rescue => e
@@ -294,7 +294,7 @@ module EffectiveTestBotFormFiller
     field_id.start_with?('datatable_') ||
     field_id.start_with?('filters_scope_') ||
     field_id.start_with?('filters_') && field['name'].blank? ||
-    field.disabled? ||
+    (field.disabled? rescue true) || # Selenium::WebDriver::Error::StaleElementReferenceError: stale element reference: element is not attached to the page document
     (!field.visible? && !ckeditor_text_area?(field) && !custom_control_input?(field)) ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
@@ -305,7 +305,7 @@ module EffectiveTestBotFormFiller
 
     [
       field['name'].presence,
-      ("##{field['id']}" if field['id'].present?), 
+      ("##{field['id']}" if field['id'].present?),
       field_name,
       (".#{field['class'].split(' ').join('.')}" if field['class'].present?)
     ].compact.join(' ')
