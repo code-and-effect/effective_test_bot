@@ -13,7 +13,7 @@ module EffectiveTestBotFormHelper
     else
       fill_form_fields(form_fills)
     end
-    
+
     true
   end
 
@@ -106,7 +106,7 @@ module EffectiveTestBotFormHelper
 
     submit.click
 
-    if submit['data-confirm'] 
+    if submit['data-confirm']
       effective_bootstrap_custom_data_confirm? ? submit.click : page.accept_alert
     end
 

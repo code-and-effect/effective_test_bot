@@ -136,6 +136,7 @@ module EffectiveTestBotFormFiller
 
   def fill_input_date(field, value)
     field.set(value)
+    try_script "$('input##{field['id']}').data('DateTimePicker').date('#{value}')"
     try_script "$('input##{field['id']}').data('DateTimePicker').hide()"
   end
 
