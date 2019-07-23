@@ -141,19 +141,25 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_checkbox(field, value)
-    return if value.nil?
-    return unless value == true
+    return if [nil, false].include?(value)
 
-    label = all("label[for='#{field['id']}']", wait: false).first
-    label.present? ? label.click() : field.set(value)
+    begin
+      field.set(value)
+    rescue => e
+      label = all("label[for='#{field['id']}']", wait: false).first
+      label.click() if label
+    end
   end
 
   def fill_input_radio(field, value)
-    return if value.nil?
-    return unless value == true
+    return if [nil, false].include?(value)
 
-    label = all("label[for='#{field['id']}']", wait: false).first
-    label.present? ? label.click() : field.set(value)
+    begin
+      field.set(value)
+    rescue => e
+      label = all("label[for='#{field['id']}']", wait: false).first
+      label.click() if label
+    end
   end
 
   def fill_input_text_area(field, value)
