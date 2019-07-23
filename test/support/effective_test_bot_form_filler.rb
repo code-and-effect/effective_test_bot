@@ -115,7 +115,7 @@ module EffectiveTestBotFormFiller
           raise "unsupported field type #{field_name}"
         end
 
-        save_test_bot_screenshot if EffectiveTestBot.tour_mode_extreme? && !skip_field_screenshot
+        save_test_bot_screenshot if (debug || EffectiveTestBot.tour_mode_extreme?) && !skip_field_screenshot
       end
 
       wait_for_ajax
@@ -142,24 +142,18 @@ module EffectiveTestBotFormFiller
 
   def fill_input_checkbox(field, value)
     return if value.nil?
+    return unless value == true
 
-    begin
-      field.set(value)
-    rescue => e
-      label = first(:label, for: field['id'])
-      label.click if label
-    end
+    label = all("label[for='#{field['id']}']", wait: false).first
+    label.present? ? label.click() : field.set(value)
   end
 
   def fill_input_radio(field, value)
     return if value.nil?
+    return unless value == true
 
-    begin
-      field.set(value)
-    rescue => e
-      label = first(:label, for: field['id'])
-      label.click if label
-    end
+    label = all("label[for='#{field['id']}']", wait: false).first
+    label.present? ? label.click() : field.set(value)
   end
 
   def fill_input_text_area(field, value)
