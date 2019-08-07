@@ -29,15 +29,15 @@ module EffectiveTestBotFormFaker
 
       if classes.include?('date') # Let's assume this is a date input.
         if attribute.include?('end') || attribute.include?('expire') # Make sure end dates are after start dates
-          Faker::Date.forward(365).strftime('%Y-%m-%d')
+          Faker::Date.forward(days: 365).strftime('%Y-%m-%d')
         else
-          Faker::Date.backward(365).strftime('%Y-%m-%d')
+          Faker::Date.backward(days: 365).strftime('%Y-%m-%d')
         end
       elsif classes.include?('datetime')
         if attribute.include?('end') || attribute.include?('expire')
-          Faker::Date.forward(365).strftime('%Y-%m-%d %H:%m')
+          Faker::Date.forward(days: 365).strftime('%Y-%m-%d %H:%m')
         else
-          Faker::Date.backward(365).strftime('%Y-%m-%d %H:%m')
+          Faker::Date.backward(days: 365).strftime('%Y-%m-%d %H:%m')
         end
       elsif classes.include?('numeric')
         value_for_input_numeric_field(field, "input.numeric[name$='[#{attribute}]']")
@@ -77,9 +77,9 @@ module EffectiveTestBotFormFaker
       elsif attribute.include?('social_insurance_number') || attributes.include?('sin_number')
         "#{DIGITS.sample(3).join} #{DIGITS.sample(3).join} #{DIGITS.sample(3).join}"
       elsif attribute.include?('slug')
-        Faker::Lorem.words(3).join(' ').parameterize
+        Faker::Lorem.words.join(' ').parameterize
       else
-        Faker::Lorem.words(3).join(' ').capitalize
+        Faker::Lorem.words.join(' ').capitalize
       end
 
     when 'input_checkbox'
