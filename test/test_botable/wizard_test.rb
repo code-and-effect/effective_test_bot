@@ -24,9 +24,9 @@ module WizardTest
       last = (paths[index-1] == page.current_path)
 
       if defined?(within_form)
-        within(within_form) { fill_form; submit_form(last: last); }
+        within(within_form) { fill_form(defined?(:fills) ? fills : {}); submit_form(last: last); }
       else
-        fill_form
+        fill_form(defined?(:fills) ? fills : {})
         submit_form(last: last)
       end
 
