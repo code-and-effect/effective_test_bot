@@ -296,7 +296,7 @@ module EffectiveTestBotFormFiller
     field_id.start_with?('filters_scope_') ||
     field_id.start_with?('filters_') && field['name'].blank? ||
     (field.disabled? rescue true) || # Selenium::WebDriver::Error::StaleElementReferenceError: stale element reference: element is not attached to the page document
-    (!field.visible? && !ckeditor_text_area?(field) && !custom_control_input?(field)) ||
+    (!field.visible? && !ckeditor_text_area?(field) && !custom_control_input?(field) && !file_input?(field)) ||
     ['true', true, 1].include?(field['data-test-bot-skip']) ||
     (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
   end
