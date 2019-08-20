@@ -104,10 +104,13 @@ module EffectiveTestBotFormHelper
       puts "Clicking: <#{submit.tag_name} id='#{submit['id']}' class='#{submit['class']}' name='#{submit['name']}' value='#{submit['value']}' href='#{submit['href']}' />"
     end
 
-    submit.click
-
-    if submit['data-confirm']
-      effective_bootstrap_custom_data_confirm? ? submit.click : page.accept_alert
+    if submit['data-confirm'] && effective_bootstrap_custom_data_confirm?
+      submit.click
+      submit.click # Twice
+    elsif submit['data-confirm']
+      page.accept_confirm { submit.click }
+    else
+      submit.click
     end
 
     synchronize!
