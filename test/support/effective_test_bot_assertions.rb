@@ -140,7 +140,8 @@ module EffectiveTestBotAssertions
   # It ensures there are no HTML5 validation errors that would prevent the form from being submit
   # Browsers seem to only consider visible fields, so we will to
   def assert_no_html5_form_validation_errors(message: nil)
-    errors = all(':invalid', visible: true, wait: false).map { |field| field['name'] }
+    errors = all(':invalid', visible: true, wait: false).map { |field| field['name'].presence }.compact
+
     assert errors.blank?, message || "(no_html5_form_validation_errors) Unable to submit form, unexpected HTML5 validation error present on the following fields:\n#{errors.join("\n")}"
   end
 
