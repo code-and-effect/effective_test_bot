@@ -1,22 +1,17 @@
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
-require 'rails/test_help'
 
-require 'minitest/fail_fast' if EffectiveTestBot.fail_fast?
-require 'minitest/reporters'
+require 'rails/test_help'
 require 'minitest/spec'
+require 'minitest/reporters'
+require 'minitest/fail_fast' if EffectiveTestBot.fail_fast?
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
-  parallelize(workers: :number_of_processors) if respond_to?(:parallelize)
+  # parallelize(workers: :number_of_processors) if respond_to?(:parallelize)
 
-  # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-  fixtures :all
-
-  # Loads your db/seeds.rb and test/fixtures/seeds.rb before all tests run. Valid options are :all :db and :test
-  seeds :all
-
-  extend Minitest::Spec::DSL # For the let syntax
+  fixtures :all               # Loads all fixtures in test/fixtures/*.yml
+  extend Minitest::Spec::DSL  # For the let syntax
 end
 
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
@@ -24,13 +19,15 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 Rails.backtrace_cleaner.remove_silencers!
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /minitest/ }
 Rails.backtrace_cleaner.add_silencer { |line| line =~ /parallelization/ }
+#Rails.backtrace_cleaner.add_silencer { |line| line =~ /effective_test_bot/ }
+
+setup = ['db:schema:load', 'db:fixtures:load', 'db:seed', 'test:load_fixture_seeds'].join(' ')
+system("rails #{setup} RAILS_ENV=test")
 
 # rails test
 # rails test:system
 # rails test:bot:environment
 # rails test:bot
-# rails test:bot:fails
-# rails test:bot:fail
 
 # rails test:system TOUR=true
 # rails test:bot TEST=posts#index
