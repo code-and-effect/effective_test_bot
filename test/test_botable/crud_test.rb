@@ -228,7 +228,7 @@ module CrudTest
 
     after = { count: resource_class.count, archived: (resource_class.where(id: resource.id).first.try(:archived) rescue nil) }
 
-    if resource.respond_to?(:archived)
+    if resource.respond_to?(:archived) && before[:count] == after[:count]
       assert_equal(true, after[:archived], "Expected @#{resource_name}.archived? to be true")
     else
       assert_equal before[:count]-1, after[:count], "Expected: #{resource_class}.count to decrement by 1"
