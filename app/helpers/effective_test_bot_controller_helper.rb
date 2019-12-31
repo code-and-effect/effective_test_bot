@@ -5,12 +5,12 @@ module EffectiveTestBotControllerHelper
   def assign_test_bot_payload(payload = {})
     payload.merge!({ response_code: response.code, assigns: test_bot_view_assigns, flash: flash.to_hash })
 
-    if response.content_type == 'text/html' && response.body[BODY_TAG].present?
+    if response.content_type.to_s.start_with?('text/html') && response.body[BODY_TAG].present?
       payload = view_context.content_tag(:script, build_payload_javascript(payload), id: 'test_bot_payload')
 
       split = response.body.split(BODY_TAG)
       response.body = "#{split.first}#{payload}#{BODY_TAG}#{split.last if split.size > 1}"
-    elsif response.content_type == 'text/javascript' && response.body.present?
+    elsif response.content_type.to_s.start_with?('text/javascript') && response.body.present?
       payload = build_payload_javascript(payload)
 
       response.body = "#{response.body};#{payload}"
