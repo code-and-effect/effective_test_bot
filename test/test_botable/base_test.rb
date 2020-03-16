@@ -70,7 +70,13 @@ module BaseTest
         assert_page_status
       end
 
-      obj = resource_class.last
+      obj = resource_class.all.last
+
+      if obj.blank?
+        visit(new_path)
+        obj = resource_class.all.last
+      end
+
       assert obj.present?, "TestBotError: Failed to create a resource after submitting form. Errors: #{(assigns[resource_name] || {})['errors']}\n#{hint}."
 
       visit root_path

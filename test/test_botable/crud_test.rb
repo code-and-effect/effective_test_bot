@@ -17,7 +17,8 @@ module CrudTest
   end
 
   def test_bot_index_test
-    sign_in(user) and (resource = (find_or_create_resource! rescue nil))
+    sign_in(user)
+    resource = (find_or_create_resource! rescue nil)
 
     visit resources_path
     save_test_bot_screenshot
