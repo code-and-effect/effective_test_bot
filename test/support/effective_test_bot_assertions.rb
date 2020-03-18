@@ -200,6 +200,16 @@ module EffectiveTestBotAssertions
     assert errors.present?, message || "(assigns_errors) Expected @#{key}.errors to be present"
   end
 
+  def assert_no_email(&block)
+    before = ActionMailer::Base.deliveries.map { |mail| {to: mail.to, subject: mail.subject} }
+    yield
+    after = ActionMailer::Base.deliveries.map { |mail| {to: mail.to, subject: mail.subject} }
+
+    diff = (after - before)
+
+    assert diff.blank?, "(assert_no_email) #{diff.length} unexpected emails delivered: #{diff}"
+  end
+
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
