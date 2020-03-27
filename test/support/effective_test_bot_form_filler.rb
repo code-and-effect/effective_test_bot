@@ -35,7 +35,8 @@ module EffectiveTestBotFormFiller
       synchronize!
       save_test_bot_screenshot
 
-      within('div' + tab['href']) { fill_form_fields(fills) }
+      tab_href = '#' + tab['href'].to_s.split('#').last
+      within('div' + tab_href) { fill_form_fields(fills) }
     end
 
     # If there is no visible submits, go back to the first tab
