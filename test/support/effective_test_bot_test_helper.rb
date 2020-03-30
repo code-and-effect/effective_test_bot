@@ -8,7 +8,7 @@ module EffectiveTestBotTestHelper
   # https://gist.github.com/josevalim/470808#gistcomment-1268491
   def wait_for_ajax
     begin
-      Timeout.timeout(Capybara.default_max_wait_time) do
+      Timeout.timeout(Capybara.default_max_wait_time * 2) do
         loop until finished_all_ajax_requests?
       end
     rescue => e
