@@ -127,7 +127,11 @@ module EffectiveTestBotAssertions
 
     if strict == false
       return if error.to_s.include?('Failed to load resource')
-      return if error.to_s.include?('WARNING')
+
+      if error.to_s.include?('WARNING')
+        puts "(no_js_errors) Unexpected javascript warning (use strict=true to fail here):\n#{error}"
+        return
+      end
     end
 
     assert error.blank?, message || "(no_js_errors) Unexpected javascript error:\n#{error}"
