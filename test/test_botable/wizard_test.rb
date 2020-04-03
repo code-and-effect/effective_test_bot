@@ -14,6 +14,7 @@ module WizardTest
     end
 
     paths = []
+
     0.upto(50) do |index|   # Can only test wizards 51 steps long
       assert_page_normal
 
@@ -23,10 +24,12 @@ module WizardTest
       # to click the last submit button on the page
       last = (paths[index-1] == page.current_path)
 
-      if defined?(within_form)
-        within(within_form) { fill_form(defined?(:fills) ? fills : {}); submit_form(last: last); }
+      fills = (defined?(:fills) && respond_to?(:fills)) ? fills : {}
+
+      if defined?(within_form) && respond_to?(:within_form)
+        within(within_form) { fill_form(fills); submit_form(last: last); }
       else
-        fill_form(defined?(:fills) ? fills : {})
+        fill_form(fills)
         submit_form(last: last)
       end
 
@@ -38,7 +41,7 @@ module WizardTest
       end
 
       # Keep going till there's no more submit buttons
-      break if all("input[type='submit']").blank?
+      break if all("[type='submit']").blank?
 
       paths << page.current_path.to_s
     end
