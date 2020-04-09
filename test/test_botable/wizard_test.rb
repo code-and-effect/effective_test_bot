@@ -24,7 +24,7 @@ module WizardTest
       # to click the last submit button on the page
       last = (paths[index-1] == page.current_path)
 
-      fills = (defined?(:fills) && respond_to?(:fills)) ? fills : {}
+      fills = (defined?(:fills) && respond_to?(:fills)) ? self.fills : {}
 
       if defined?(within_form) && respond_to?(:within_form)
         within(within_form) { fill_form(fills); submit_form(last: last); }
