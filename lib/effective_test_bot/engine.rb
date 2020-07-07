@@ -2,10 +2,17 @@ module EffectiveTestBot
   class Engine < ::Rails::Engine
     engine_name 'effective_test_bot'
 
-    config.autoload_paths += Dir["#{config.root}/test/test_botable/", "#{config.root}/test/concerns/", "#{config.root}/test/support/"]
-    # config.autoload_paths += Dir["#{config.root}/test/test_botable/**/"]
-    # config.autoload_paths += Dir["#{config.root}/test/concerns/**/"]
-    # config.autoload_paths += Dir["#{config.root}/test/support/**/"]
+    config.autoload_paths += Dir[
+      "#{config.root}/test/test_botable/", 
+      "#{config.root}/test/concerns/", 
+      "#{config.root}/test/support/"
+    ]
+
+    config.eager_load_paths += Dir[
+      "#{config.root}/test/test_botable/", 
+      "#{config.root}/test/concerns/", 
+      "#{config.root}/test/support/"
+    ]
 
     # Set up our default configuration options.
     initializer 'effective_test_bot.defaults', before: :load_config_initializers do |app|
