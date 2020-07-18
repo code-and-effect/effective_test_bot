@@ -218,7 +218,15 @@ module EffectiveTestBotAssertions
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
-  def assert_email(action = nil, to: nil, from: nil, subject: nil, body: nil, message: nil)
+  def assert_email(action = nil, to: nil, from: nil, subject: nil, body: nil, message: nil, &block)
+    if block_given?
+      before = ActionMailer::Base.deliveries.length
+      yield
+      after = ActionMailer::Base.deliveries.length
+
+      assert (after - before == 1), "(assert_email) Expected one email to have been delivered"
+    end
+
     if (action || to || from || subject || body).nil?
       assert ActionMailer::Base.deliveries.present?, message || "(assert_email) Expected email to have been delivered"
       return
