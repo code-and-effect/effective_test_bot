@@ -19,7 +19,8 @@ module EffectiveTestBotFormFiller
     active_tab = all("li.active > a[data-toggle='tab']", wait: false).first
 
     tab_content = if active_tab && active_tab['href'].present?
-      find('div' + active_tab['href']).find(:xpath, '..')
+      tab_href = '#' + active_tab['href'].split('#').last
+      find('div' + tab_href).find(:xpath, '..')
     end
 
     excluding_fields_with_parent(tab_content) { fill_form_fields(fills) }
