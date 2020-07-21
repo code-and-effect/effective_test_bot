@@ -30,10 +30,6 @@ module EffectiveTestBotTestHelper
     end
   end
 
-  def with_time_travel(date, &block)
-    travel_to(date) { yield }
-  end
-
   def finished_all_ajax_requests?
     ajax_request_count = page.evaluate_script('jQuery.active')
     ajax_request_count.blank? || ajax_request_count.zero?
