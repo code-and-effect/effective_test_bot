@@ -66,7 +66,7 @@ module EffectiveTestBot
   end
 
   def self.gifs?
-    image_processing_class.present?
+    screenshots? && image_processing_class.present?
   end
 
   def self.image_processing_class
@@ -97,7 +97,7 @@ module EffectiveTestBot
     if ENV['TOUR'].present?
       ENV['TOUR'].to_s != 'false'
     else
-      screenshots? && (tour_mode != false)
+      gifs? && (tour_mode != false)
     end
   end
 
@@ -106,7 +106,7 @@ module EffectiveTestBot
     if ENV['TOUR'].present?
       ['extreme', 'debug'].include?(ENV['TOUR'].to_s.downcase)
     else
-      screenshots? && ['extreme', 'debug'].include?(tour_mode.to_s)
+      gifs? && ['extreme', 'debug'].include?(tour_mode.to_s)
     end
   end
 

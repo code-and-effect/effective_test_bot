@@ -7,17 +7,15 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def save_test_bot_screenshot
-    return unless EffectiveTestBot.screenshots?
+    return unless EffectiveTestBot.gifs?
     return unless page.current_path.present?
-    
+
     page.save_screenshot("#{current_test_temp_path}/#{current_test_screenshot_id}.png")
     true
   end
 
   def save_test_bot_failure_gif
-    return unless EffectiveTestBot.screenshots?
     return unless EffectiveTestBot.gifs?
-
     return unless save_test_bot_screenshot
 
     Dir.mkdir(current_test_failure_path) unless File.exist?(current_test_failure_path)
@@ -28,7 +26,6 @@ module EffectiveTestBotScreenshotsHelper
   end
 
   def save_test_bot_tour_gif
-    return unless EffectiveTestBot.screenshots?
     return unless EffectiveTestBot.gifs?
     return unless (@test_bot_screenshot_id || 0) > 0
 
@@ -42,9 +39,12 @@ module EffectiveTestBotScreenshotsHelper
   def without_screenshots(&block)
     original = EffectiveTestBot.screenshots
 
-    EffectiveTestBot.screenshots = false
-    yield
-    EffectiveTestBot.screenshots = original
+    begin
+      EffectiveTestBot.screenshots = false
+      yield
+    ensure
+      EffectiveTestBot.screenshots = original
+    end
   end
 
   protected
