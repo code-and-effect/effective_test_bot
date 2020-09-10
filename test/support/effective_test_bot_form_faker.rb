@@ -5,6 +5,8 @@ require 'faker'
 module EffectiveTestBotFormFaker
   DIGITS = ('1'..'9').to_a
   LETTERS = %w(A B C E G H J K L M N P R S T V X Y) # valid letters of a canadian postal code, eh?
+  TRUE_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE', 'on', 'ON']
+  FALSE_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF']
 
   # Generates an appropriately pseudo-random value for the given field
   # Pass in a Hash of fills to define pre-selected values
@@ -269,19 +271,11 @@ module EffectiveTestBotFormFaker
   end
 
   def truthy?(value)
-    if defined?(::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES)  # Rails 5
-      ::ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(value)
-    else
-      ActiveRecord::Type::Boolean.new.cast(value)
-    end
+    TRUE_VALUES.include?(value)
   end
 
   def falsey?(value)
-    if defined?(::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES)  # Rails 5
-      ::ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.include?(value)
-    else
-      ::ActiveRecord::Type::Boolean.new.cast(value) == false
-    end
+    FALSE_VALUES.include?(value)
   end
 
 end
