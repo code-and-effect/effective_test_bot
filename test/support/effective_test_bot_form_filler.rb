@@ -130,6 +130,7 @@ module EffectiveTestBotFormFiller
     @filled_country_fields = nil
 
     save_test_bot_screenshot
+    true
   end
 
   def fill_input_text(field, value)
