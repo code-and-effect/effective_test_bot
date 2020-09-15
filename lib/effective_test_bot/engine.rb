@@ -3,14 +3,14 @@ module EffectiveTestBot
     engine_name 'effective_test_bot'
 
     config.autoload_paths += Dir[
-      "#{config.root}/test/test_botable/", 
-      "#{config.root}/test/concerns/", 
+      "#{config.root}/test/test_botable/",
+      "#{config.root}/test/concerns/",
       "#{config.root}/test/support/"
     ]
 
     config.eager_load_paths += Dir[
-      "#{config.root}/test/test_botable/", 
-      "#{config.root}/test/concerns/", 
+      "#{config.root}/test/test_botable/",
+      "#{config.root}/test/concerns/",
       "#{config.root}/test/support/"
     ]
 

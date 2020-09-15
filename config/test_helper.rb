@@ -2,6 +2,7 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 
 require 'rails/test_help'
+require 'minitest/mock'
 require 'minitest/spec'
 require 'minitest/reporters'
 require 'minitest/fail_fast' if EffectiveTestBot.fail_fast?
@@ -9,6 +10,8 @@ require 'minitest/fail_fast' if EffectiveTestBot.fail_fast?
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
   # parallelize(workers: :number_of_processors) if respond_to?(:parallelize)
+
+  include EffectiveTestBot::DSL
 
   fixtures :all               # Loads all fixtures in test/fixtures/*.yml
   extend Minitest::Spec::DSL  # For the let syntax

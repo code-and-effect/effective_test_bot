@@ -3,6 +3,7 @@ module EffectiveTestBot
     extend ActiveSupport::Concern
 
     included do
+      # test/support/
       include EffectiveTestBotAssertions
       include EffectiveTestBotFormFaker
       include EffectiveTestBotFormFiller
@@ -11,6 +12,10 @@ module EffectiveTestBot
       include EffectiveTestBotMinitestHelper
       include EffectiveTestBotScreenshotsHelper
       include EffectiveTestBotTestHelper
+
+      class BasicObject
+        include EffectiveTestBotMocks
+      end
 
       # test/test_botable/
       include BaseTest

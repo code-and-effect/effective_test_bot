@@ -34,4 +34,3 @@ Gem::Specification.new do |s|
   # Same image processing library as Active Storage variant
   # s.add_dependency 'image_processing'
 end
-
