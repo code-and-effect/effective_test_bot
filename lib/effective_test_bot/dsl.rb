@@ -13,9 +13,7 @@ module EffectiveTestBot
       include EffectiveTestBotScreenshotsHelper
       include EffectiveTestBotTestHelper
 
-      class BasicObject
-        include EffectiveTestBotMocks
-      end
+      BasicObject.send :include, EffectiveTestBotMocks
 
       # test/test_botable/
       include BaseTest
