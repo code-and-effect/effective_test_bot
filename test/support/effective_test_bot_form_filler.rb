@@ -71,7 +71,9 @@ module EffectiveTestBotFormFiller
       end
 
       # Fill all fields now
-      fields = all('input,select,textarea', visible: false).reject { |field| seen[field_key(field)] }
+      fields = all('input,select,textarea', visible: false).reject do |field|
+        (seen[field_key(field)] rescue true)
+      end
 
       break unless fields.present?
 

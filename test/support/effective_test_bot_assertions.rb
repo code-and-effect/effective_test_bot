@@ -123,6 +123,8 @@ module EffectiveTestBotAssertions
       error = page.driver.browser.manage.logs.get(:browser).first # headless_chrome
     rescue NotImplementedError
       return
+    rescue => e
+      return
     end
 
     if strict == false
