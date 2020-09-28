@@ -126,6 +126,9 @@ module EffectiveTestBotFormFaker
     when 'textarea', 'textarea_textarea'
       Faker::Lorem.paragraph
 
+    when 'input_hidden'
+      Faker::Lorem.paragraph
+
     when 'input_submit', 'input_search', 'input_button'
       nil
 

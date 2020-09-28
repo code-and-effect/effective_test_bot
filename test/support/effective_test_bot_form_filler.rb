@@ -115,6 +115,8 @@ module EffectiveTestBotFormFiller
           fill_input_file(field, value)
         when 'input_submit', 'input_search', 'input_button'
           skip_field_screenshot = true # Do nothing
+        when 'input_hidden'
+          fill_action_text_input(field, value)
         else
           raise "unsupported field type #{field_name}"
         end
@@ -174,6 +176,15 @@ module EffectiveTestBotFormFiller
     else
       field.set(value)
     end
+  end
+
+  def fill_action_text_input(field, value)
+    return unless action_text_input?(field)
+
+    trix_id = field['id'].to_s.split('_trix_input_form').first
+    return unless trix_id.present?
+
+    try_script "document.querySelector(\"##{trix_id}\").editor.insertString(\"#{value}\")"
   end
 
   def fill_input_select(field, value)
@@ -276,6 +287,10 @@ module EffectiveTestBotFormFiller
     (field['class'].to_s.include?('ckeditor') || all("span[id='cke_#{field['id']}']", wait: false).present?)
   end
 
+  def action_text_input?(field)
+    field.tag_name == 'input' && field['type'] == 'hidden' && field['id'].to_s.include?('trix_input_form')
+  end
+
   def custom_control_input?(field) # Bootstrap 4 radios and checks
     field['class'].to_s.include?('custom-control-input')
   end
@@ -294,16 +309,25 @@ module EffectiveTestBotFormFiller
 
   def skip_form_field?(field)
     field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
-
     field_id = field['id'].to_s
 
-    field_id.start_with?('datatable_') ||
-    field_id.start_with?('filters_scope_') ||
-    field_id.start_with?('filters_') && field['name'].blank? ||
-    (field.disabled? rescue true) || # Selenium::WebDriver::Error::StaleElementReferenceError: stale element reference: element is not attached to the page document
-    (!field.visible? && !ckeditor_text_area?(field) && !custom_control_input?(field) && !file_input?(field)) ||
-    ['true', true, 1].include?(field['data-test-bot-skip']) ||
-    (@test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath))
+    return true if field_id.start_with?('datatable_')
+    return true if field_id.start_with?('filters_scope_')
+    return true if field_id.start_with?('filters_') && field['name'].blank?
+    return true if field['type'] == 'button'
+    return true if (field.disabled? rescue true) # Selenium::WebDriver::Error::StaleElementReferenceError: stale element reference: element is not attached to the page document
+    return true if ['true', true, 1].include?(field['data-test-bot-skip'])
+    return true if @test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath)
+
+    if !field.visible?
+      return false if ckeditor_text_area?(field)
+      return false if custom_control_input?(field)
+      return false if file_input?(field)
+      return false if action_text_input?(field)
+      return true
+    end
+
+    false
   end
 
   def field_key(field)
