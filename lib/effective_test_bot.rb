@@ -124,7 +124,11 @@ module EffectiveTestBot
     return if EffectiveTestBot.passed_tests[name] == true
 
     EffectiveTestBot.passed_tests[name] = true
-    Dir.mkdir(passed_tests_path) unless File.exist?(passed_tests_path)
+
+    # Make test pass directory
+    Dir.mkdir("#{Rails.root}/tmp") unless Dir.exist?("#{Rails.root}/tmp")
+    Dir.mkdir("#{Rails.root}/tmp/test_bot") unless Dir.exist?("#{Rails.root}/tmp/test_bot")
+
     File.open(passed_tests_filename, 'a') { |file| file.puts(name) }
   end
 
