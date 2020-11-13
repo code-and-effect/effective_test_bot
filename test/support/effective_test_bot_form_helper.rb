@@ -106,7 +106,7 @@ module EffectiveTestBotFormHelper
   # This kind of sucks, as we want to simulate mouse movements with the tour
   # Instead we manually trigger submit buttons and use the data-disable-with to
   # make the 'submit form' step look nice
-  def click_submit(label = nil, last: false, debug: false)
+  def click_submit(label = nil, last: false, synchronize: true, debug: false)
     submit = find_submit(label, last: last)
 
     if EffectiveTestBot.screenshots?
@@ -128,7 +128,7 @@ module EffectiveTestBotFormHelper
       submit.click
     end
 
-    synchronize!
+    synchronize ? synchronize! : sleep(2)
 
     save_test_bot_screenshot if EffectiveTestBot.screenshots? && page.current_path.present?
 
