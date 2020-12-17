@@ -73,7 +73,8 @@ module EffectiveTestBotTestHelper
   end
 
   def effective_bootstrap_custom_data_confirm?
-    (page.evaluate_script('$.rails.effective_bootstrap_custom_data_confirm') rescue nil) == true
+    (page.evaluate_script('$.rails.effective_bootstrap_custom_data_confirm') rescue nil) ||
+    (page.evaluate_script('window.Rails.effective_bootstrap_custom_data_confirm') rescue nil)
   end
 
   # EffectiveTestBot includes an after_filter on ApplicationController to set an http header
