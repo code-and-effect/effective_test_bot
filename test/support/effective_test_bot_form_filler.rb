@@ -37,7 +37,7 @@ module EffectiveTestBotFormFiller
       save_test_bot_screenshot
 
       tab_href = '#' + tab['href'].to_s.split('#').last
-      within('div' + tab_href) { fill_form_fields(fills) }
+      within_if('div' + tab_href) { fill_form_fields(fills) }
     end
 
     # If there is no visible submits, go back to the first tab
@@ -193,8 +193,23 @@ module EffectiveTestBotFormFiller
       save_test_bot_screenshot
     end
 
-    if field.all('option:enabled', wait: false).length > 0 && value != :unselect
-      Array(value).each do |value|
+    if value == :unselect
+      return close_effective_select(field)
+    end
+
+    if field.all('option:enabled', wait: false).length == 0
+      return close_effective_select(field)
+    end
+
+    # Must be some options
+    Array(value).each do |value|
+      option = field.all("option:enabled[value=\"#{value}\"]", wait: false).first
+      option ||= field.all('option:enabled', wait: false).find { |field| field.text == value }
+
+      if option.present?
+        option.select_option
+      else
+        # This will most likely raise an error that it cant be found
         field.select(value.to_s, match: :first, disabled: false)
       end
     end

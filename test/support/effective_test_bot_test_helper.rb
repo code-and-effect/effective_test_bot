@@ -57,7 +57,7 @@ module EffectiveTestBotTestHelper
 
   # Calls capybara within do .. end if selector is present and bool is true
   def within_if(selector, bool = true, &block)
-    (selector.present? && bool) ? within(first(selector)) { yield } : yield
+    (all(selector).length > 0 && bool) ? within(first(selector)) { yield } : yield
   end
 
   def within_each(selector, &block)
