@@ -217,6 +217,20 @@ module EffectiveTestBotAssertions
     assert diff.blank?, "(assert_no_email) #{diff.length} unexpected emails delivered: #{diff}"
   end
 
+  # assert_effective_log { click_on('download.txt') }
+  def assert_effective_log(status: nil)
+    raise('EffectiveLogging is not defined') unless defined?(EffectiveLogging)
+    raise('expected a block') unless block_given?
+
+    logs = (status.present? ? Effective::Log.where(status: status).all : Effective::Log.all)
+
+    before = logs.count
+    yield
+    after = logs.count
+
+    assert (after - before == 1), "(assert_effective_log) Expected one log to have been created"
+  end
+
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
