@@ -58,10 +58,10 @@ module EffectiveTestBotControllerHelper
       case object
       when ActiveRecord::Base
         assigns[key] = object.attributes
-        assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
+        assigns[key][:errors] = object.errors.messages.select { |_, v| v.present? } if object.errors.present?
       when (ActiveModel::Model rescue nil)
         assigns[key] = object.respond_to?(:attributes) ? object.attributes : { present_but_not_serialized: true }
-        assigns[key][:errors] = object.errors.messages.delete_if { |_, v| v.blank? } if object.errors.present?
+        assigns[key][:errors] = object.errors.messages.select { |_, v| v.present? } if object.errors.present?
       when TrueClass, FalseClass, NilClass, String, Symbol, Numeric
         assigns[key] = object
       else
