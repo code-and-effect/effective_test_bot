@@ -10,8 +10,8 @@ module EffectiveTestBotLoginHelper
   # This is currently hardcoded to use the warden login_as test helper
   def sign_in(user)
     if user.kind_of?(String)
-      login_as(User.find_by_email!(user))
-    elsif user.kind_of?(User)
+      login_as(devise_user_class.find_by_email!(user))
+    elsif user.kind_of?(devise_user_class)
       raise 'user must be persisted' unless user.persisted?
       user.reload
       login_as(user)
@@ -28,7 +28,7 @@ module EffectiveTestBotLoginHelper
   end
 
   def sign_in_manually(user_or_email, password = nil)
-    visit new_user_session_path
+    visit (respond_to?(:new_user_session_path) ? new_user_session_path : '/users/sign_in')
 
     email = (user_or_email.respond_to?(:email) ? user_or_email.email : user_or_email)
     username = (user_or_email.respond_to?(:username) ? user_or_email.username : user_or_email)
@@ -41,18 +41,23 @@ module EffectiveTestBotLoginHelper
   end
 
   def sign_up(email: Faker::Internet.email, password: Faker::Internet.password, **options)
-    visit new_user_registration_path
+    visit (respond_to?(:new_user_registration_path) ? new_user_registration_path : '/users/sign_up')
 
     within('form#new_user') do
       fill_form({email: email, password: password, password_confirmation: password}.merge(options))
       submit_novalidate_form
     end
 
-    User.find_by_email(email)
+    devise_user_class.find_by_email(email)
   end
 
   def current_user
-    User.where(id: assigns['current_user']['id']).first if (assigns['current_user'] && assigns['current_user']['id'])
+    return nil unless (assigns['current_user'] && assigns['current_user']['id'])
+    devise_user_class.where(id: assigns['current_user']['id']).first
+  end
+
+  def devise_user_class
+    User
   end
 
 end
