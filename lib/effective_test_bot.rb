@@ -5,26 +5,23 @@ require 'effective_test_bot/middleware'
 require 'effective_test_bot/version'
 
 module EffectiveTestBot
-  mattr_accessor :user
-  mattr_accessor :except
-  mattr_accessor :only
-  mattr_accessor :fail_fast
-  mattr_accessor :form_fills
-  mattr_accessor :screenshots
-  mattr_accessor :autosave_animated_gif_on_failure
-  mattr_accessor :tour_mode
-  mattr_accessor :tour_mode_extreme
-  mattr_accessor :animated_gif_delay
-  mattr_accessor :animated_gif_background_color
-  mattr_accessor :image_processing_class_name
-  mattr_accessor :backtrace_lines
-  mattr_accessor :silence_skipped_routes
+  mattr_accessor :passed_tests
 
-  mattr_accessor :passed_tests # This isn't a config variable.
-
-  def self.setup
-    yield self
+  def self.config_keys
+    [
+      :user,
+      :except, :only,
+      :fail_fast,
+      :form_fills,
+      :screenshots, :autosave_animated_gif_on_failure,
+      :tour_mode, :tour_mode_extreme,
+      :animated_gif_delay, :animated_gif_background_color,
+      :image_processing_class_name,
+      :backtrace_lines, :silence_skipped_routes
+    ]
   end
+
+  include EffectiveGem
 
   # Test could be something like "crud_test", "crud_test (documents#new)", "documents", documents#new"
   # Assertion will be page_title, or flash
