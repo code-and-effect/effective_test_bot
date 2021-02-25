@@ -1,3 +1,3 @@
 module EffectiveTestBot
-  VERSION = '1.1.36'.freeze
+  VERSION = '1.2.0'.freeze
 end
