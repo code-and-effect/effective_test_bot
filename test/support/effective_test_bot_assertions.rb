@@ -10,13 +10,14 @@ module EffectiveTestBotAssertions
   def assert_signed_in(message: 'Expected @current_user to be present when signed in')
     visit(root_path)
     assert_page_normal
-    assert assigns['current_user'].present?, message
+
+    assert assigns[current_user_assigns_key].present?, message
   end
 
   def assert_signed_out(message: 'Expected @current_user to be blank when signed out')
     visit(root_path)
     assert_page_normal
-    assert assigns['current_user'].blank?, message
+    assert assigns[current_user_assigns_key].blank?, message
   end
 
   def assert_no_exceptions(message: "(no_exceptions) Unexpected rails server exception:\n:exception:")

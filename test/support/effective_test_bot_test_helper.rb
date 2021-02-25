@@ -93,6 +93,14 @@ module EffectiveTestBotTestHelper
     key ? assigns[key.to_s] : assigns
   end
 
+  def current_user_assigns_key
+    assigns.keys.find { |key| key.start_with?('current_') && key.end_with?('_user') } || 'current_user'
+  end
+
+  def current_user_assigns_class
+    current_user_assigns_key.sub('current_').gsub('_', '::').classify.safe_constantize
+  end
+
   def access_denied_exception
     return nil unless (page.evaluate_script('window.effective_test_bot.access_denied') rescue nil).present?
 

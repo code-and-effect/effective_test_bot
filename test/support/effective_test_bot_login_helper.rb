@@ -11,10 +11,12 @@ module EffectiveTestBotLoginHelper
   def sign_in(user)
     if user.kind_of?(String)
       login_as(devise_user_class.find_by_email!(user))
-    elsif user.kind_of?(devise_user_class)
+    elsif user.class.name.end_with?('User')
       raise 'user must be persisted' unless user.persisted?
       user.reload
-      login_as(user)
+
+      devise_scope = user.class.name.underscore.gsub('/', '_').to_sym
+      login_as(user, scope: devise_scope)
     elsif user == false
       true # Do nothing
     else
@@ -34,7 +36,7 @@ module EffectiveTestBotLoginHelper
     username = (user_or_email.respond_to?(:username) ? user_or_email.username : user_or_email)
     login = (user_or_email.respond_to?(:login) ? user_or_email.login : user_or_email)
 
-    within('form#new_user') do
+    within('form[id^=new][id$=user]') do
       fill_form(email: email, password: password, username: username, login: login)
       submit_novalidate_form
     end
@@ -43,7 +45,7 @@ module EffectiveTestBotLoginHelper
   def sign_up(email: Faker::Internet.email, password: Faker::Internet.password, **options)
     visit (respond_to?(:new_user_registration_path) ? new_user_registration_path : '/users/sign_up')
 
-    within('form#new_user') do
+    within('form[id^=new][id$=user]') do
       fill_form({email: email, password: password, password_confirmation: password}.merge(options))
       submit_novalidate_form
     end
@@ -52,12 +54,14 @@ module EffectiveTestBotLoginHelper
   end
 
   def current_user
-    return nil unless (assigns['current_user'] && assigns['current_user']['id'])
-    devise_user_class.where(id: assigns['current_user']['id']).first
+    user_id = assigns.dig(current_user_assigns_key, 'id')
+    return if user_id.blank?
+
+    devise_user_class.where(id: user_id).first
   end
 
   def devise_user_class
-    User
+    (current_user_assigns_class || User)
   end
 
 end
