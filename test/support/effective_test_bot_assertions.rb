@@ -210,35 +210,39 @@ module EffectiveTestBotAssertions
 
   def assert_no_email(&block)
     before = ActionMailer::Base.deliveries.map { |mail| {to: mail.to, subject: mail.subject} }
-    yield
+    retval = yield
     after = ActionMailer::Base.deliveries.map { |mail| {to: mail.to, subject: mail.subject} }
 
     diff = (after - before)
 
     assert diff.blank?, "(assert_no_email) #{diff.length} unexpected emails delivered: #{diff}"
+    retval
   end
 
   # assert_effective_log { click_on('download.txt') }
-  def assert_effective_log(status: nil)
+  def assert_effective_log(status: nil, &block)
     raise('EffectiveLogging is not defined') unless defined?(EffectiveLogging)
     raise('expected a block') unless block_given?
 
     logs = (status.present? ? Effective::Log.where(status: status).all : Effective::Log.all)
 
     before = logs.count
-    yield
+    retval = yield
     after = logs.count
 
     assert (after - before == 1), "(assert_effective_log) Expected one log to have been created"
+    retval
   end
 
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
   def assert_email(action = nil, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
+    retval = nil
+
     if block_given?
       before = ActionMailer::Base.deliveries.length
-      yield
+      retval = yield
       difference = (ActionMailer::Base.deliveries.length - before)
 
       if count.present?
@@ -250,7 +254,7 @@ module EffectiveTestBotAssertions
 
     if (action || to || from || subject || body).nil?
       assert ActionMailer::Base.deliveries.present?, message || "(assert_email) Expected email to have been delivered"
-      return
+      return retval
     end
 
     actions = ActionMailer::Base.instance_variable_get(:@mailer_actions)
@@ -264,7 +268,7 @@ module EffectiveTestBotAssertions
       matches &&= (message.subject == subject) if subject
       matches &&= (message.body == body) if body
 
-      return if matches
+      return retval if matches
     end
 
     expected = [
