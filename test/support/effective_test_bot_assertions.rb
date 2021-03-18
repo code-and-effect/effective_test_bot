@@ -1,4 +1,6 @@
 module EffectiveTestBotAssertions
+  include ActiveJob::TestHelper if defined?(ActiveJob::TestHelper)
+
   def assert_page_content(content, message: "(page_content) Expected page content :content: to be present")
     assert page.has_text?(/#{Regexp.escape(content)}/i, wait: 0), message.sub(':content:', content)
   end
@@ -239,6 +241,8 @@ module EffectiveTestBotAssertions
   # assert_email from: 'admin@example.com'
   def assert_email(action = nil, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
     retval = nil
+
+    perform_enqueued_jobs if respond_to?(:perform_enqueued_jobs)
 
     if block_given?
       before = ActionMailer::Base.deliveries.length
