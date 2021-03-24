@@ -73,6 +73,13 @@ module EffectiveTestBotTestHelper
     within_first("div.tab-pane##{name.parameterize}") { yield }
   end
 
+  def with_time_travel(date, &block)
+    Timecop.travel(date)
+    retval = yield
+    Timecop.return
+    retval
+  end
+
   def click_first(label)
     click_link(label, match: :first)
   end

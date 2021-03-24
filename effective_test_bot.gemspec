@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'faker'
   s.add_dependency 'minitest-fail-fast'
   s.add_dependency 'minitest-reporters'
+  s.add_dependency 'timecop'
 
   # RMagick has been implemented and generates animated gifs.
   # s.add_dependency 'rmagick'
