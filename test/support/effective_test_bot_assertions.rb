@@ -1,5 +1,4 @@
 module EffectiveTestBotAssertions
-  include ActiveJob::TestHelper if defined?(ActiveJob::TestHelper)
 
   def assert_page_content(content, message: "(page_content) Expected page content :content: to be present")
     assert page.has_text?(/#{Regexp.escape(content)}/i, wait: 0), message.sub(':content:', content)
@@ -236,17 +235,19 @@ module EffectiveTestBotAssertions
     retval
   end
 
+  #include ActiveJob::TestHelper if defined?(ActiveJob::TestHelper)
+
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
-  def assert_email(action = nil, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
+  def assert_email(action = nil, perform: nil, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
     retval = nil
-
-    perform_enqueued_jobs if respond_to?(:perform_enqueued_jobs)
 
     if block_given?
       before = ActionMailer::Base.deliveries.length
+      perform_enqueued_jobs if perform && respond_to?(:perform_enqueued_jobs)
       retval = yield
+
       difference = (ActionMailer::Base.deliveries.length - before)
 
       if count.present?
@@ -254,6 +255,8 @@ module EffectiveTestBotAssertions
       else
         assert (difference > 0), "(assert_email) Expected at least one email to have been delivered"
       end
+    else
+      perform_enqueued_jobs if perform && respond_to?(:perform_enqueued_jobs)
     end
 
     if (action || to || from || subject || body).nil?

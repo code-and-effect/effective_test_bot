@@ -110,7 +110,7 @@ module EffectiveTestBotTestHelper
   end
 
   def current_user_assigns_class
-    current_user_assigns_key.sub('current_').gsub('_', '::').classify.safe_constantize
+    current_user_assigns_key.sub('current_', '').gsub('_', '::').classify.safe_constantize
   end
 
   def access_denied_exception
