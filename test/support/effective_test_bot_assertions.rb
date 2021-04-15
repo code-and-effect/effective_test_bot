@@ -235,17 +235,21 @@ module EffectiveTestBotAssertions
     retval
   end
 
+
   #include ActiveJob::TestHelper if defined?(ActiveJob::TestHelper)
+  def assert_email_perform_enqueued_jobs
+    perform_enqueued_jobs if respond_to?(:perform_enqueued_jobs)
+  end
 
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
-  def assert_email(action = nil, perform: nil, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
+  def assert_email(action = nil, perform: true, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
     retval = nil
 
     if block_given?
       before = ActionMailer::Base.deliveries.length
-      perform_enqueued_jobs if perform && respond_to?(:perform_enqueued_jobs)
+      assert_email_perform_enqueued_jobs if perform
       retval = yield
 
       difference = (ActionMailer::Base.deliveries.length - before)
@@ -256,7 +260,7 @@ module EffectiveTestBotAssertions
         assert (difference > 0), "(assert_email) Expected at least one email to have been delivered"
       end
     else
-      perform_enqueued_jobs if perform && respond_to?(:perform_enqueued_jobs)
+      assert_email_perform_enqueued_jobs if perform
     end
 
     if (action || to || from || subject || body).nil?
