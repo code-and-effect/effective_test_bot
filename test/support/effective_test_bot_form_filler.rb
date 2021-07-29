@@ -98,7 +98,7 @@ module EffectiveTestBotFormFiller
         field_name = [field.tag_name, field['type']].compact.join('_')
 
         case field_name
-        when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_url', 'input_color'
+        when 'input_text', 'input_email', 'input_password', 'input_tel', 'input_number', 'input_url', 'input_color', 'input_search'
           if field['class'].to_s.include?('effective_date')
             fill_input_date(field, value)
           else
@@ -114,7 +114,7 @@ module EffectiveTestBotFormFiller
           fill_input_select(field, value)
         when 'input_file'
           fill_input_file(field, value)
-        when 'input_submit', 'input_search', 'input_button'
+        when 'input_submit', 'input_button'
           skip_field_screenshot = true # Do nothing
         when 'input_hidden'
           fill_action_text_input(field, value)
