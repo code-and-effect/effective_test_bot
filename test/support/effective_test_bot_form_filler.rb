@@ -219,6 +219,8 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_file(field, value)
+    return if value == :unselect
+
     if field['class'].to_s.include?('asset-box-uploader-fileinput')
       upload_effective_asset(field, value)
     else

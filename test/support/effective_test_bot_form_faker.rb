@@ -152,7 +152,7 @@ module EffectiveTestBotFormFaker
 
       if fills.key?(key)
         fill = fills[key].to_s
-        fill = :unselect if field_name == 'select' && fills[key].blank?
+        fill = :unselect if ['select', 'input_file'].include?(field_name) && fills[key].blank?
       end
 
       break if fill.present?
@@ -162,7 +162,7 @@ module EffectiveTestBotFormFaker
     fill ||= fills[value]
 
     # If this is a file field, make sure the file is present at Rails.root/test/fixtures/
-    if fill.present? && field_name == 'input_file'
+    if fill.present? && fill != :unselect && field_name == 'input_file'
       filename = (fill.to_s.include?('/') ? fill : "#{Rails.root}/test/fixtures/#{fill}")
       raise("Warning: Unable to load fill file #{fill}. Expected file #{filename}") unless File.exists?(filename)
       return filename
