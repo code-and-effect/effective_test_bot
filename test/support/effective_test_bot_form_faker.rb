@@ -123,7 +123,7 @@ module EffectiveTestBotFormFaker
     when 'input_url'
       Faker::Internet.url
 
-    when 'textarea', 'textarea_textarea'
+    when 'textarea', 'textarea_textarea', 'trix-editor'
       Faker::Lorem.paragraph
 
     when 'input_hidden'
