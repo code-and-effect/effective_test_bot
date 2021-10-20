@@ -72,7 +72,7 @@ module EffectiveTestBotFormFiller
       end
 
       # Fill all fields now
-      fields = all('input,select,textarea', visible: false).reject do |field|
+      fields = all('input,select,textarea,trix-editor', visible: false).reject do |field|
         (seen[field_key(field)] rescue true)
       end
 
@@ -108,7 +108,7 @@ module EffectiveTestBotFormFiller
           fill_input_checkbox(field, value)
         when 'input_radio'
           fill_input_radio(field, value)
-        when 'textarea', 'textarea_textarea'
+        when 'textarea', 'textarea_textarea', 'trix-editor'
           fill_input_text_area(field, value)
         when 'select', 'select_select-one', 'select_select-multiple'
           fill_input_select(field, value)
