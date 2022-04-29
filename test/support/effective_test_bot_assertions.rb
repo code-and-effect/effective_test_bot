@@ -85,6 +85,7 @@ module EffectiveTestBotAssertions
   end
 
   def assert_page_status(status = 200, message: '(page_status) Expected :status: HTTP status code')
+    return if response_code == nil # This doesn't work well in some drivers
     assert_equal status, response_code, message.sub(':status:', status.to_s)
   end
 
