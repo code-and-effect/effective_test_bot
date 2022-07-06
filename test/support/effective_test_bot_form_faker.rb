@@ -29,13 +29,13 @@ module EffectiveTestBotFormFaker
     when 'input_text'
       classes = field['class'].to_s.split(' ')
 
-      if classes.include?('date') # Let's assume this is a date input.
+      if classes.include?('effective_date') || classes.include?('date')
         if attribute.include?('end') || attribute.include?('expire') # Make sure end dates are after start dates
           Faker::Date.forward(days: 365).strftime('%Y-%m-%d')
         else
           Faker::Date.backward(days: 365).strftime('%Y-%m-%d')
         end
-      elsif classes.include?('datetime')
+      elsif classes.include?('effective_datetime') || classes.include?('datetime')
         if attribute.include?('end') || attribute.include?('expire')
           Faker::Date.forward(days: 365).strftime('%Y-%m-%d %H:%m')
         else
