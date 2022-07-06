@@ -84,6 +84,14 @@ module EffectiveTestBotAssertions
     end
   end
 
+  def assert_current_path_changed(&block)
+    raise('expected a block') unless block_given?
+
+    before_path = page.current_path
+    yield
+    assert_no_current_path(before_path)
+  end
+
   def assert_page_status(status = 200, message: '(page_status) Expected :status: HTTP status code')
     return if response_code == nil # This doesn't work well in some drivers
     assert_equal status, response_code, message.sub(':status:', status.to_s)
