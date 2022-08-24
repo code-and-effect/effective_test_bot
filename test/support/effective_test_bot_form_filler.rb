@@ -174,6 +174,10 @@ module EffectiveTestBotFormFiller
     if ckeditor_text_area?(field)
       value = "<p>#{value.gsub("'", '')}</p>"
       try_script "CKEDITOR.instances['#{field['id']}'].setData('#{value}')"
+    elsif article_editor_text_area?(field)
+      value = "<p>#{value.gsub("'", '')}</p>"
+      try_script "ArticleEditor('##{field['id']}').editor.setContent({html: '#{value}'})"
+      try_script "$('body').click()"
     else
       field.set(value)
     end
@@ -300,6 +304,10 @@ module EffectiveTestBotFormFiller
     @test_bot_excluded_fields_xpath = nil
   end
 
+  def article_editor_text_area?(field)
+    field.tag_name == 'textarea' && field['class'].to_s.include?('effective_article_editor')
+  end
+
   def ckeditor_text_area?(field)
     return false unless field.tag_name == 'textarea'
     (field['class'].to_s.include?('ckeditor') || all("span[id='cke_#{field['id']}']", wait: false).present?)
@@ -338,6 +346,7 @@ module EffectiveTestBotFormFiller
     return true if @test_bot_excluded_fields_xpath.present? && field.path.include?(@test_bot_excluded_fields_xpath)
 
     if !field.visible?
+      return false if article_editor_text_area?(field)
       return false if ckeditor_text_area?(field)
       return false if custom_control_input?(field)
       return false if file_input?(field)
