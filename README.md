@@ -145,6 +145,16 @@ As well,
 
 - `assert_page_normal` checks for general errors on the current page. Checks include `assert_page_status`, `assert_no_js_errors`, and `assert_page_title`.
 
+## Object Extras
+
+Includes a `stub_any_instance` helper:
+
+```
+String.stub_any_instance(:length, 42) do
+  assert_equal "hello".length, 42
+end
+```
+
 ## Capybara Extras
 
 The following quality of life helpers are added by this gem:
