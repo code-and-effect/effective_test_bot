@@ -176,11 +176,10 @@ module EffectiveTestBotFormFiller
       try_script "CKEDITOR.instances['#{field['id']}'].setData('#{value}')"
     elsif article_editor_text_area?(field)
       value = "<p>#{value.gsub("'", '')}</p>"
-      try_script "ArticleEditor('##{field['id']}').editor.setFocus('start')"
       try_script "ArticleEditor('##{field['id']}').editor.setContent({html: '#{value}'})"
       try_script "ArticleEditor('##{field['id']}').editor.insertContent({html: '#{value}'})"
-      try_script "ArticleEditor('##{field['id']}').editor.setFocus('end')"
-      field.set(value)
+      try_script "ArticleEditor('##{field['id']}').editor.build()"
+      try_script "ArticleEditor('##{field['id']}').editor.getContent()"
     else
       field.set(value)
     end
