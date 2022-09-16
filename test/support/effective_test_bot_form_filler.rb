@@ -177,8 +177,10 @@ module EffectiveTestBotFormFiller
     elsif article_editor_text_area?(field)
       value = "<p>#{value.gsub("'", '')}</p>"
       try_script "ArticleEditor('##{field['id']}').editor.setFocus('start')"
+      try_script "ArticleEditor('##{field['id']}').editor.setContent({html: '#{value}'})"
       try_script "ArticleEditor('##{field['id']}').editor.insertContent({html: '#{value}'})"
       try_script "ArticleEditor('##{field['id']}').editor.setFocus('end')"
+      field.set(value)
     else
       field.set(value)
     end
