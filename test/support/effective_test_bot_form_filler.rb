@@ -180,6 +180,7 @@ module EffectiveTestBotFormFiller
       try_script "ArticleEditor('##{field['id']}').editor.insertContent({html: '#{value}'})"
       try_script "ArticleEditor('##{field['id']}').editor.build()"
       try_script "ArticleEditor('##{field['id']}').editor.getContent()"
+      try_script "$('body').click()"
     else
       field.set(value)
     end
