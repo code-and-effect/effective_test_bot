@@ -8,7 +8,7 @@ module EffectiveTestBotScreenshotsHelper
 
   def save_test_bot_screenshot
     return unless EffectiveTestBot.gifs?
-    return unless (page.current_path rescue false).present?
+    return unless (page.current_url rescue false).present?
 
     page.save_screenshot("#{current_test_temp_path}/#{current_test_screenshot_id}.png")
     true

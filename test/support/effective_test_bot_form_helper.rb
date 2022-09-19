@@ -141,7 +141,7 @@ module EffectiveTestBotFormHelper
 
     synchronize ? synchronize! : sleep(2)
 
-    save_test_bot_screenshot if EffectiveTestBot.screenshots? && page.current_path.present?
+    save_test_bot_screenshot if EffectiveTestBot.screenshots?
 
     true
   end
