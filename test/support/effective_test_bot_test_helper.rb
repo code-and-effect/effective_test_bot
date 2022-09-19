@@ -68,6 +68,10 @@ module EffectiveTestBotTestHelper
     Array(all(selector).first).each { |field| within(field) { yield } }
   end
 
+  def within_last(selector, &block)
+    Array(all(selector).last).each { |field| within(field) { yield } }
+  end
+
   def within_tab(name, &block)
     first("a.nav-link#tab-#{name.parameterize}").click
     within_first("div.tab-pane##{name.parameterize}") { yield }
