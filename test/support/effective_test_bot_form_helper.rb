@@ -152,7 +152,8 @@ module EffectiveTestBotFormHelper
 
     if label.present?
       submit = (find("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']", match: :first) rescue nil)
-      submit ||= find(:link_or_button, label, match: :first)
+      submit ||= (find(:link_or_button, label, match: :first) rescue nil)
+      submit ||= all('a', text: label).first
 
       if last
         submit = all("input[type='submit'][value='#{label}'],button[type='submit'][value='#{label}']").last
