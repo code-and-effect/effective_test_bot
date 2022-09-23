@@ -105,7 +105,8 @@ module EffectiveTestBotTestHelper
   end
 
   def assigns(key = nil)
-    assigns = (page.evaluate_script('window.effective_test_bot.assigns') rescue nil) || {}
+    assigns = (page.evaluate_script('window.effective_test_bot.assigns') rescue nil)
+    assigns = {} unless assigns.kind_of?(Hash)
     key ? assigns[key.to_s] : assigns
   end
 

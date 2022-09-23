@@ -38,7 +38,7 @@ module EffectiveTestBotFormHelper
     assert_no_assigns_errors unless test_bot_skip?(:no_assigns_errors)
 
     # This is a blocking selector that will wait until the page has changed url
-    assert_no_current_path(before_path)
+    assert_no_current_path(before_path.to_s)
 
     assert_no_exceptions unless test_bot_skip?(:exceptions)
     assert_authorization unless test_bot_skip?(:authorization)
