@@ -78,6 +78,8 @@ module EffectiveTestBotFormHelper
     stripe_iframe = find('iframe[name=stripe_checkout_app]')
     assert stripe_iframe.present?, 'unable to find stripe iframe'
 
+    before_path = page.current_path
+
     within_frame(stripe_iframe) do
       fill_in('Card number', with: '4242424242424242')
       fill_in('Expiry', with: "12#{Time.zone.now.year - 1999}")
@@ -85,7 +87,32 @@ module EffectiveTestBotFormHelper
       find_submit.click
     end
 
-    synchronize! # Doesn't seem to work
+    # This is a blocking selector that will wait until the page has changed url
+    assert_no_current_path(before_path.to_s, wait: Capybara.default_max_wait_time * 10)
+
+    if success_content
+      assert page.has_content?(success_content, wait: Capybara.default_max_wait_time * 10), "#{success_content} not found"
+    end
+
+    true
+  end
+
+  def submit_moneris_checkout(success_content: nil)
+    moneris_checkout_iframe = find('iframe[id=monerisCheckout-Frame]')
+    assert moneris_checkout_iframe.present?, 'unable to find moneris checkout iframe'
+
+    before_path = page.current_path
+
+    within_frame(moneris_checkout_iframe) do
+      fill_in('Cardholder Name', with: 'Test User')
+      fill_in('Card Number', with: '4242424242424242')
+      fill_in('MMYY', with: "12#{Time.zone.now.year - 1999}")
+      fill_in('CVV', with: '123')
+      find_submit.click
+    end
+
+    # This is a blocking selector that will wait until the page has changed url
+    assert_no_current_path(before_path.to_s, wait: Capybara.default_max_wait_time * 10)
 
     if success_content
       assert page.has_content?(success_content, wait: Capybara.default_max_wait_time * 10), "#{success_content} not found"
