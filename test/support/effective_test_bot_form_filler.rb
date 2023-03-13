@@ -367,7 +367,7 @@ module EffectiveTestBotFormFiller
       field['name'].presence,
       ("##{field['id']}" if field['id'].present?),
       field_name,
-      (".#{field['class'].split(' ').join('.')}" if field['class'].present?)
+      (".#{field['class'].to_s.split(' ').join('.')}" if field['class'].present?)
     ].compact.join(' ')
   end
 
