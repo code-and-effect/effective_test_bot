@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'timeout'
 
 module EffectiveTestBotFormHelper
@@ -61,7 +63,7 @@ module EffectiveTestBotFormHelper
     assert stripe_iframe.present?, 'unable to find stripe iframe'
 
     within_frame(stripe_iframe) do
-      card_number.to_s.chars.each { |key| find_field('Card number').send_keys(key) }
+      card_number.to_s.chars.each { |key| first("input[name=cardnumber]").send_keys(key) }
       fill_in('MM / YY', with: mm.to_s + (Time.zone.now.year + 2).to_s.last(2))
       fill_in('CVC', with: '123')
       fill_in('ZIP', with: '90210')
