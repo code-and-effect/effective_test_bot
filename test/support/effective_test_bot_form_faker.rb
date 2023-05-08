@@ -52,6 +52,8 @@ module EffectiveTestBotFormFaker
         max = (Float(field['max']) rescue 1000)
         number = Random.new.rand(min..max)
         number.kind_of?(Float) ? number.round(2) : number
+      elsif classes.include?('url') || classes.include?('effective_url') || attribute.include?('url')
+        'https://www.slashdot.org'
       elsif attribute.include?('first_name')
         Faker::Name.first_name
       elsif attribute.include?('last_name')
