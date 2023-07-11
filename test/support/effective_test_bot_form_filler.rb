@@ -324,6 +324,10 @@ module EffectiveTestBotFormFiller
     field['class'].to_s.include?('custom-control-input')
   end
 
+  def effective_radios_input?(field)
+    field['class'].to_s.include?('effective-radios-input')
+  end
+
   def effective_date_input?(field)
     field['class'].to_s.include?('effective_date')
   end
@@ -352,6 +356,7 @@ module EffectiveTestBotFormFiller
       return false if article_editor_text_area?(field)
       return false if ckeditor_text_area?(field)
       return false if custom_control_input?(field)
+      return false if effective_radios_input?(field)
       return false if file_input?(field)
       return false if action_text_input?(field)
       return true
