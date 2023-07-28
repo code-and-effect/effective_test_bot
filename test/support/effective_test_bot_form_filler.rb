@@ -179,7 +179,7 @@ module EffectiveTestBotFormFiller
 
       # There are weird mouse events that prevent form submission.
       try_script "ArticleEditor('##{field['id']}').stop()"
-      field.set(value)
+      try_script "$('textarea##{field['id']}').val('#{value}')"
 
       try_script "ArticleEditor('##{field['id']}').start()"
       try_script "ArticleEditor('##{field['id']}').disable()"
