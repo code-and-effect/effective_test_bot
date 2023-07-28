@@ -176,11 +176,13 @@ module EffectiveTestBotFormFiller
       try_script "CKEDITOR.instances['#{field['id']}'].setData('#{value}')"
     elsif article_editor_text_area?(field)
       value = "<p>#{value.gsub("'", '')}</p>"
-      try_script "ArticleEditor('##{field['id']}').editor.setContent({html: '#{value}'})"
-      try_script "ArticleEditor('##{field['id']}').editor.insertContent({html: '#{value}'})"
-      try_script "ArticleEditor('##{field['id']}').editor.build()"
-      try_script "ArticleEditor('##{field['id']}').editor.getContent()"
-      try_script "$('body').click()"
+
+      # There are weird mouse events that prevent form submission.
+      try_script "ArticleEditor('##{field['id']}').stop()"
+      field.set(value)
+
+      try_script "ArticleEditor('##{field['id']}').start()"
+      try_script "ArticleEditor('##{field['id']}').disable()"
     else
       field.set(value)
     end
