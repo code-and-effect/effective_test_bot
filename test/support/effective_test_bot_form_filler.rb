@@ -175,6 +175,8 @@ module EffectiveTestBotFormFiller
       value = "<p>#{value.gsub("'", '')}</p>"
       try_script "CKEDITOR.instances['#{field['id']}'].setData('#{value}')"
     elsif article_editor_text_area?(field)
+      value = "<p>#{value.gsub("'", '')}</p>"
+
       # There are weird mouse events that prevent form submission.
       try_script "ArticleEditor('##{field['id']}').stop()"
       field.set(value)
