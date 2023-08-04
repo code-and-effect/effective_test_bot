@@ -16,12 +16,11 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,lib,test}/**/*'] + ['MIT-LICENSE', 'README.md']
 
-  s.add_dependency 'rails', ['>= 5.1']
+  s.add_dependency 'rails'
 
   # Match Rails 6.0.0.rc1 new Gemfile
-  s.add_dependency 'capybara', '>= 2.15'
+  s.add_dependency 'capybara'
   s.add_dependency 'selenium-webdriver'
-  # s.add_dependency 'webdrivers'
 
   s.add_dependency 'effective_resources'
   s.add_dependency 'faker'
