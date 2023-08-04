@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   # Match Rails 6.0.0.rc1 new Gemfile
   s.add_dependency 'capybara', '>= 2.15'
   s.add_dependency 'selenium-webdriver'
-  s.add_dependency 'webdrivers'
+  # s.add_dependency 'webdrivers'
 
   s.add_dependency 'effective_resources'
   s.add_dependency 'faker'
