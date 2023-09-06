@@ -63,7 +63,7 @@ module EffectiveTestBotFormHelper
     assert stripe_iframe.present?, 'unable to find stripe iframe'
 
     within_frame(stripe_iframe) do
-      card_number.to_s.chars.each { |key| first("input[name=cardnumber]").send_keys(key) }
+      fill_in('Card number', with: '4242424242424242')
       fill_in('MM / YY', with: mm.to_s + (Time.zone.now.year + 2).to_s.last(2))
       fill_in('CVC', with: '123')
       fill_in('ZIP', with: '90210')
