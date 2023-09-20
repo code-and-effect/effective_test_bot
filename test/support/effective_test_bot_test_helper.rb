@@ -77,6 +77,12 @@ module EffectiveTestBotTestHelper
     within_first("div.tab-pane##{name.parameterize}") { yield }
   end
 
+  def within_datatable_new_form(&block)
+    click_on 'New'
+    within_first('.col-inline-form') { yield }
+  end
+  alias_method :within_datatables_new_form, :within_datatable_new_form
+
   def with_time_travel(date, &block)
     Timecop.travel(date)
     retval = yield
