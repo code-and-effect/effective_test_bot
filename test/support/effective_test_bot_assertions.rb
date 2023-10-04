@@ -256,10 +256,17 @@ module EffectiveTestBotAssertions
   def assert_email(action = nil, perform: true, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
     retval = nil
 
+    # Clear the queue of any previous emails first
+    if perform
+      assert_email_perform_enqueued_jobs
+      raise('expected empty mailer queue. unable to clear it.') unless (assert_email_perform_enqueued_jobs.to_i == 0)
+    end
+
+    before = ActionMailer::Base.deliveries.length
+
     if block_given?
-      before = ActionMailer::Base.deliveries.length
-      assert_email_perform_enqueued_jobs if perform
       retval = yield
+      assert_email_perform_enqueued_jobs if perform
 
       difference = (ActionMailer::Base.deliveries.length - before)
 
@@ -268,8 +275,6 @@ module EffectiveTestBotAssertions
       else
         assert (difference > 0), "(assert_email) Expected at least one email to have been delivered"
       end
-    else
-      assert_email_perform_enqueued_jobs if perform
     end
 
     if (action || to || from || subject || body).nil?
