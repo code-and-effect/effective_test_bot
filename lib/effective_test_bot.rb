@@ -123,9 +123,14 @@ module EffectiveTestBot
 
     EffectiveTestBot.passed_tests[name] = true
 
-    # Make test pass directory
-    Dir.mkdir("#{Rails.root}/tmp") unless Dir.exist?("#{Rails.root}/tmp")
-    Dir.mkdir("#{Rails.root}/tmp/test_bot") unless Dir.exist?("#{Rails.root}/tmp/test_bot")
+    # Make test pass directory. These can inconsistently fail when doing parallel tests
+    unless Dir.exist?("#{Rails.root}/tmp")
+      (Dir.mkdir("#{Rails.root}/tmp") rescue false)
+    end
+
+    unless Dir.exist?("#{Rails.root}/tmp/test_bot")
+      (Dir.mkdir("#{Rails.root}/tmp/test_bot") rescue false)
+    end
 
     File.open(passed_tests_filename, 'a') { |file| file.puts(name) }
   end
