@@ -108,7 +108,7 @@ module EffectiveTestBotFormHelper
     within_frame(moneris_checkout_iframe) do
       fill_in('Cardholder Name', with: 'Test User')
       fill_in('Card Number', with: '4242424242424242')
-      fill_in('MMYY', with: "12#{Time.zone.now.year - 1999}")
+      fill_in('MM/YY', with: "12#{Time.zone.now.year - 1999}")
       fill_in('CVV', with: '123')
       find_submit.click
     end
