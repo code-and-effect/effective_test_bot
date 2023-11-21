@@ -151,9 +151,14 @@ module EffectiveTestBotFormFiller
   def fill_input_checkbox(field, value)
     return if [nil, false].include?(value)
 
+    if field['class'].to_s.include?('custom-control-input')
+      label = all("label[for='#{field['id']}']", wait: false).first
+      return label.click() if label
+    end
+
     begin
       field.set(value)
-    rescue => e
+    rescue Exception => e
       label = all("label[for='#{field['id']}']", wait: false).first
       label.click() if label
     end
@@ -162,9 +167,14 @@ module EffectiveTestBotFormFiller
   def fill_input_radio(field, value)
     return if [nil, false].include?(value)
 
+    if field['class'].to_s.include?('custom-control-input')
+      label = all("label[for='#{field['id']}']", wait: false).first
+      return label.click() if label
+    end
+
     begin
       field.set(value)
-    rescue => e
+    rescue Exception => e
       label = all("label[for='#{field['id']}']", wait: false).first
       label.click() if label
     end
