@@ -10,6 +10,7 @@ module EffectiveTestBot
       include EffectiveTestBotFormHelper
       include EffectiveTestBotLoginHelper
       include EffectiveTestBotMinitestHelper
+      include EffectiveTestBotPerformance
       include EffectiveTestBotScreenshotsHelper
       include EffectiveTestBotTestHelper
 
