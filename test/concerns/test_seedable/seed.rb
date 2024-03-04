@@ -34,12 +34,12 @@ module TestSeedable
 
       case seed
       when :all
-        load(db_seeds) if File.exists?(db_seeds)
-        load(test_seeds) if File.exists?(test_seeds)
+        load(db_seeds) if File.exist?(db_seeds)
+        load(test_seeds) if File.exist?(test_seeds)
       when :db
-        load(db_seeds) if File.exists?(db_seeds)
+        load(db_seeds) if File.exist?(db_seeds)
       when :test
-        load(test_seeds) if File.exists?(test_seeds)
+        load(test_seeds) if File.exist?(test_seeds)
       else
         raise('unexpected seed argument. use :all, :db or :test')
       end

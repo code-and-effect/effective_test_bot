@@ -166,7 +166,7 @@ module EffectiveTestBotFormFaker
     # If this is a file field, make sure the file is present at Rails.root/test/fixtures/
     if fill.present? && fill != :unselect && field_name == 'input_file'
       filename = (fill.to_s.include?('/') ? fill : "#{Rails.root}/test/fixtures/#{fill}")
-      raise("Warning: Unable to load fill file #{fill}. Expected file #{filename}") unless File.exists?(filename)
+      raise("Warning: Unable to load fill file #{fill}. Expected file #{filename}") unless File.exist?(filename)
       return filename
     end
 
