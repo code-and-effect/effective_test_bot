@@ -149,12 +149,15 @@ module EffectiveTestBotFormFiller
   end
 
   def fill_input_checkbox(field, value)
-    return if [nil, false].include?(value)
-
     if field['class'].to_s.include?('custom-control-input')
       label = all("label[for='#{field['id']}']", wait: false).first
-      return label.click() if label
+      if label
+        label.click if field.checked? ^ value # click if check status is different from value
+        return
+      end
     end
+
+    return if [nil, false].include?(value)
 
     begin
       field.set(value)
