@@ -94,6 +94,14 @@ module EffectiveTestBotTestHelper
     click_link(label, match: :first)
   end
 
+  def click_dropdown_link(label)
+    dropdown = first(".btn.dropdown-toggle")
+    raise("Unable to find a .btn.dropdown-toggle") unless dropdown.present?
+
+    dropdown.click
+    within_first("div.dropdown-menu") { submit_form(label) }
+  end
+
   def effective_bootstrap_custom_data_confirm?
     (page.evaluate_script('$.rails.effective_bootstrap_custom_data_confirm') rescue nil) ||
     (page.evaluate_script('window.Rails.effective_bootstrap_custom_data_confirm') rescue nil)
