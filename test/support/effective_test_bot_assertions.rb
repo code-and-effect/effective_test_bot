@@ -206,7 +206,7 @@ module EffectiveTestBotAssertions
       assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
     else
       assigns.each do |key, value|
-        errors = value['errors'] if value.respond_to?(:[])
+        errors = (value['errors'] rescue false) if value.respond_to?(:[])
         assert errors.blank?, message || "(no_assigns_errors) Unexpected @#{key} rails validation errors:\n#{errors}"
       end
     end

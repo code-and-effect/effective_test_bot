@@ -80,6 +80,7 @@ module EffectiveTestBotTestHelper
   def within_datatable_new_form(&block)
     click_on 'New'
     within_first('.col-inline-form') { yield }
+    sleep(1)
   end
   alias_method :within_datatables_new_form, :within_datatable_new_form
 
