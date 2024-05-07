@@ -123,6 +123,29 @@ module EffectiveTestBotFormHelper
     true
   end
 
+  def submit_deluxe_checkout(success_content: nil)
+    deluxe_checkout_iframe = find('iframe[id=dppjssdk]')
+    assert deluxe_checkout_iframe.present?, 'unable to find deluxe checkout iframe'
+
+    before_path = page.current_path
+
+    within_frame(deluxe_checkout_iframe) do
+      find('input[id=ccNum]').set("4242424242424242")
+      find('input[id=ccExpry]').set("12#{Time.zone.now.year - 1999}")
+      find('input[id=ccCvv]').set("123")
+      find_submit.click
+    end
+
+    # This is a blocking selector that will wait until the page has changed url
+    assert_no_current_path(before_path.to_s, wait: Capybara.default_max_wait_time * 10)
+
+    if success_content
+      assert page.has_content?(success_content, wait: Capybara.default_max_wait_time * 10), "#{success_content} not found"
+    end
+
+    true
+  end
+
   def clear_form
     all('input,select,textarea', wait: false).each do |field|
       if effective_select_input?(field)
