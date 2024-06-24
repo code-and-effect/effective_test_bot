@@ -253,13 +253,16 @@ module EffectiveTestBotAssertions
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
-  def assert_email(action = nil, perform: true, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, &block)
+  def assert_email(action = nil, perform: true, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, plain_layout: nil, html_layout: nil, &block)
     retval = nil
 
     # Clear the queue of any previous emails first
     if perform
       assert_email_perform_enqueued_jobs
       raise('expected empty mailer queue. unable to clear it.') unless (assert_email_perform_enqueued_jobs.to_i == 0)
+
+      ActionMailer::Base.deliveries.clear
+      raise('expected empty mailer deliveries. unable to clear it.') unless (ActionMailer::Base.deliveries.length.to_i == 0)
     end
 
     before = ActionMailer::Base.deliveries.length
@@ -277,7 +280,7 @@ module EffectiveTestBotAssertions
       end
     end
 
-    if (action || to || from || subject || body).nil?
+    if (action || to || from || subject || body || plain_layout || html_layout).nil?
       assert ActionMailer::Base.deliveries.present?, message || "(assert_email) Expected email to have been delivered"
       return retval
     end
@@ -287,11 +290,23 @@ module EffectiveTestBotAssertions
     ActionMailer::Base.deliveries.each do |message|
       matches = true
 
+      html_body = message.parts.find { |part| part.content_type.start_with?('text/html') }.try(:body).to_s.presence
+      plain_body = message.parts.find { |part| part.content_type.start_with?('text/plain') }.try(:body).to_s.presence
+      message_body = message.body.to_s
+
       matches &&= (actions.include?(action.to_s)) if action
       matches &&= (Array(message.to).include?(to)) if to
       matches &&= (Array(message.from).include?(from)) if from
       matches &&= (message.subject == subject) if subject
-      matches &&= (message.body == body) if body
+
+      if body && html_layout
+        matches &&= html_body.to_s.gsub("\r\n", '').gsub("\n", '').include?(">#{body}<")
+      elsif body
+        matches &&= (plain_body == body || message_body == body)
+      end
+
+      matches &&= (html_body.present? && html_body.include?('<meta')) if html_layout
+      matches &&= (html_body.blank? && plain_body.blank? && message_body.exclude?('<meta')) if plain_layout
 
       return retval if matches
     end
@@ -302,6 +317,8 @@ module EffectiveTestBotAssertions
       ("from: {from}" if from),
       ("subject: #{subject}" if subject),
       ("body: #{body}" if body),
+      ("an HTML layout" if html_layout),
+      ("no HTML layout" if plain_layout),
     ].compact.to_sentence
 
     assert false, message || "(assert_email) Expected email with #{expected} to have been delivered"
