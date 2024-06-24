@@ -253,14 +253,17 @@ module EffectiveTestBotAssertions
   # assert_email :new_user_sign_up
   # assert_email :new_user_sign_up, to: 'newuser@example.com'
   # assert_email from: 'admin@example.com'
-  def assert_email(action = nil, perform: true, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, plain_layout: nil, html_layout: nil, &block)
+  def assert_email(action = nil, perform: true, clear: nil, to: nil, from: nil, subject: nil, body: nil, message: nil, count: nil, plain_layout: nil, html_layout: nil, &block)
     retval = nil
+    clear = (count || 0) < 2 if clear.nil?
 
     # Clear the queue of any previous emails first
     if perform
       assert_email_perform_enqueued_jobs
       raise('expected empty mailer queue. unable to clear it.') unless (assert_email_perform_enqueued_jobs.to_i == 0)
+    end
 
+    if clear
       ActionMailer::Base.deliveries.clear
       raise('expected empty mailer deliveries. unable to clear it.') unless (ActionMailer::Base.deliveries.length.to_i == 0)
     end
