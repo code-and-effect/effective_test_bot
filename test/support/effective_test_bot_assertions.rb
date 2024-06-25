@@ -283,6 +283,8 @@ module EffectiveTestBotAssertions
       end
     end
 
+    return true if count == 0
+
     if (action || to || from || subject || body || plain_layout || html_layout).nil?
       assert ActionMailer::Base.deliveries.present?, message || "(assert_email) Expected email to have been delivered"
       return retval
