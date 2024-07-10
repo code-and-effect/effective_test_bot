@@ -58,12 +58,12 @@ module EffectiveTestBotFormHelper
   end
 
   # Fills in the Stripe Elements form
-  def fill_stripe(card_number: '4242 4242 4242 4242', mm: '01')
+  def fill_stripe(card_number: '5555 5555 5555 4444', mm: '01')
     stripe_iframe = find("iframe[src^='https://js.stripe.com/v3']")
     assert stripe_iframe.present?, 'unable to find stripe iframe'
 
     within_frame(stripe_iframe) do
-      fill_in('Card number', with: '4242424242424242')
+      fill_in('Card number', with: '5555555555554444')
       fill_in('MM / YY', with: mm.to_s + (Time.zone.now.year + 2).to_s.last(2))
       fill_in('CVC', with: '123')
       fill_in('ZIP', with: '90210')
@@ -83,7 +83,7 @@ module EffectiveTestBotFormHelper
     before_path = page.current_path
 
     within_frame(stripe_iframe) do
-      fill_in('Card number', with: '4242424242424242')
+      fill_in('Card number', with: '5555555555554444')
       fill_in('Expiry', with: "12#{Time.zone.now.year - 1999}")
       fill_in('CVC', with: '123')
       find_submit.click
@@ -107,7 +107,7 @@ module EffectiveTestBotFormHelper
 
     within_frame(moneris_checkout_iframe) do
       fill_in('Cardholder Name', with: 'Test User')
-      fill_in('Card Number', with: '4242424242424242')
+      fill_in('Card Number', with: '5555555555554444')
       fill_in('MM/YY', with: "12#{Time.zone.now.year - 1999}")
       fill_in('CVV', with: '123')
       find_submit.click
@@ -130,7 +130,8 @@ module EffectiveTestBotFormHelper
     before_path = page.current_path
 
     within_frame(deluxe_checkout_iframe) do
-      find('input[id=ccNum]').set("4242424242424242")
+      assert_content 'Expiry'
+      find('input[id=ccNum]').set("5555555555554444")
       find('input[id=ccExpry]').set("12#{Time.zone.now.year - 1999}")
       find('input[id=ccCvv]').set("123")
       find_submit.click
