@@ -133,7 +133,7 @@ module EffectiveTestBotFormHelper
       assert_content 'Expiry'
       find('input[id=ccNum]').set("5555555555554444")
       find('input[id=ccExpry]').set("12#{Time.zone.now.year - 1999}")
-      find('input[id=ccCvv]').set("123")
+      (find('input[id=ccCvv]') rescue nil).try(:set, "123")
       find_submit.click
     end
 
