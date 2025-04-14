@@ -44,7 +44,7 @@ module EffectiveTestBotFormFiller
 
     # If there is no visible submits, go back to the first tab
     if all("input[type='submit']", wait: false).length == 0
-      tabs.first.click()
+      (tabs.first.click() rescue :obsolete)
       synchronize!
       save_test_bot_screenshot
     end
