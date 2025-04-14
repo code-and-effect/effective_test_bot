@@ -42,9 +42,12 @@ module EffectiveTestBotFormFiller
       within_if('div' + tab_href) { fill_form_fields(fills) }
     end
 
+    # Refresh the tabs, as they may have changed
+    tabs = all("a[data-toggle='tab']", wait: false)
+
     # If there is no visible submits, go back to the first tab
     if all("input[type='submit']", wait: false).length == 0
-      (tabs.first.click() rescue :obsolete)
+      tabs.first.click()
       synchronize!
       save_test_bot_screenshot
     end
