@@ -36,6 +36,8 @@ module EffectiveTestBotFormFiller
       synchronize!
       save_test_bot_screenshot
 
+      next if (tab['id'].to_s rescue :obsolete) == :obsolete
+
       tab_href = '#' + tab['href'].to_s.split('#').last
       within_if('div' + tab_href) { fill_form_fields(fills) }
     end
@@ -352,6 +354,7 @@ module EffectiveTestBotFormFiller
   end
 
   def effective_select_input?(field)
+    return false if (field['id'].to_s rescue :obsolete) == :obsolete
     field['class'].to_s.include?('select2') || field['class'].to_s.include?('effective_select')
   end
 
