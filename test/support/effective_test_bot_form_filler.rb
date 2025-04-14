@@ -357,8 +357,9 @@ module EffectiveTestBotFormFiller
 
   def skip_form_field?(field)
     field.reload # Handle a field changing visibility/disabled state from previous form field manipulations
-    field_id = field['id'].to_s
+    field_id = (field['id'].to_s rescue :obsolete)
 
+    return true if field_id == :obsolete
     return true if field_id.start_with?('datatable_')
     return true if field_id.start_with?('filters_scope_')
     return true if field_id.start_with?('filters_') && field['name'].blank?
@@ -381,14 +382,18 @@ module EffectiveTestBotFormFiller
   end
 
   def field_key(field)
-    field_name = [field.tag_name, field['type']].compact.join('_')
+    begin
+      field_name = [field.tag_name, field['type']].compact.join('_')
 
-    [
-      field['name'].presence,
-      ("##{field['id']}" if field['id'].present?),
-      field_name,
-      (".#{field['class'].to_s.split(' ').join('.')}" if field['class'].present?)
-    ].compact.join(' ')
+      [
+        field['name'].presence,
+        ("##{field['id']}" if field['id'].present?),
+        field_name,
+        (".#{field['class'].to_s.split(' ').join('.')}" if field['class'].present?)
+      ].compact.join(' ')
+    rescue => e
+      :obsolete
+    end
   end
 
 end
