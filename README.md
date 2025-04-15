@@ -54,9 +54,10 @@ Then you're ready to install `effective_test_bot`:
 ```ruby
 group :test do
   gem 'capybara'
-  gem 'selenium-webdriver'
-  gem 'webdrivers'
   gem 'effective_test_bot'
+
+  # Choose one:
+  gem 'selenium-webdriver' # or cuprite
 
   # Optional.  Only required if you want animated gifs.
   gem 'rmagick'

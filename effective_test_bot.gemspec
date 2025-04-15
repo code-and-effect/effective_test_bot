@@ -20,7 +20,10 @@ Gem::Specification.new do |s|
 
   # Match Rails 6.0.0.rc1 new Gemfile
   s.add_dependency 'capybara'
-  s.add_dependency 'selenium-webdriver'
+
+  # Choose one of the following
+  #s.add_dependency 'selenium-webdriver'
+  #s.add_dependency 'cuprite'
 
   s.add_dependency 'effective_resources'
   s.add_dependency 'faker'
