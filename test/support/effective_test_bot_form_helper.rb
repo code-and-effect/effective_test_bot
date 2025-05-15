@@ -28,6 +28,9 @@ module EffectiveTestBotFormHelper
     assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
     assert_jquery_ujs_disable_with(label) unless test_bot_skip?(:jquery_ujs_disable_with)
 
+    # Add a unique class to the body before submission
+    page.execute_script("document.body.classList.add('effective-test-bot-submitting-form');")
+
     before_path = page.current_path
     before_path = 'ignore' unless assert_path_changed
 
@@ -39,7 +42,8 @@ module EffectiveTestBotFormHelper
 
     assert_no_assigns_errors unless test_bot_skip?(:no_assigns_errors)
 
-    # This is a blocking selector that will wait until the page has changed url
+    # Make sure the page has fully loaded afer submission
+    assert_no_selector('body.effective-test-bot-submitting-form', wait: Capybara.default_max_wait_time * 10)
     assert_no_current_path(before_path.to_s, wait: Capybara.default_max_wait_time * 10)
 
     assert_no_exceptions unless test_bot_skip?(:exceptions)
