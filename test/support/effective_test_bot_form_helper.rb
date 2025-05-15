@@ -19,17 +19,24 @@ module EffectiveTestBotFormHelper
     true
   end
 
-  def submit_page(label = nil, last: false, assert_path_changed: true, debug: false)
-    submit_form(label, last: last, assert_path_changed: assert_path_changed, debug: debug)
+  def submit_page(label = nil, last: false, assert_path_changed: true, wait: true, debug: false)
+    submit_form(label, last: last, assert_path_changed: assert_path_changed, wait: wait, debug: debug)
+  end
+
+  def submit_ajax_form(label = nil, last: false, assert_path_changed: false, wait: false, debug: false)
+    submit_form(label, last: last, assert_path_changed: assert_path_changed, wait: wait, debug: debug)
   end
 
   # This submits the form, while checking for html5 form validation errors and unpermitted params
-  def submit_form(label = nil, last: false, assert_path_changed: false, debug: false)
+  def submit_form(label = nil, last: false, assert_path_changed: false, wait: true, debug: false)
     assert_no_html5_form_validation_errors unless test_bot_skip?(:no_html5_form_validation_errors)
     assert_jquery_ujs_disable_with(label) unless test_bot_skip?(:jquery_ujs_disable_with)
 
-    # Add a unique class to the body before submission
-    page.execute_script("document.body.classList.add('effective-test-bot-submitting-form');")
+    # Add a div to track form submission
+    if wait
+      page.execute_script("$('body').prepend($('<div id=\"effective-test-bot-submitting-form\"></div>'));")
+      page.assert_selector(:xpath, '//div[@id="effective-test-bot-submitting-form"]')
+    end
 
     before_path = page.current_path
     before_path = 'ignore' unless assert_path_changed
@@ -42,9 +49,22 @@ module EffectiveTestBotFormHelper
 
     assert_no_assigns_errors unless test_bot_skip?(:no_assigns_errors)
 
-    # Make sure the page has fully loaded afer submission
-    assert_no_selector('body.effective-test-bot-submitting-form', wait: Capybara.default_max_wait_time * 10)
     assert_no_current_path(before_path.to_s, wait: Capybara.default_max_wait_time * 10)
+
+    # Wait for form-submitting div to disappear via JS (not Capybara element)
+    if wait
+      begin
+        Timeout.timeout(Capybara.default_max_wait_time * 10) do
+          loop do
+            gone = page.evaluate_script("document.querySelector('#effective-test-bot-submitting-form') === null")
+            break if gone
+            sleep 0.1
+          end
+        end
+      rescue Timeout::Error
+        raise Timeout::Error, "Form submission did not disappear after #{Capybara.default_max_wait_time * 10} seconds. The form submission may have stalled or failed."
+      end
+    end
 
     assert_no_exceptions unless test_bot_skip?(:exceptions)
     assert_authorization unless test_bot_skip?(:authorization)
@@ -193,11 +213,14 @@ module EffectiveTestBotFormHelper
     elsif submit['data-confirm']
       page.accept_confirm { submit.click }
     else
-      submit.click
+      begin
+        submit.click
+      rescue => e
+        submit.click
+      end
     end
 
-    synchronize ? synchronize! : sleep(2)
-
+    synchronize! if synchronize
     save_test_bot_screenshot if EffectiveTestBot.screenshots?
 
     true
