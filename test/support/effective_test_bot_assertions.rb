@@ -247,7 +247,9 @@ module EffectiveTestBotAssertions
 
   #include ActiveJob::TestHelper if defined?(ActiveJob::TestHelper)
   def assert_email_perform_enqueued_jobs
-    perform_enqueued_jobs if respond_to?(:perform_enqueued_jobs)
+    if respond_to?(:perform_enqueued_jobs)
+      perform_enqueued_jobs while (jobs = perform_enqueued_jobs) > 0
+    end
   end
 
   # assert_email :new_user_sign_up
