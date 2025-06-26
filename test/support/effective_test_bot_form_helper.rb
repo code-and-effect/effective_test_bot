@@ -19,6 +19,19 @@ module EffectiveTestBotFormHelper
     true
   end
 
+  # Asserts were on the given wizard step, fills the form and submits the page
+  def submit_wizard_step(step, fills = {})
+    if(add_another = fills.delete(:add_another)).present?
+      add_another = 1 if add_another == true
+      raise("expected add_another to be a number, but it was #{add_another}") if add_another.present? && !add_another.is_a?(Integer)
+      add_another.times { click_on('Add Another') }
+    end
+
+    assert_wizard_step(step)
+    fill_form(fills)
+    submit_page
+  end
+
   def submit_page(label = nil, last: false, assert_path_changed: true, wait: true, debug: false)
     submit_form(label, last: last, assert_path_changed: assert_path_changed, wait: wait, debug: debug)
   end
