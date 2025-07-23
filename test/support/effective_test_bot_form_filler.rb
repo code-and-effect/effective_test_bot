@@ -157,7 +157,7 @@ module EffectiveTestBotFormFiller
     if field['class'].to_s.include?('custom-control-input')
       label = all("label[for='#{field['id']}']", wait: false).first
       if label
-        label.click if field.checked? ^ value # click if check status is different from value
+        field.trigger('click') if field.checked? ^ value # click if check status is different from value
         return
       end
     end
