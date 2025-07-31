@@ -136,6 +136,37 @@ module EffectiveTestBotFormHelper
     true
   end
 
+  def submit_helcim_checkout(success_content: nil)
+    # Click Pay by Credit Card button
+    within('.effective-helcim-checkout') { find('a#helcim-checkout-button').click }
+
+    # Find the iframe
+    helcim_checkout_iframe = find('iframe#helcimPayIframe')
+    assert helcim_checkout_iframe.present?, 'unable to find helcim iframe'
+
+    before_path = page.current_path
+
+    within_frame(helcim_checkout_iframe) do
+      assert_content 'Card number'
+      find('input[id=checkout-card-fields__number]').set("4242424242424242")
+      find('input[id=checkout-card-fields__expiry-date]').set("12#{Time.zone.now.year - 1999}")
+      (find('input[id=checkout-card-fields__security-number]') rescue nil).try(:set, "123")
+      find('button.hds-a-button').click
+
+      assert_no_js_errors
+      refute_content 'Payment not completed'
+    end
+
+    # This is a blocking selector that will wait until the page has changed url
+    assert_no_current_path(before_path.to_s, wait: Capybara.default_max_wait_time * 10)
+
+    if success_content
+      assert page.has_content?(success_content, wait: Capybara.default_max_wait_time * 10), "#{success_content} not found"
+    end
+
+    true
+  end
+
   def submit_moneris_checkout(success_content: nil)
     moneris_checkout_iframe = find('iframe[id=monerisCheckout-Frame]')
     assert moneris_checkout_iframe.present?, 'unable to find moneris checkout iframe'
