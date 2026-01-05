@@ -42,7 +42,10 @@ module EffectiveTestBotLoginHelper
     end
   end
 
-  def sign_up(email: Faker::Internet.email, password: Faker::Internet.password, **options)
+  def sign_up(email: nil, password: nil, **options)
+    email ||= Faker::Internet.email
+    password ||= "#{Faker::Internet.password}#{Faker::Internet.password}#{Faker::Internet.password}"
+
     visit (respond_to?(:new_user_registration_path) ? new_user_registration_path : '/users/sign_up')
 
     within('form[id^=new][id$=user]') do
