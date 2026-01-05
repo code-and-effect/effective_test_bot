@@ -107,8 +107,7 @@ module EffectiveTestBotFormFaker
 
     when 'input_password'
       # Use the same password throughout a single test. Allows passwords and password_confirmations to match.
-      @filled_password_fields ||= Faker::Internet.password
-
+      @filled_password_fields ||= LETTERS.sample(10).join + DIGITS.sample(6).join + Faker::Internet.password
     when 'input_radio'
       value_for_input_radio_field(field, fill_value)
 

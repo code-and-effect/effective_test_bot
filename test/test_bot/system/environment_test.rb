@@ -32,7 +32,7 @@ module TestBot
     end
 
     test '04: activerecord can save a resource' do
-      User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123').save(validate: false)
+      User.new(email: 'unique@testbot.com', password: '!SecurePassword123', password_confirmation: '!SecurePassword123').save(validate: false)
       assert_equal (@@original_users_count + 1), User.unscoped.count
     end
 
@@ -50,10 +50,10 @@ module TestBot
     end
 
     test '08: capybara database connection is shared' do
-      user = User.new(email: 'unique@testbot.com', password: '!Password123', password_confirmation: '!Password123')
+      user = User.new(email: 'unique@testbot.com', password: '!SecurePassword123', password_confirmation: '!SecurePassword123')
       user.save!(validate: false)
 
-      without_screenshots { sign_in_manually(user, '!Password123') }
+      without_screenshots { sign_in_manually(user, '!SecurePassword123') }
       assert_signed_in(message: "expected successful devise manual sign in with user created in this test.\nTry using one of the ActiveRecord shared_connection snippets in test/test_helper.rb")
     end
 

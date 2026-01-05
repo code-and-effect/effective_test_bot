@@ -33,7 +33,7 @@ module TestBotable
     # Instance Methods - Call me from within a test
     def devise_action_test(test:, **options)
       options[:email] ||= "unique-#{Time.zone.now.to_i}@example.com"
-      options[:password] ||= '!Password123'
+      options[:password] ||= '!SecurePassword123'
       options[:username] ||= 'unique-username'
       options[:login] ||= 'unique-login'
       options[:user] ||= User.new
