@@ -3,6 +3,19 @@ module EffectiveTestBotTestHelper
   def synchronize!
     page.document.find('html')
     wait_for_ajax
+    wait_for_turbolinks
+  end
+
+  def wait_for_turbolinks
+    return unless page.evaluate_script('typeof Turbolinks !== "undefined"')
+
+    begin
+      Timeout.timeout(Capybara.default_max_wait_time * 2) do
+        loop until page.evaluate_script('Turbolinks.controller === undefined || !Turbolinks.controller.adapter.progressBar.visible')
+      end
+    rescue => e
+      # Turbolinks not active or not available, continue
+    end
   end
 
   # https://gist.github.com/josevalim/470808#gistcomment-1268491

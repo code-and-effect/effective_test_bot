@@ -260,6 +260,7 @@ module EffectiveTestBotFormHelper
       begin
         submit.click
       rescue => e
+        submit = find_submit(label, last: last) # Re-find in case element became stale
         submit.click
       end
     end
