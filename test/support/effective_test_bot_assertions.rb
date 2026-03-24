@@ -315,7 +315,11 @@ module EffectiveTestBotAssertions
       matches &&= (html_body.present? && html_body.include?('<meta')) if html_layout
       matches &&= (html_body.blank? && plain_body.blank? && message_body.exclude?('<meta')) if plain_layout
 
-      return retval if matches
+      # assert_email is true on any delivery that match
+      if matches
+        assert true # self.assertions += 1
+        return retval 
+      end
     end
 
     expected = [
