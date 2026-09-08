@@ -1,4 +1,4 @@
-# Watch for any rails server exceptions and write the stacktrace to ./tmp/test_bot/exception.txt
+# Watch for any rails server exceptions and write the stacktrace to ./tmp/test_bot/exception-PID.txt
 # This file is checked for by assert_no_exceptions
 
 module EffectiveTestBot
@@ -25,7 +25,7 @@ module EffectiveTestBot
       lines = [exception.message] + exception.backtrace.first(EffectiveTestBot&.backtrace_lines || 10)
 
       dir = File.join(Dir.pwd, 'tmp', 'test_bot')
-      file = File.join(dir, 'exception.txt')
+      file = File.join(dir, "exception-#{Process.pid}.txt")
 
       Dir.mkdir(dir) unless File.exist?(dir)
       File.delete(file) if File.exist?(file)

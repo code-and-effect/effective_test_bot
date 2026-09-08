@@ -23,7 +23,7 @@ module EffectiveTestBotAssertions
 
   def assert_no_exceptions(message: "(no_exceptions) Unexpected rails server exception:\n:exception:")
     # this file is created by EffectiveTestBot::Middleware when an exception is encountered in the rails app
-    file = File.join(Dir.pwd, 'tmp', 'test_bot', 'exception.txt')
+    file = File.join(Dir.pwd, 'tmp', 'test_bot', "exception-#{Process.pid}.txt")
     return unless File.exist?(file)
 
     exception = File.read(file)
@@ -99,7 +99,8 @@ module EffectiveTestBotAssertions
 
   def assert_current_path(path, message: '(current_path) Expected current_path to be :path:')
     path = public_send(path) if path.kind_of?(Symbol)
-    assert_equal path, page.current_path, message.sub(':path:', path.to_s)
+    assert page.has_current_path?(path), message.sub(':path:', path.to_s)
+    wait_for_turbo
   end
 
   # assert_redirect '/about'

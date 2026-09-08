@@ -4,6 +4,19 @@ module EffectiveTestBotTestHelper
     page.document.find('html')
     wait_for_ajax
     wait_for_turbolinks
+    wait_for_turbo
+  end
+
+  def wait_for_turbo
+    return unless page.evaluate_script('typeof Turbo !== "undefined"')
+
+    begin
+      Timeout.timeout(Capybara.default_max_wait_time * 2) do
+        loop until page.evaluate_script("document.querySelector('html[aria-busy=\"true\"], form[aria-busy=\"true\"], turbo-frame[busy]') === null")
+      end
+    rescue => e
+      # Turbo not active or not available, continue
+    end
   end
 
   def wait_for_turbolinks
