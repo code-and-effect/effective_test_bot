@@ -343,7 +343,7 @@ module EffectiveTestBotAssertions
   end
 
   def assert_wizard_step(step)
-    assert page.current_url.end_with?("/#{step}"), "Expected current wizard step to be :#{step}, but it was :#{page.current_url.split('/').last}"
+    assert page.has_current_path?(%r{/#{Regexp.escape(step.to_s)}\z}, url: true), "Expected current wizard step to be :#{step}, but it was :#{page.current_url.split('/').last}"
   end
 
 end
