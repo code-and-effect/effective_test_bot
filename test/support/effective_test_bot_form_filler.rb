@@ -117,6 +117,7 @@ module EffectiveTestBotFormFiller
           fill_input_text_area(field, value)
         when 'select', 'select_select-one', 'select_select-multiple'
           fill_input_select(field, value)
+          wait_for_ajax
         when 'input_file'
           fill_input_file(field, value)
         when 'input_submit', 'input_button'
